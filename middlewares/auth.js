@@ -13,9 +13,10 @@ const auth = async (req, res, next) => {
 
     //if token exists, verify the token
     const decoded = jwt.verify(token, config.get("jwtSecret"));
-    const user = await User.findOne({ id: decoded.id });
+    // const user = await User.findById(decoded.user.id).select('-password');
 
-    req.user = user;
+    //save both the token and the user to the request object except the password
+    req.user = decoded.user;
     req.token = token;
 
     next();

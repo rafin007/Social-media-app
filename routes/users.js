@@ -6,6 +6,7 @@ const config = require("config");
 const { check, validationResult } = require("express-validator");
 
 const User = require("../models/User");
+const auth = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -80,7 +81,7 @@ router.post(
         { expiresIn: 3600 },
         (error, token) => {
           if (error) throw error;
-          res.send({ user, token });
+          res.send({ token });
         }
       );
     } catch (error) {
@@ -89,5 +90,143 @@ router.post(
     }
   }
 );
+
+
+/*  @route PUT /users/follow/:user_id
+    @desc Follow user by id
+    @access Private
+*/
+router.put('/follow/:user_id', auth, async (req, res) => {
+  try {
+    //if the req.user wants to follow himself
+    if (req.params.user_id === req.user.id) {
+      return res.status(400).send({ msg: 'You cannot follow yourself' });
+    }
+
+    const user = await User.findById(req.params.user_id);
+
+    if (!user) {
+      return res.status(404).send({ msg: 'User does not exist' });
+    }
+
+    //check if the req.user is already following the user
+    if (user.followers.filter(follower => follower.user.toString() === req.user.id).length > 0) {
+      return res.status(400).send({ msg: 'Already following this user' });
+    }
+
+    //if not following then follow
+    user.followers.unshift({ user: req.user.id });
+
+    //save user
+    await user.save();
+
+    //get the req.user
+    const reqUser = await User.findById(req.user.id);
+
+    //add the user to req.user's following list
+    reqUser.following.unshift({ user: req.params.user_id });
+
+    await reqUser.save();
+
+    res.send(user.followers);
+
+    //check if the user is already in req.user's following list
+    // if (reqUser.following.filter(follow => follow.user.toString() === req.params.user_id).length > 0) {
+    //   return res.status(400).send({msg: 'A'})
+    // }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+
+
+/*  @route PUT /users/unfollow/:user_id
+    @desc Unfollow user by id
+    @access Private
+*/
+router.put('/unfollow/:user_id', auth, async (req, res) => {
+  try {
+    //check if the req.user wants to unfollow himself
+    if (req.params.user_id === req.user.id) {
+      return res.status(400).send({ msg: 'You cannot unfollow yourself' });
+    }
+
+    const user = await User.findById(req.params.user_id);
+
+    //if user does not exist then exit
+    if (!user) {
+      return res.status(404).send({ msg: 'User not found!' });
+    }
+
+    //check if req.user deos NOT exist in the user's followers' list
+    if (user.followers.filter(follower => follower.user.toString() === req.user.id).length === 0) {
+      return res.status(400).send({ msg: 'User has not been followed yet!' });
+    }
+
+    //get the index to remove from followers' list
+    const index = user.followers.map(follower => follower.user.toString()).indexOf(req.user.id);
+
+    //remove the index
+    user.followers.splice(index, 1);
+
+    //save the user
+    await user.save();
+
+    //get the req user
+    const reqUser = await User.findById(req.user.id);
+
+    //get the index of req.user's following list
+    const reqIndex = reqUser.following.map(follow => follow.user.toString()).indexOf(req.params.user_id);
+
+    //remove that index
+    reqUser.following.splice(reqIndex, 1);
+
+    //save the req.user
+    await reqUser.save();
+
+    res.send(user.followers);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+
+/*  @route GET /users/followers
+    @desc Get followers' list
+    @access Private
+*/
+router.get('/followers', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    res.send(user.followers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+/*  @route GET /users/following
+    @desc Get following's list
+    @access Private
+*/
+router.get('/following', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    res.send(user.following);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
 
 module.exports = router;
