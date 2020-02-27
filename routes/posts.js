@@ -45,10 +45,16 @@ router.post('/', [auth, [
 */
 router.get('/:post_id', auth, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.post_id).populate('user', ['name', 'avatar']);
+        const post = await Post.findById(req.params.post_id).populate('user', ['name', 'avatar', 'followers']);
 
+        //if post not found, throw error
         if (!post) {
             return res.status(404).send({ msg: 'Post not found!' });
+        }
+
+        //check if the req.user is NOT a follower of user
+        if (post.user.followers.filter(follower => follower.user.toString() === req.user.id).length === 0) {
+            return res.status(400).send({ msg: 'Follow this user to see their posts' });
         }
 
         res.send(post);
@@ -60,7 +66,7 @@ router.get('/:post_id', auth, async (req, res) => {
 
 
 /*  @route GET /posts
-    @desc Get all posts of a user
+    @desc Get all posts of logged in user
     @access Private
 */
 router.get('/', auth, async (req, res) => {
@@ -72,6 +78,28 @@ router.get('/', auth, async (req, res) => {
         }
 
         res.send(posts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+/*  @route GET /posts/users/:user_id
+    @desc Get all posts of a user
+    @access Private
+*/
+//uses the isFollowing middleware to check if the logged in user is a follower of the searched user
+router.get('/users/:user_id', [auth, isFollowing], async (req, res) => {
+    try {
+        const posts = await Post.find({ user: req.params.user_id });
+
+        if (posts.length === 0) {
+            return res.send({ msg: 'This user has no posts' });
+        }
+
+        res.send(posts);
+
     } catch (error) {
         console.error(error);
         res.status(500).send('Server error');

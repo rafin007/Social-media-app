@@ -92,6 +92,8 @@ router.post(
 );
 
 
+
+//@ TODO-------------------
 /*  @route PUT /users/follow/:user_id
     @desc Follow user by id
     @access Private
@@ -114,19 +116,24 @@ router.put('/follow/:user_id', auth, async (req, res) => {
       return res.status(400).send({ msg: 'Already following this user' });
     }
 
-    //if not following then follow
-    user.followers.unshift({ user: req.user.id });
+    //check if the req.user is already sent a follow request
+    if (user.followRequests.filter(followReq => followReq.user.toString() === req.user.id).length > 0) {
+      return res.status(400).send({ msg: 'You have already sent a follow request to this user!' });
+    }
+
+    //if not following, then push in followRequests 
+    user.followRequests.unshift({ user: req.user.id });
 
     //save user
     await user.save();
 
     //get the req.user
-    const reqUser = await User.findById(req.user.id);
+    // const reqUser = await User.findById(req.user.id);
 
-    //add the user to req.user's following list
-    reqUser.following.unshift({ user: req.params.user_id });
+    // //add the user to req.user's following list
+    // reqUser.following.unshift({ user: req.params.user_id });
 
-    await reqUser.save();
+    // await reqUser.save();
 
     res.send(user.followers);
 
@@ -141,6 +148,57 @@ router.put('/follow/:user_id', auth, async (req, res) => {
   }
 });
 
+
+/*  @route PUT /users/acceptFollow/:user_id
+    @desc Accept follow requests by user_id
+    @access Private
+*/
+router.put('/acceptFollow/:user_id', auth, async (req, res) => {
+  try {
+
+    //if the req.user wants to send follow request to himself
+    if (req.params.user_id === req.user.id) {
+      return res.status(400).send({ msg: 'You cannot follow yourself' });
+    }
+
+    //find the user that is logged in
+    const reqUser = await User.findById(req.user.id);
+
+    const user = await User.findById(req.params.user_id);
+
+    // if there is no user, then exit
+    if (!user) {
+      return res.status(404).send({ msg: 'User not found!' });
+    }
+
+    //check if the other user is already a follower
+    if (reqUser.followers.filter(follower => follower.user.toString() === req.params.user_id).length > 0) {
+      return res.status(400).send({ msg: 'Sorry, this user is already following you' });
+    }
+
+    //find the index and remove from follow requests
+    const index = reqUser.followRequests.map(followReq => followReq.user.toString()).indexOf(req.params.user_id);
+    reqUser.followRequests.splice(index, 1);
+
+    //add to the followers' list
+    reqUser.followers.unshift({ user: req.params.user_id });
+
+    //save the req.user
+    await reqUser.save();
+
+    //add to the other useer's followling list
+    user.following.unshift({ user: req.user.id });
+
+    //save that other user
+    await user.save();
+
+    res.send({ msg: 'Request accepted' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
 
 
 
@@ -223,6 +281,22 @@ router.get('/following', auth, async (req, res) => {
     const user = await User.findById(req.user.id);
 
     res.send(user.following);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+/*  @route GET /users/followRequests
+    @desc Get users' follow requests
+    @access Private
+*/
+router.get('/followRequests', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    res.send(user.followRequests);
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
