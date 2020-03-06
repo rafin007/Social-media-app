@@ -8,7 +8,7 @@ const auth = async (req, res, next) => {
     const token = req.header("x-auth-token");
 
     if (!token) {
-      return res.status(401).send({ error: [{ msg: "Please authenticate" }] });
+      return res.status(401).send({ msg: 'Please authenticate' });
     }
 
     //if token exists, verify the token
@@ -21,7 +21,7 @@ const auth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.status(401).send({ error: [{ msg: "Please authenticate" }] });
+    res.status(401).send({ msg: "Please authenticate" });
   }
 };
 

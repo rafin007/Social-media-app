@@ -1,17 +1,37 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const sharp = require('sharp');
 
 const auth = require('../middlewares/auth');
 const isFollowing = require('../middlewares/isFollowing');
+const isFollowingPost = require('../middlewares/isFollowingPost');
 const Post = require('../models/Post');
-const User = require('../models/User');
+
+
+//file upload
+const multer = require('multer');
+
+const upload = multer({
+    limits: {
+        fileSize: 1024 * 1024 * 2 //max 2MB
+    },
+    fileFilter(req, file, cb) {
+        //check if the file extension is not of an image
+        if (!file.originalname.match(/\.(jpg|jpeg|png|JPG|PNG|JPEG)$/)) {
+            return new Error('Please upload an image');
+        }
+
+        //everything goes well
+        cb(undefined, true);
+    }
+});
 
 /*  @route POST /posts
     @desc Create a post
     @access Private
 */
-router.post('/', [auth, [
+router.post('/', [auth, upload.single('upload'), [
     check('text', 'Text is required').not().isEmpty()
 ]], async (req, res) => {
     const error = validationResult(req);
@@ -21,10 +41,19 @@ router.post('/', [auth, [
         res.status(400).send({ errors: error.array() });
     }
 
+    let buffer;
+
+    //check if there is a file
+    if (req.file) {
+        //resize and convert to png
+        buffer = await sharp(req.file.buffer).resize({ width: 600, height: 600 }).png().toBuffer();
+    }
+
     //create a new post
     const newPost = new Post({
         ...req.body,
-        user: req.user.id
+        user: req.user.id,
+        image: req.file ? buffer : null
     });
 
     try {
@@ -35,6 +64,8 @@ router.post('/', [auth, [
         console.error(error);
         res.status(500).send('Server error');
     }
+}, (error, req, res, next) => {
+    res.status(400).send({ msg: error.message });
 });
 
 
@@ -43,21 +74,23 @@ router.post('/', [auth, [
     @desc Get post by id
     @access Private
 */
-router.get('/:post_id', auth, async (req, res) => {
+// uses the isFollowingPost middleware to check if the logged in user is a follower of the post's owner
+router.get('/:post_id', [auth, isFollowingPost], async (req, res) => {
     try {
-        const post = await Post.findById(req.params.post_id).populate('user', ['name', 'avatar', 'followers']);
+        res.send(req.post);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
 
-        //if post not found, throw error
-        if (!post) {
-            return res.status(404).send({ msg: 'Post not found!' });
-        }
+router.get('/:post_id/image', [auth, isFollowingPost], async (req, res) => {
+    try {
+        const post = req.post;
 
-        //check if the req.user is NOT a follower of user
-        if (post.user.followers.filter(follower => follower.user.toString() === req.user.id).length === 0) {
-            return res.status(400).send({ msg: 'Follow this user to see their posts' });
-        }
+        res.set('Content-Type', 'image/png');
 
-        res.send(post);
+        res.send(post.image);
     } catch (error) {
         console.error(error);
         res.status(500).send('Server error');
@@ -190,14 +223,9 @@ router.delete('/:post_id', auth, async (req, res) => {
     @desc Like post by id
     @access Private
 */
-router.put('/like/:post_id', auth, async (req, res) => {
+router.put('/like/:post_id', [auth, isFollowingPost], async (req, res) => {
     try {
-        const post = await Post.findById(req.params.post_id);
-
-        //check if post exists
-        if (!post) {
-            return res.status(404).send({ msg: 'Post not found!' });
-        }
+        const post = req.post;
 
         //check if that post is already liked
         if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
@@ -223,14 +251,9 @@ router.put('/like/:post_id', auth, async (req, res) => {
     @desc Unlike post by id
     @access Private
 */
-router.put('/unlike/:post_id', auth, async (req, res) => {
+router.put('/unlike/:post_id', [auth, isFollowingPost], async (req, res) => {
     try {
-        const post = await Post.findById(req.params.post_id);
-
-        //check if post exists
-        if (!post) {
-            return res.status(404).send({ msg: 'Post not found!' });
-        }
+        const post = req.post;
 
         //check if that post is already liked
         if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
@@ -247,6 +270,161 @@ router.put('/unlike/:post_id', auth, async (req, res) => {
         await post.save();
 
         return res.send(post.likes);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+
+/*  @route GET /posts/comments/:post_id
+    @desc Get all comments of a post by id
+    @access Private
+*/
+//uses the isFollowingPost middleware to check if the logged in user is a follower of the post's owner
+router.get('/comments/:post_id', [auth, isFollowingPost], async (req, res) => {
+    const post = req.post;
+
+    if (post.comments.length === 0) {
+        return res.send({ msg: 'This post has no comments' });
+    }
+
+    res.send(post.comments);
+});
+
+
+/*  @route POST /posts/comments/:post_id
+    @desc Post comment on post by id
+    @access Private
+*/
+//uses the isFollowingPost middleware to check if the logged in user is a follower of the post's owner
+router.post('/comments/:post_id', [auth, isFollowingPost, [
+    check('text', 'Text field is required').not().isEmpty()
+]], async (req, res) => {
+
+    const errors = validationResult(req);
+
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array() });
+    }
+
+    try {
+
+        //make the comment
+        const comment = {
+            user: req.user.id,
+            ...req.body
+        }
+
+        //push it to the array
+        req.post.comments.unshift(comment);
+
+        //save the comment
+        await req.post.save();
+
+        res.send(req.post);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+/*  @route PATCH /posts/comments/:post_id/:comment_id
+    @desc Update comment on post by ids
+    @access Private
+*/
+router.patch('/comments/:post_id/:comment_id', [auth, [
+    check('text', 'Text field is required').not().isEmpty()
+]], async (req, res) => {
+    const errors = validationResult(req);
+
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+        return res.status(400).send({ errors: errors.array() });
+    }
+
+    try {
+
+        const post = await Post.findById(req.params.post_id);
+
+        //if no post, throw error
+        if (!post) {
+            return res.status(404).send({ msg: 'Post not found!' });
+        }
+
+        //get the comment and the index
+        const comment = post.comments.find(comment => comment.id === req.params.comment_id);
+        const index = post.comments.findIndex(comment => comment.id === req.params.comment_id);
+
+        //if comment not found throw error
+        if (!comment) {
+            return res.status(404).send({ msg: 'Comment not found!' });
+        }
+
+        //check if it is NOT the author of the comment
+        if (comment.user.toString() !== req.user.id) {
+            return res.status(401).send({ msg: 'Unauthorized' });
+        }
+
+        //update the comment
+        for (let key in req.body) {
+            comment[key] = req.body[key];
+        }
+
+        //update the comments array
+        post.comments.splice(index, 1, comment);
+
+        await post.save();
+
+        res.send(post.comments);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+/*  @route DELETE /posts/comments/:post_id/:comment_id
+    @desc Delete comment on post by id
+    @access Private
+*/
+router.delete('/comments/:post_id/:comment_id', auth, async (req, res) => {
+
+    try {
+
+        const post = await Post.findById(req.params.post_id);
+
+        //if no post, throw error
+        if (!post) {
+            return res.status(404).send({ msg: 'Post not found!' });
+        }
+
+        //get the comment and the index
+        const comment = post.comments.find(comment => comment.id === req.params.comment_id);
+        const index = post.comments.findIndex(comment => comment.id === req.params.comment_id);
+
+        //if comment not found throw error
+        if (!comment) {
+            return res.status(404).send({ msg: 'Comment not found!' });
+        }
+
+        //check if it is NOT the author of the comment
+        if (comment.user.toString() !== req.user.id) {
+            return res.status(401).send({ msg: 'Unauthorized' });
+        }
+
+        //delete from the comments array
+        post.comments.splice(index, 1);
+
+        await post.save();
+
+        res.send(post.comments);
 
     } catch (error) {
         console.error(error);

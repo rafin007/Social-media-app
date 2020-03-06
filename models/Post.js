@@ -17,6 +17,9 @@ const postSchema = mongoose.Schema({
             }
         }
     ],
+    image: {
+        type: Buffer
+    },
     comments: [
         {
             user: {

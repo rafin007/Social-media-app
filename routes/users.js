@@ -3,12 +3,28 @@ const bcryptjs = require("bcryptjs");
 const gravatar = require("gravatar");
 const jwt = require("jsonwebtoken");
 const config = require("config");
+const multer = require('multer');
 const { check, validationResult } = require("express-validator");
+const sharp = require('sharp');
 
 const User = require("../models/User");
 const auth = require('../middlewares/auth');
 
 const router = express.Router();
+
+//for file upload
+const upload = multer({
+  limits: {
+    fileSize: 1024 * 1024
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error('Please upload an image'));
+    }
+
+    cb(undefined, true);
+  }
+});
 
 /*  @route POST /users
     @desc Register user
@@ -44,19 +60,11 @@ router.post(
           .send({ errors: [{ msg: "User already exists" }] });
       }
 
-      //get user's gravatar
-      const avatar = gravatar.url(email, {
-        s: "200",
-        r: "pg",
-        d: "mm"
-      });
-
       //create the user object
       user = new User({
         name,
         email,
-        password,
-        avatar
+        password
       });
 
       //generate salt
@@ -93,7 +101,6 @@ router.post(
 
 
 
-//@ TODO-------------------
 /*  @route PUT /users/follow/:user_id
     @desc Follow user by id
     @access Private
@@ -300,6 +307,99 @@ router.get('/followRequests', auth, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
+  }
+});
+
+
+/*  Example file upload
+*/
+// const multer = require('multer');
+// const upload = multer({
+//   dest: 'avatars',
+//   limits: {
+//     fileSize: 1024 * 1024
+//   },
+//   fileFilter(req, file, cb) {
+//     if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
+//       return cb(new Error('Please upload an image'));
+//     }
+//     cb(undefined, true);
+//   }
+// });
+
+// router.post('/me/avatar', upload.single('upload'), (req, res) => {
+//   res.send('file uploaded');
+// }, (error, req, res, next) => {
+//   res.status(400).send({ error: error.message });
+// });
+
+
+/*  @route POST /users/avatar/me
+    @desc Post users' profile picture
+    @access Private
+*/
+router.post('/me/avatar', [auth, upload.single('upload')], async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    //resize and convert to png
+    const buffer = await sharp(req.file.buffer).resize({ width: 300, height: 300 }).png().toBuffer();
+    //save the buffer file in avatar field
+    user.avatar = buffer;
+
+    //save the user
+    await user.save();
+
+    res.send({ msg: 'Image uploaded' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+}, (error, req, res, next) => {
+  res.status(400).send({ msg: error.message });
+});
+
+
+/*  @route DELETE /users/avatar/me
+    @desc Delete users' profile picture
+    @access Private
+*/
+router.delete('/me/avatar', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+
+    user.avatar = null;
+
+    await user.save();
+
+    res.send(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+/*  @route GET /users/avatar/me
+    @desc Get users' profile picture
+    @access Private
+*/
+router.get('/:user_id/avatar', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user_id);
+
+    //if any of user or avatar not found, throw error
+    if (!user || !user.avatar) {
+      throw new Error('Not found');
+    }
+
+    //set the content type to image
+    res.set('Content-Type', 'image/png');
+
+    //send the image
+    res.send(user.avatar);
+  } catch (error) {
+    res.status(404).send({ msg: error });
   }
 });
 
