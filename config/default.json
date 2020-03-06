@@ -1,4 +1,6 @@
 {
     "mongoURI": "mongodb+srv://rafin123:rafin123@devconnector-kjdzp.mongodb.net/test?retryWrites=true&w=majority",
-    "jwtSecret": "thisisthesecrettoken"
+    "jwtSecret": "thisisthesecrettoken",
+    "email": "devil.lucifer99@gmail.com",
+    "pass": "ineedtoreflect"
 }

@@ -1,5 +1,5 @@
 const express = require("express");
-const connectDB = require("./config/db");
+const connectDB = require("./DB/db");
 
 // import all the route modules
 const users = require("./routes/users");

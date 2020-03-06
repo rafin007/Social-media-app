@@ -6,11 +6,18 @@ const config = require("config");
 const multer = require('multer');
 const { check, validationResult } = require("express-validator");
 const sharp = require('sharp');
+const cryptoRandomString = require('crypto-random-string');
 
 const User = require("../models/User");
 const auth = require('../middlewares/auth');
+const isVerified = require('../middlewares/isVerified');
+const { verifyEmail } = require('../email/account');
 
 const router = express.Router();
+
+//@TODO => FIX the value of random String
+//generate random string
+const randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
 
 //for file upload
 const upload = multer({
@@ -57,7 +64,7 @@ router.post(
       if (user) {
         return res
           .status(400)
-          .send({ errors: [{ msg: "User already exists" }] });
+          .send({ msg: "User already exists" });
       }
 
       //create the user object
@@ -72,6 +79,9 @@ router.post(
 
       //encrypt user's password
       user.password = await bcryptjs.hash(password, salt);
+
+      //send email to user
+      verifyEmail(user.email, user.name, randomString);
 
       //save the user
       await user.save();
@@ -98,6 +108,55 @@ router.post(
     }
   }
 );
+
+/*  @route GET /users/sendVerification
+@desc Send email to users to verify
+@access Protected
+*/
+//uses the isVerified middleware to retrieve the user
+router.get('/sendEmailVerification', isVerified, (req, res) => {
+
+  const user = req.user;
+
+  //send that random string to email
+  verifyEmail(user.email, user.name, randomString);
+});
+
+
+/*  @route POST /users/verifyEmail
+    @desc Register user if their email is verified
+    @access Protected
+*/
+router.post('/verifyEmail', [isVerified, [
+  check('string', 'Verification code cannot be empty').not().isEmpty()
+]], async (req, res) => {
+  const error = validationResult(req);
+
+  //if errors, throw them
+  if (!error.isEmpty()) {
+    return res.status(400).send({ errors: error.array() });
+  }
+
+  const { string } = req.body;
+
+  if (string !== randomString) {
+    return res.status(400).send({ msg: 'Sorry, verification code did not match' });
+  }
+
+  try {
+    //mark as verified user
+    req.user.verified = true;
+
+    //save it
+    await req.user.save();
+
+    res.send({ msg: 'Verification successful!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+
+});
 
 
 
