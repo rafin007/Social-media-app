@@ -15,9 +15,9 @@ const auth = async (req, res, next) => {
     const decoded = jwt.verify(token, config.get("jwtSecret"));
     const user = await User.findById(decoded.user.id).select('-password');
 
-    if (!user.verified) {
-      return res.status(400).send({ msg: 'Please verify your email address to continue' });
-    }
+    // if (!user.verified) {
+    //   return res.status(400).send({ msg: 'Please verify your email address to continue' });
+    // }
 
     //save both the token and the user to the request object except the password
     req.user = decoded.user;

@@ -1,6 +1,5 @@
 const express = require("express");
 const bcryptjs = require("bcryptjs");
-const gravatar = require("gravatar");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const multer = require('multer');
@@ -14,10 +13,6 @@ const isVerified = require('../middlewares/isVerified');
 const { verifyEmail } = require('../email/account');
 
 const router = express.Router();
-
-//@TODO => FIX the value of random String
-//generate random string
-const randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
 
 //for file upload
 const upload = multer({
@@ -80,8 +75,11 @@ router.post(
       //encrypt user's password
       user.password = await bcryptjs.hash(password, salt);
 
+      //generate random string
+      user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+
       //send email to user
-      verifyEmail(user.email, user.name, randomString);
+      verifyEmail(user.email, user.name, user.randomString);
 
       //save the user
       await user.save();
@@ -109,17 +107,20 @@ router.post(
   }
 );
 
-/*  @route GET /users/sendVerification
-@desc Send email to users to verify
-@access Protected
+/*  @route GET /users/sendEmailVerification
+    @desc Send email to users to verify email address
+    @access Protected
 */
 //uses the isVerified middleware to retrieve the user
 router.get('/sendEmailVerification', isVerified, (req, res) => {
 
   const user = req.user;
 
+  //generate random string
+  user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+
   //send that random string to email
-  verifyEmail(user.email, user.name, randomString);
+  verifyEmail(user.email, user.name, user.randomString);
 });
 
 
@@ -139,7 +140,7 @@ router.post('/verifyEmail', [isVerified, [
 
   const { string } = req.body;
 
-  if (string !== randomString) {
+  if (string !== req.user.randomString) {
     return res.status(400).send({ msg: 'Sorry, verification code did not match' });
   }
 
@@ -147,10 +148,76 @@ router.post('/verifyEmail', [isVerified, [
     //mark as verified user
     req.user.verified = true;
 
-    //save it
+    //save user
     await req.user.save();
 
     res.send({ msg: 'Verification successful!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+
+});
+
+
+//@TODO => redirect user to change their password
+//@TODO => Test the whole password recovery system
+/*  @route POST /users/recoverPassword/:email
+    @desc check verification code to recover password
+    @access Public
+*/
+router.post('/recoverPassword/:email', [
+  check('string', 'Verification code cannot be empty').not().isEmpty()
+], async (req, res) => {
+  const errors = validationResult(req);
+
+  //if errors, throw them
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ errors: errors.array() });
+  }
+
+  const user = await User.findOne({ email: req.params.email });
+
+  //check users' string with verification string
+  if (user.randomString !== req.body.string) {
+    return res.status(401).send({ msg: 'Sorry verification code did not match!' });
+  }
+
+  res.send({ msg: 'Matched. yay!!!' })
+
+});
+
+
+/*  @route POST /users/sendVerification
+    @desc check verification to recover password
+    @access Public
+*/
+router.post('/recoverPassword', [
+  check('email', 'Email is not valid').isEmail()
+], async (req, res) => {
+
+  const errors = validationResult(req);
+
+  //if errors, throw them
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ errors: errors.array() });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    //if no user throw error
+    if (!user) {
+      return res.status(404).send({ msg: 'Sorry no user found with provided email' });
+    }
+
+    //save the new random string to user
+    user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+
+    await user.save();
+
+    res.send({ msg: 'Your verification code has been sent to your email!', email });
+
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
@@ -182,7 +249,7 @@ router.put('/follow/:user_id', auth, async (req, res) => {
       return res.status(400).send({ msg: 'Already following this user' });
     }
 
-    //check if the req.user is already sent a follow request
+    //check if the req.user has already sent a follow request
     if (user.followRequests.filter(followReq => followReq.user.toString() === req.user.id).length > 0) {
       return res.status(400).send({ msg: 'You have already sent a follow request to this user!' });
     }
@@ -259,6 +326,39 @@ router.put('/acceptFollow/:user_id', auth, async (req, res) => {
     await user.save();
 
     res.send({ msg: 'Request accepted' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+
+/*  @route PUT /users/rejectFollowRequest/:user_id
+    @desc Reject follow requests by user_id
+    @access Private
+*/
+router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
+  try {
+    //get the logged in user
+    const reqUser = await User.findById(req.user.id);
+
+    //find the index of the follow requester
+    const index = reqUser.followRequests.findIndex(followReq => followReq.user.toString() === req.params.user_id);
+
+    //check if the other user is in logged in user's followRequests
+    if (index === -1) {
+      return res.status(404).send({ msg: 'This person did not request to follow you' });
+    }
+
+    //remove that index from array
+    reqUser.followRequests.splice(index, 1);
+
+    //save the user
+    await reqUser.save();
+
+    res.send(reqUser.followRequests);
 
   } catch (error) {
     console.error(error);

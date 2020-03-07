@@ -48,6 +48,9 @@ const userSchema = mongoose.Schema({
   verified: {
     type: Boolean,
     default: false
+  },
+  randomString: {
+    type: String
   }
 });
 
