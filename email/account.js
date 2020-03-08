@@ -20,7 +20,7 @@ const verifyEmail = async (email, name, randomString) => {
             Thank you!`
         };
         const info = await transporter.sendMail(mailOptions);
-        console.log(info);
+        // console.log(info);
     } catch (error) {
         console.log(error);
     }

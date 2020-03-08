@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcryptjs = require('bcryptjs');
 
 const userSchema = mongoose.Schema({
   name: {
@@ -53,6 +54,18 @@ const userSchema = mongoose.Schema({
     type: String
   }
 });
+
+userSchema.methods.encryptPassword = async function (password) {
+  const user = this;
+
+  //generate salt
+  const salt = await bcryptjs.genSalt(10);
+
+  //hash password
+  const hashedPassword = await bcryptjs.hash(password, salt);
+
+  return hashedPassword;
+}
 
 const User = mongoose.model('user', userSchema);
 

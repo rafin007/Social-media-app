@@ -1,11 +1,11 @@
 const express = require("express");
-const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const multer = require('multer');
 const { check, validationResult } = require("express-validator");
 const sharp = require('sharp');
 const cryptoRandomString = require('crypto-random-string');
+const bcryptjs = require('bcryptjs');
 
 const User = require("../models/User");
 const auth = require('../middlewares/auth');
@@ -69,11 +69,8 @@ router.post(
         password
       });
 
-      //generate salt
-      const salt = await bcryptjs.genSalt(10);
-
-      //encrypt user's password
-      user.password = await bcryptjs.hash(password, salt);
+      //get the encrypted password
+      user.password = await user.encryptPassword(password);
 
       //generate random string
       user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
@@ -106,6 +103,7 @@ router.post(
     }
   }
 );
+
 
 /*  @route GET /users/sendEmailVerification
     @desc Send email to users to verify email address
@@ -160,8 +158,104 @@ router.post('/verifyEmail', [isVerified, [
 });
 
 
+/*  @route POST /users/changePassword
+    @desc Change users' password
+    @access Private
+*/
+router.post('/changePassword', [auth, [
+  check('oldPassword', 'Old password cannot be empty').not().isEmpty(),
+  check('newPassword', 'Password must be at least 6 characters').isLength({
+    min: 6
+  }),
+  check('confirmPassword', 'Field cannot be empty').not().isEmpty()
+]], async (req, res) => {
+
+  const errors = validationResult(req);
+
+  //if errors, throw them
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ msg: errors.array() });
+  }
+
+  try {
+    const user = await User.findById(req.user.id);
+
+    //extract the fields
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    //throw error if old password doesn't match with user's current password
+    const isMatch = await bcryptjs.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).send({ msg: 'Your old password did not match' });
+    }
+
+    //throw error if new password and confirm password don't match
+    if (newPassword !== confirmPassword) {
+      return res.status(400).send({ msg: 'Your new passwords do not match' });
+    }
+
+    //save the new password
+    user.password = await user.encryptPassword(newPassword);
+
+    //save the user
+    await user.save();
+
+    res.send({ msg: 'Your password has been changed' });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+/*  @route POST /users/recoverPassword
+    @desc send email to recover password
+    @access Public
+*/
+router.post('/recoverPassword', [
+  check('email', 'Email is not valid').isEmail()
+], async (req, res) => {
+
+  const errors = validationResult(req);
+
+  //if errors, throw them
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ errors: errors.array() });
+  }
+
+  const email = req.body.email;
+
+  try {
+    const user = await User.findOne({ email });
+
+    //if no user throw error
+    if (!user) {
+      return res.status(404).send({ msg: 'Sorry no user found with provided email' });
+    }
+
+    //save the new random string to user
+    const randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+
+    //send email
+    verifyEmail(user.email, user.name, randomString);
+
+    //save the string to user model
+    user.randomString = randomString;
+
+    await user.save();
+
+    res.send({ msg: 'Your verification code has been sent to your email!', email });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+
+});
+
+
 //@TODO => redirect user to change their password
-//@TODO => Test the whole password recovery system
 /*  @route POST /users/recoverPassword/:email
     @desc check verification code to recover password
     @access Public
@@ -188,41 +282,52 @@ router.post('/recoverPassword/:email', [
 });
 
 
-/*  @route POST /users/sendVerification
-    @desc check verification to recover password
-    @access Public
+/*  @route POST /users/changePassword/:email
+    @desc Change users' password
+    @access Private
 */
-router.post('/recoverPassword', [
-  check('email', 'Email is not valid').isEmail()
+router.post('/changePassword/:email', [
+  check('newPassword', 'Password must be at least 6 characters').isLength({
+    min: 6
+  }),
+  check('confirmPassword', 'Field cannot be empty').not().isEmpty()
 ], async (req, res) => {
 
   const errors = validationResult(req);
 
   //if errors, throw them
   if (!errors.isEmpty()) {
-    return res.status(400).send({ errors: errors.array() });
+    return res.status(400).send({ msg: errors.array() });
   }
 
   try {
-    const user = await User.findOne({ email });
+    //find user by email
+    const user = await User.findOne({ email: req.params.email });
 
-    //if no user throw error
     if (!user) {
-      return res.status(404).send({ msg: 'Sorry no user found with provided email' });
+      return res.status(404).send({ msg: 'No user found!' });
     }
 
-    //save the new random string to user
-    user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+    //extract the fields
+    const { newPassword, confirmPassword } = req.body;
 
+    //throw error if new password and confirm password don't match
+    if (newPassword !== confirmPassword) {
+      return res.status(400).send({ msg: 'Your new passwords do not match' });
+    }
+
+    //save the new password
+    user.password = await user.encryptPassword(newPassword);
+
+    //save the user
     await user.save();
 
-    res.send({ msg: 'Your verification code has been sent to your email!', email });
+    res.send({ msg: 'Your password has been changed' });
 
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
   }
-
 });
 
 
