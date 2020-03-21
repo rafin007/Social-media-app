@@ -5,9 +5,10 @@ const User = require("../models/User");
 const auth = async (req, res, next) => {
   try {
     //get the token from the header
-    const token = req.header("x-auth-token");
+    const token = req.header('authorization').replace('Bearer ', '');
 
     if (!token) {
+      console.log('hey');
       return res.status(401).send({ msg: 'Please authenticate' });
     }
 
@@ -25,6 +26,7 @@ const auth = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.error(error);
     res.status(401).send({ msg: "Please authenticate" });
   }
 };

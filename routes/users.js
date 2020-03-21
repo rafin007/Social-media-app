@@ -277,7 +277,7 @@ router.post('/recoverPassword/:email', [
     return res.status(401).send({ msg: 'Sorry verification code did not match!' });
   }
 
-  res.send({ msg: 'Matched. yay!!!' })
+  res.send({ msg: 'Matched. yay!!!' });
 
 });
 

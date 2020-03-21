@@ -5,7 +5,7 @@ const User = require("../models/User");
 const isVerified = async (req, res, next) => {
     try {
         //get the token from the header
-        const token = req.header("x-auth-token");
+        const token = req.header("authorization").replace('Bearer ', '');
 
         if (!token) {
             return res.status(401).send({ msg: 'Please authenticate' });
