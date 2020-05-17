@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const messageSchema = mongoose.Schema({
     text: {
         type: String,
-        trim: true,
-        required: true
+        trim: true
     },
     sender: {
         type: mongoose.Schema.Types.ObjectId,
