@@ -18,9 +18,9 @@ connectDB();
 const PORT = process.env.PORT || 5000;
 
 // base route
-app.get("/", (req, res) => {
-  res.send("helo!!");
-});
+// app.get("/", (req, res) => {
+//   res.send("helo!!");
+// });
 
 //define routes
 app.use("/users", users);
