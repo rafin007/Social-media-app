@@ -1,0 +1,2 @@
+export const SIGNUP_STARTED = 'SIGNUP_STARTED';
+export const SIGNUP_FINISHED = 'SIGNUP_FINISHED';
