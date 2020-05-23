@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { TextField, makeStyles, Grid, Card, CardContent, Typography, CardActions, Button, FormControl, InputLabel, Select, MenuItem, } from '@material-ui/core';
+import * as yup from 'yup';
+import { Formik, Form, Field } from 'formik';
+import Text from '../../Components/Form/Text';
+import SelectField from '../../Components/Form/SelectField';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,6 +31,14 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const validationSchema = yup.object({
+    name: yup.string().required(),
+    email: yup.string().required().email(),
+    password: yup.string().required().min(6),
+    confirmPassword: yup.string().required().min(6),
+    gender: yup.string().required()
+});
+
 const Signup = () => {
 
     const classes = useStyles();
@@ -44,28 +56,56 @@ const Signup = () => {
                         {/* <Typography className={classes.title} color="primary" variant="h4" align="center" gutterBottom>
                             Sign up
                         </Typography> */}
-                        <form noValidate autoComplete="off" className={classes.form} >
-                            <TextField label="Name" required />
-                            <TextField label="Email" required type="email" />
-                            <TextField label="Password" required type="password" />
-                            <TextField label="Confirm Password" required type="password" />
+                        <Formik
+                            validateOnChange={true}
+                            initialValues={{
+                                name: "",
+                                email: "",
+                                password: "",
+                                confirmPassword: "",
+                                gender: ""
+                            }}
+                            validationSchema={validationSchema}
+                            onSubmit={(data, { setSubmitting }) => {
+                                setSubmitting(true);
+                                //make async call
+                                console.log('Submitting', data);
+                                setSubmitting(false);
+                            }} >
 
-                            <FormControl className={classes.formControl}>
-                                <InputLabel>Choose Gender</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                // value={age}
-                                // onChange={handleChange}
-                                >
-                                    <MenuItem value="Male">Male</MenuItem>
-                                    <MenuItem value="Female">Female</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <Button color="primary" className={classes.signup} variant="contained" >
-                                Sign up
-                            </Button>
-                        </form>
+                            {({ values, errors, isSubmitting }) => (
+                                <Form className={classes.form} >
+                                    <Text placeholder="Name" name="name" />
+                                    <Text placeholder="Email" name="email" />
+                                    <Text placeholder="Password" name="password" />
+                                    <Text placeholder="Confrim Password" name="confirmPassword" />
+                                    <SelectField name="gender" label="Choose Gender" />
+                                    <Button color="primary" className={classes.signup} variant="contained" disabled={isSubmitting} type="submit" >
+                                        Sign up
+                                    </Button>
+                                </Form>
+                            )}
+
+                            {/* <form noValidate autoComplete="off" className={classes.form} >
+                                <TextField label="Name" required />
+                                <TextField label="Email" required type="email" />
+                                <TextField label="Password" required type="password" />
+                                <TextField label="Confirm Password" required type="password" />
+
+                                <FormControl className={classes.formControl} required >
+                                    <InputLabel>Choose Gender</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                    // value={age}
+                                    // onChange={handleChange}
+                                    >
+                                        <MenuItem value="Male">Male</MenuItem>
+                                        <MenuItem value="Female">Female</MenuItem>
+                                        <MenuItem value="Other">Other</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </form> */}
+                        </Formik>
                     </CardContent>
                     <CardActions>
                         <Typography variant="body1" align="center" gutterBottom style={{ margin: '0 auto' }} >

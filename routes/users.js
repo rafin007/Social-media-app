@@ -41,7 +41,8 @@ router.post(
     check("email", "Please include a valid email").isEmail(),
     check("password", "Password must be at least 6 characters long").isLength({
       min: 6
-    })
+    }),
+    check("gender", "Please select your gender").not().isEmpty()
   ],
   async (req, res) => {
     const error = validationResult(req);
@@ -50,7 +51,7 @@ router.post(
     }
 
     //properties of users
-    const { name, email, password } = req.body;
+    const { name, email, password, gender } = req.body;
 
     try {
       //check if the user's email already exists
@@ -66,7 +67,8 @@ router.post(
       user = new User({
         name,
         email,
-        password
+        password,
+        gender
       });
 
       //get the encrypted password
