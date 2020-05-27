@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { TextField, makeStyles, Grid, Card, CardContent, Typography, CardActions, Button, FormControl, InputLabel, Select, MenuItem, } from '@material-ui/core';
-import * as yup from 'yup';
+import { signupSchema } from '../../Validators/AuthValidation';
 import { Formik, Form, Field } from 'formik';
 import Text from '../../Components/Form/Text';
 import SelectField from '../../Components/Form/SelectField';
@@ -31,13 +31,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const validationSchema = yup.object({
-    name: yup.string().required(),
-    email: yup.string().required().email(),
-    password: yup.string().required().min(6),
-    confirmPassword: yup.string().required().min(6),
-    gender: yup.string().required()
-});
+
 
 const Signup = () => {
 
@@ -65,11 +59,11 @@ const Signup = () => {
                                 confirmPassword: "",
                                 gender: ""
                             }}
-                            validationSchema={validationSchema}
+                            validationSchema={signupSchema}
                             onSubmit={(data, { setSubmitting }) => {
                                 setSubmitting(true);
                                 //make async call
-                                console.log('Submitting', data);
+                                console.log('signing up', data);
                                 setSubmitting(false);
                             }} >
 
@@ -77,9 +71,9 @@ const Signup = () => {
                                 <Form className={classes.form} >
                                     <Text placeholder="Name" name="name" />
                                     <Text placeholder="Email" name="email" />
-                                    <Text placeholder="Password" name="password" />
-                                    <Text placeholder="Confrim Password" name="confirmPassword" />
-                                    <SelectField name="gender" label="Choose Gender" />
+                                    <Text placeholder="Password" name="password" type="password" />
+                                    <Text placeholder="Confrim Password" name="confirmPassword" type="password" />
+                                    <SelectField name="gender" label="Choose Gender" options={['Male', 'Female', 'Other']} />
                                     <Button color="primary" className={classes.signup} variant="contained" disabled={isSubmitting} type="submit" >
                                         Sign up
                                     </Button>

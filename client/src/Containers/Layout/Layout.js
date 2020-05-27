@@ -6,7 +6,7 @@ import Signin from '../../Auth/Signin/Signin';
 
 const Layout = () => {
 
-    const [isAuth, setIsAuth] = useState(false);
+    const [isAuth, setIsAuth] = useState(true);
 
     const auth = (
         <Switch>
@@ -20,8 +20,8 @@ const Layout = () => {
             {/* signup */}
             {/* signin */}
             {/* routing */}
-            {auth}
-            {isAuth && <Main />}
+            {/* {auth} */}
+            {isAuth ? <Main /> : auth}
         </div>
     );
 }

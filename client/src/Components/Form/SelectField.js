@@ -2,7 +2,7 @@ import React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@material-ui/core';
 import { useField } from 'formik';
 
-const SelectField = ({ label, ...props }) => {
+const SelectField = ({ label, options, ...props }) => {
 
     const [field, meta] = useField(props);
 
@@ -17,9 +17,7 @@ const SelectField = ({ label, ...props }) => {
             // value={age}
             // onChange={handleChange}
             >
-                <MenuItem value="Male">Male</MenuItem>
-                <MenuItem value="Female">Female</MenuItem>
-                <MenuItem value="Other">Other</MenuItem>
+                {options.map(option => <MenuItem value={option} key={option} >{option}</MenuItem>)}
             </Select>
             <FormHelperText>{errorText}</FormHelperText>
         </FormControl>

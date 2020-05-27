@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { TextField, makeStyles, Grid, Card, CardContent, Typography, CardActions, Button } from '@material-ui/core';
+import { Form, Formik } from 'formik';
+import { signinSchema } from '../../Validators/AuthValidation';
+import Text from '../../Components/Form/Text';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -44,13 +47,38 @@ const Signin = () => {
                         {/* <Typography className={classes.title} color="primary" variant="h4" align="center" gutterBottom>
                             Sign up
                         </Typography> */}
-                        <form noValidate autoComplete="off" className={classes.form} >
+                        <Formik
+                            validateOnChange={true}
+                            initialValues={{
+                                email: '',
+                                password: ''
+                            }}
+                            validationSchema={signinSchema}
+                            onSubmit={(data, { setSubmitting }) => {
+                                setSubmitting(true);
+                                console.log('signing in', data);
+                                setSubmitting(false);
+                            }} >
+
+
+                            {({ values, errors, isSubmitting }) => (
+                                <Form className={classes.form} >
+                                    <Text placeholder="email" name="email" type="email" />
+                                    <Text placeholder="password" name="password" type="password" />
+                                    <Button color="primary" className={classes.signin} variant="contained" disabled={isSubmitting} type="submit" >
+                                        Sign in
+                                    </Button>
+                                </Form>
+                            )}
+                        </Formik>
+
+                        {/* <form noValidate autoComplete="off" className={classes.form} >
                             <TextField label="Email" required type="email" />
                             <TextField label="Password" required type="password" />
                             <Button color="primary" className={classes.signin} variant="contained" >
                                 Sign in
                             </Button>
-                        </form>
+                        </form> */}
                     </CardContent>
                     <CardActions>
                         <Typography variant="body1" align="center" gutterBottom style={{ margin: '0 auto' }} >
