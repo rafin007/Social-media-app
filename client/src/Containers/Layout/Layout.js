@@ -6,7 +6,7 @@ import Signin from '../../Auth/Signin/Signin';
 
 const Layout = () => {
 
-    const [isAuth, setIsAuth] = useState(true);
+    const [isAuth, setIsAuth] = useState(false);
 
     const auth = (
         <Switch>

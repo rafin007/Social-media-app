@@ -19,9 +19,9 @@ const Main = () => {
 
     //main contains components after the user has logged in
 
-    //bottom navbar
     const classes = useStyles();
 
+    //bottom navbar
     const [bottomNavbar, setBottomNavbar] = useState('');
 
     useEffect(() => {

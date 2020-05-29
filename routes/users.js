@@ -60,7 +60,11 @@ router.post(
       if (user) {
         return res
           .status(400)
-          .send({ msg: "User already exists" });
+          .send({
+            errors: [
+              { msg: "User already exists" }
+            ]
+          });
       }
 
       //create the user object
@@ -75,10 +79,10 @@ router.post(
       user.password = await user.encryptPassword(password);
 
       //generate random string
-      user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+      // user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
 
       //send email to user
-      verifyEmail(user.email, user.name, user.randomString);
+      // verifyEmail(user.email, user.name, user.randomString);
 
       //save the user
       await user.save();
@@ -112,52 +116,52 @@ router.post(
     @access Protected
 */
 //uses the isVerified middleware to retrieve the user
-router.get('/sendEmailVerification', isVerified, (req, res) => {
+// router.get('/sendEmailVerification', isVerified, (req, res) => {
 
-  const user = req.user;
+//   const user = req.user;
 
-  //generate random string
-  user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+//   //generate random string
+//   user.randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
 
-  //send that random string to email
-  verifyEmail(user.email, user.name, user.randomString);
-});
+//   //send that random string to email
+//   verifyEmail(user.email, user.name, user.randomString);
+// });
 
 
 /*  @route POST /users/verifyEmail
     @desc Register user if their email is verified
     @access Protected
 */
-router.post('/verifyEmail', [isVerified, [
-  check('string', 'Verification code cannot be empty').not().isEmpty()
-]], async (req, res) => {
-  const error = validationResult(req);
+// router.post('/verifyEmail', [isVerified, [
+//   check('string', 'Verification code cannot be empty').not().isEmpty()
+// ]], async (req, res) => {
+//   const error = validationResult(req);
 
-  //if errors, throw them
-  if (!error.isEmpty()) {
-    return res.status(400).send({ errors: error.array() });
-  }
+//   //if errors, throw them
+//   if (!error.isEmpty()) {
+//     return res.status(400).send({ errors: error.array() });
+//   }
 
-  const { string } = req.body;
+//   const { string } = req.body;
 
-  if (string !== req.user.randomString) {
-    return res.status(400).send({ msg: 'Sorry, verification code did not match' });
-  }
+//   if (string !== req.user.randomString) {
+//     return res.status(400).send({ msg: 'Sorry, verification code did not match' });
+//   }
 
-  try {
-    //mark as verified user
-    req.user.verified = true;
+//   try {
+//     //mark as verified user
+//     req.user.verified = true;
 
-    //save user
-    await req.user.save();
+//     //save user
+//     await req.user.save();
 
-    res.send({ msg: 'Verification successful!' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
-  }
+//     res.send({ msg: 'Verification successful!' });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Server error');
+//   }
 
-});
+// });
 
 
 /*  @route POST /users/changePassword

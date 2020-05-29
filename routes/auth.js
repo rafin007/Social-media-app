@@ -8,11 +8,17 @@ const router = express.Router();
 const User = require('../models/User');
 
 /*  @route GET /auth
-    @desc Test route
+    @desc check if user is authenticated
     @access RESTRICTED
 */
-router.get('/', auth, (req, res) => {
-    res.send({ user: req.user, token: req.token });
+router.get('/', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        res.send(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
 });
 
 

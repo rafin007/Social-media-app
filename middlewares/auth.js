@@ -5,11 +5,16 @@ const User = require("../models/User");
 const auth = async (req, res, next) => {
   try {
     //get the token from the header
-    const token = req.header('authorization').replace('Bearer ', '');
+    let token = req.header('authorization');
+
+    if (token) {
+      token = token.replace('Bearer ', '');
+    }
 
     if (!token) {
-      console.log('hey');
-      return res.status(401).send({ msg: 'Please authenticate' });
+      return res.status(401).send({
+        errors: [{ msg: 'Please authenticate' }]
+      });
     }
 
     //if token exists, verify the token
@@ -21,7 +26,7 @@ const auth = async (req, res, next) => {
     // }
 
     //save both the token and the user to the request object except the password
-    req.user = decoded.user;
+    req.user = user;
     req.token = token;
 
     next();
