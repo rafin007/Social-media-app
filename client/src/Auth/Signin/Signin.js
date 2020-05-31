@@ -1,9 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { TextField, makeStyles, Grid, Card, CardContent, Typography, CardActions, Button } from '@material-ui/core';
+import { Link, Redirect } from 'react-router-dom';
+import { makeStyles, Grid, Card, CardContent, Typography, CardActions, Button } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import { signinSchema } from '../../Validators/AuthValidation';
 import Text from '../../Components/Form/Text';
+import { useSelector, useDispatch } from 'react-redux';
+import Spinner from '../../Components/Spinner/Spinner';
+import CustomAlert from '../../Components/CustomAlert/CustomAlert';
+import { login } from '../../Actions/auth';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,6 +31,9 @@ const useStyles = makeStyles((theme) => ({
     },
     card: {
         paddingTop: '2vh'
+    },
+    errors: {
+        marginTop: '1rem'
     }
 }));
 
@@ -34,8 +41,29 @@ const Signin = () => {
 
     const classes = useStyles();
 
+    const dispatch = useDispatch();
+
+    //loading state
+    const loading = useSelector(state => state.auth.loading);
+
+    //errors state
+    const errors = useSelector(state => state.auth.errors);
+
+    //submit action
+    const handleSubmit = async (data) => {
+        dispatch(login(data));
+    }
+
+    //get isAuthenticated state
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+
+    //check if the user is authenticated and redirect accordingly
+    if (isAuthenticated) {
+        return <Redirect to="/home" />;
+    }
+
     return (
-        <Grid container direction="row" justify="center" alignItems="center" className={classes.root} >
+        <Grid container direction="column" justify="center" alignItems="center" className={classes.root} >
             <Grid item xs={12}>
                 <Typography color="primary" variant="h3" gutterBottom align="center" >
                     Social media
@@ -56,19 +84,19 @@ const Signin = () => {
                             validationSchema={signinSchema}
                             onSubmit={(data, { setSubmitting }) => {
                                 setSubmitting(true);
-                                console.log('signing in', data);
+                                handleSubmit(data);
                                 setSubmitting(false);
                             }} >
 
 
                             {({ values, errors, isSubmitting }) => (
-                                <Form className={classes.form} >
+                                loading ? <Spinner /> : (<Form className={classes.form} >
                                     <Text placeholder="email" name="email" type="email" />
                                     <Text placeholder="password" name="password" type="password" />
                                     <Button color="primary" className={classes.signin} variant="contained" disabled={isSubmitting} type="submit" >
                                         Sign in
                                     </Button>
-                                </Form>
+                                </Form>)
                             )}
                         </Formik>
 
@@ -96,6 +124,9 @@ const Signin = () => {
                         </Typography>
                     </CardActions>
                 </Card>
+            </Grid>
+            <Grid item xs={10} md={6} lg={4} className={classes.errors} className={classes.errors} >
+                {errors && errors.length > 0 ? errors.map((error, i) => <CustomAlert message={error} severity="error" key={i} />) : null}
             </Grid>
         </Grid>
     );

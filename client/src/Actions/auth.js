@@ -2,6 +2,13 @@ import axios from 'axios';
 import * as actionTypes from './actionTypes';
 import setAuthToken from '../utils/setAuthToken';
 
+//axios config
+const config = {
+    headers: {
+        'Content-Type': 'application/json'
+    }
+}
+
 
 //--------------Load user--------------------------
 export const loadUser = () => async dispatch => {
@@ -22,27 +29,25 @@ export const loadUser = () => async dispatch => {
     } catch (err) {
         const errors = err.response.data.errors;
 
-        dispatch({
-            type: actionTypes.AUTH_ERROR,
-            payload: errors.map(error => error.msg)
-        });
+        if (errors) {
+            dispatch({
+                type: actionTypes.AUTH_ERROR,
+                payload: errors.map(error => error.msg)
+            });
+        }
+
     }
 }
 
 //--------------register user-------------------------
 export const register = ({ name, email, password, gender }) => async dispatch => {
-    const config = {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
 
     const body = JSON.stringify({ name, email, password, gender });
 
     try {
         //loading first
         dispatch({
-            type: actionTypes.REGISTER_LOADING
+            type: actionTypes.LOADING
         });
 
         const response = await axios.post('/users', body, config);
@@ -53,8 +58,44 @@ export const register = ({ name, email, password, gender }) => async dispatch =>
             payload: response.data
         });
 
+        //load the user
+        dispatch(loadUser());
+
     } catch (err) {
 
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.REGISTER_FAIL,
+            payload: errors.map(error => error.msg)
+        });
+    }
+}
+
+
+//-----------------login user---------------------
+export const login = ({ email, password }) => async dispatch => {
+
+    const body = JSON.stringify({ email, password });
+
+    try {
+
+        //loading first
+        dispatch({
+            type: actionTypes.LOADING
+        });
+
+        const response = await axios.post('/auth', body, config);
+
+        dispatch({
+            type: actionTypes.LOGIN_SUCCESS,
+            payload: response.data
+        });
+
+        //load the user
+        dispatch(loadUser());
+
+    } catch (err) {
         const errors = err.response.data.errors;
 
         dispatch({

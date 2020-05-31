@@ -26,6 +26,7 @@ const SimpleBottomNavigation = (props) => {
 
     const { pathname } = useLocation();
 
+    //ORS stands for something other than main bottom navbar option (but i forgot)
     useEffect(() => {
         if (pathname !== '/home' && pathname !== '/messages' && pathname !== '/profile' && pathname !== '/notifications') {
             props.setBottomNavbar('ORS');

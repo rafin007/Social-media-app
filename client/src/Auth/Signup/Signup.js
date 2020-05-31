@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { TextField, makeStyles, Grid, Card, CardContent, Typography, CardActions, Button } from '@material-ui/core';
+import { Link, Redirect } from 'react-router-dom';
+import { makeStyles, Grid, Card, CardContent, Typography, CardActions, Button } from '@material-ui/core';
 import { signupSchema } from '../../Validators/AuthValidation';
 import { Formik, Form, Field } from 'formik';
 import Text from '../../Components/Form/Text';
@@ -61,8 +61,16 @@ const Signup = () => {
         dispatch(register(data));
     }
 
+    //get isAuthenticated state
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+
+    //check if the user is authenticated and redirect accordingly
+    if (isAuthenticated) {
+        return <Redirect to="/home" />;
+    }
+
     return (
-        <Grid container direction="row" justify="center" alignItems="center" className={classes.root} >
+        <Grid container direction="column" justify="center" alignItems="center" className={classes.root} >
             <Grid item xs={12}>
                 <Typography color="primary" variant="h3" gutterBottom align="center" >
                     Social media
@@ -116,7 +124,7 @@ const Signup = () => {
                     </CardActions>
                 </Card>
             </Grid>
-            <Grid item xs={10} className={classes.errors} >
+            <Grid item xs={10} md={6} lg={4} className={classes.errors} >
                 {errors && errors.length > 0 ? errors.map((error, i) => <CustomAlert message={error} severity="error" key={i} />) : null}
             </Grid>
         </Grid>

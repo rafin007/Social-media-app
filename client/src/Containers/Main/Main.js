@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import BottomNavbar from '../../Components/BottomNavbar/BottomNavbar';
 import { makeStyles } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
-// import Div100vh from 'react-div-100vh';
 import Drawer from '../../Components/Drawer/Drawer';
 import Routes from '../Routes/Routes';
 
@@ -22,7 +21,7 @@ const Main = () => {
     const classes = useStyles();
 
     //bottom navbar
-    const [bottomNavbar, setBottomNavbar] = useState('');
+    const [bottomNavbar, setBottomNavbar] = useState('home');
 
     useEffect(() => {
         if (bottomNavbar === 'home') {

@@ -22,7 +22,7 @@ const App = () => {
   //load the user that is logged in, if any
   useEffect(() => {
     store.dispatch(loadUser());
-  }, [localStorage.token]);
+  }, []);
 
   return (
     <Provider store={store} >

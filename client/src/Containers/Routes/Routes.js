@@ -17,16 +17,16 @@ import HomeView from '../../Views/Home/HomeView';
 const Routes = () => {
     return (
         <Switch>
-            <Route path="/posts" component={Posts} />
-            <Route path="/followers" component={Followers} />
-            <Route path="/following" component={Following} />
-            <Route path="/requests" component={Requests} />
-            <Route path="/settings" component={Settings} />
-            <Route path="/logout" component={Logout} />
-            <Route path="/messages" component={MessagesView} />
-            <Route path="/profile" component={ProfileView} />
-            <Route path="/notifications" component={NotificationsView} />
-            <Route path="/home" component={HomeView} />
+            <Route path="/posts" exact component={Posts} />
+            <Route path="/followers" exact component={Followers} />
+            <Route path="/following" exact component={Following} />
+            <Route path="/requests" exact component={Requests} />
+            <Route path="/settings" exact component={Settings} />
+            <Route path="/logout" exact component={Logout} />
+            <Route path="/messages" exact component={MessagesView} />
+            <Route path="/profile" exact component={ProfileView} />
+            <Route path="/notifications" exact component={NotificationsView} />
+            <Route path="/home" exact component={HomeView} />
         </Switch>
     );
 }
