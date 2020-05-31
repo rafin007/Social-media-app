@@ -12,3 +12,6 @@ export const REGISTER_FAIL = 'REGISTER_FAIL';
 //check if user loaded
 export const USER_LOADED = 'USER_LOADED';
 export const AUTH_ERROR = 'AUTH_ERROR';
+
+//logout
+export const LOGOUT = 'LOGOUT';

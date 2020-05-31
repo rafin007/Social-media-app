@@ -104,3 +104,11 @@ export const login = ({ email, password }) => async dispatch => {
         });
     }
 }
+
+
+//----------------LOGOUT---------------
+export const logout = () => dispatch => {
+    dispatch({
+        type: actionTypes.LOGOUT
+    });
+}
