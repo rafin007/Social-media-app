@@ -7,13 +7,6 @@ import { useSelector } from 'react-redux';
 
 const Layout = () => {
 
-    // const auth = (
-    //     <Switch>
-    //         <Route path="/signin" component={Signin} />
-    //         <Route path="/" exact component={Signup} />
-    //     </Switch>
-    // );
-
     //get isAuthenticated state
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
@@ -32,16 +25,6 @@ const Layout = () => {
     else {
         return <Main />;
     }
-
-    // return (
-    //     <div>
-    //         {/* signup */}
-    //         {/* signin */}
-    //         {/* routing */}
-    //         {auth}
-    //         {isAuthenticated && <Main />}
-    //     </div>
-    // );
 }
 
 export default Layout;
