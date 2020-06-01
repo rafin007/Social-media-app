@@ -11,11 +11,11 @@ const Layout = () => {
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
     //check if the user is authenticated and redirect accordingly
-    if (!isAuthenticated) {
+    if (isAuthenticated) { //change it to !isAuthenticated later
         return (
             <>
                 <Switch>
-                    <Route path="/signin" component={Signin} />
+                    <Route path="/signin" exact component={Signin} />
                     <Route path="/" exact component={Signup} />
                 </Switch>
                 <Redirect to="/" />

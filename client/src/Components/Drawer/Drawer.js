@@ -12,6 +12,8 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Link, useLocation } from 'react-router-dom';
 import { MenuList, MenuItem, ListItemIcon } from '@material-ui/core';
 import { HomeOutlined, MessageOutlined, AccountCircleOutlined, NotificationsOutlined, SupervisorAccountOutlined, ImageOutlined, GroupOutlined, GroupAddOutlined, SettingsOutlined, ExitToAppOutlined } from '@material-ui/icons';
+import Avatar from '../Avatar/Avatar';
+import imageAvatar from '../../assets/images/avatar.jpg';
 
 
 const drawerWidth = 240;
@@ -95,7 +97,8 @@ const ResponsiveDrawer = (props) => {
     const drawer = (
         <div>
             <div className={classes.toolbar} />
-            <Typography variant="h4" align="center" gutterBottom >LOGO</Typography>
+            <Avatar owner={imageAvatar} width={10} height={10} />
+            <Typography variant="h5" align="center" gutterBottom color="textPrimary" >Arefin</Typography>
             <Divider />
             <MenuList>
 
