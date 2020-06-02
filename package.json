@@ -12,6 +12,7 @@
   "author": "Arefin",
   "license": "MIT",
   "dependencies": {
+    "@n8tb1t/use-scroll-position": "^1.0.43",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "crypto-random-string": "^3.1.0",
@@ -22,6 +23,7 @@
     "mongoose": "^5.9.1",
     "multer": "^1.4.2",
     "nodemailer": "^6.4.4",
+    "react-scroll": "^1.7.16",
     "sharp": "^0.24.1"
   },
   "devDependencies": {

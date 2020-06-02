@@ -78,7 +78,9 @@ const ProfileView = () => {
                 </div>
                 <Button variant="contained" color="primary" >Follow</Button>
             </Grid>
-            <ProfileTabs value={value} handleChange={handleChange} />
+            <Grid item xs={12} >
+                <ProfileTabs value={value} handleChange={handleChange} />
+            </Grid>
             {pageContent}
         </Grid>
     );
