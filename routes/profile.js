@@ -303,7 +303,7 @@ router.patch('/experience/:exp_id', [auth, [
 //------------------education-----------------
 
 /*  @route POST /profile/education
-    @desc Delete profile of user
+    @desc Post education of user
     @access Private
 */
 router.post('/education', [auth, [

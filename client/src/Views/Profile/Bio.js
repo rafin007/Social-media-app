@@ -43,8 +43,6 @@ const Bio = () => {
                 <Button
                     variant="contained"
                     color="primary"
-                    className={classes.button}
-                    startIcon={<SaveOutlined />}
                 >
                     Save
                 </Button>

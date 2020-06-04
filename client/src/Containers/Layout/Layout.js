@@ -11,7 +11,7 @@ const Layout = () => {
     const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
     //check if the user is authenticated and redirect accordingly
-    if (isAuthenticated) { //change it to !isAuthenticated later
+    if (!isAuthenticated) { //change it to !isAuthenticated later
         return (
             <>
                 <Switch>

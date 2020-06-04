@@ -5,6 +5,7 @@ import imageAvatar from '../../assets/images/avatar.jpg';
 import ProfileTabs from './ProfileTabs';
 import Bio from './Bio';
 import ProfilePosts from './ProfilePosts';
+import About from './About';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -51,7 +52,7 @@ const ProfileView = () => {
         pageContent = <ProfilePosts />
     }
     else {
-        pageContent = 'About';
+        pageContent = <About />;
     }
 
     return (
