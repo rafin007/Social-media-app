@@ -19,7 +19,7 @@ router.get('/me', auth, async (req, res) => {
             return res.status(400).send({ msg: 'This user has no profile' });
         }
 
-        res.send({ profile });
+        res.send(profile);
 
     }
     catch (error) {
@@ -28,59 +28,139 @@ router.get('/me', auth, async (req, res) => {
     }
 });
 
+
+/*  @route POST /profile/personal
+    @desc Update/Create Personal Profile
+    @access Private
+*/
+router.post('/personal', [auth, [
+    check('gender', 'Gender is required').not().isEmpty(),
+    check('birthday', 'Birthday is required').not().isEmpty(),
+    check('address', 'Address cannot be empty').not().isEmpty(),
+    check('website', 'Must be a website').isURL()
+]], async (req, res) => {
+    //check for errors
+    const error = validationResult(req);
+
+    if (!error.isEmpty()) {
+        return res.status(400).send({ errors: error.array() });
+    }
+
+    const profileFields = {};
+
+    for (let key in req.body) {
+        profileFields[key] = req.body[key];
+    }
+
+    // profileFields.user = req.user.id;
+
+    try {
+        //check if the profile exists, if found modify
+        let profile = await Profile.findOne({ user: req.user.id });
+
+        profile = await Profile.findOneAndUpdate({ user: req.user.id }, profileFields, { new: true });
+
+        return res.send(profile);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
+
+
+/*  @route POST /profile/social
+    @desc Add social links
+    @access Private
+*/
+router.post('/social', [auth, [
+    check('name', 'Social media name cannot be empty').not().isEmpty(),
+    check('username', 'Username cannot be empty').not().isEmpty()
+]], async (req, res) => {
+
+    //check for errors
+    const error = validationResult(req);
+
+    if (!error.isEmpty()) {
+        return res.status(400).send({ errors: error.array() });
+    }
+
+    const newMedia = {};
+
+    for (let key in req.body) {
+        newMedia[key] = req.body[key];
+    }
+
+    try {
+        let profile = await Profile.findOne({ user: req.user.id });
+
+        profile.social.push(newMedia);
+
+        await profile.save();
+
+        res.send(profile);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+
+});
+
+
 /*  @route POST /profile
     @desc Update/Create Profile
     @access Private
 */
-router.post('/', [auth, [
-    //status and skills should be required
-    check('status', 'Status is required').not().isEmpty(),
-    check('skills', 'Skills are required').not().isEmpty()
-]], async (req, res) => {
-    //check if there are errors
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-        res.status(400).send({ errors: error.array() });
-    }
+// router.post('/', [auth, [
+//     //status and skills should be required
+//     check('status', 'Status is required').not().isEmpty(),
+//     check('skills', 'Skills are required').not().isEmpty()
+// ]], async (req, res) => {
+//     //check if there are errors
+//     const error = validationResult(req);
+//     if (!error.isEmpty()) {
+//         res.status(400).send({ errors: error.array() });
+//     }
 
-    //check if those fields are filled
-    const profileFields = {};
-    profileFields.user = req.user.id;
-    profileFields.social = {};
+//     //check if those fields are filled
+//     const profileFields = {};
+//     profileFields.user = req.user.id;
+//     profileFields.social = {};
 
-    for (let key in req.body) {
-        if (key === 'skills') {
-            profileFields.skills = req.body.skills.split(',').map(skill => skill.trim());
-        }
-        else if (key === 'youtube' || key === 'instagram' || key === 'facebook' || key === 'twitter' || key === 'linkedin') {
-            if (key) profileFields.social[key] = req.body[key];
-        }
-        else if (key) {
-            profileFields[key] = req.body[key];
-        }
-    }
+//     for (let key in req.body) {
+//         if (key === 'skills') {
+//             profileFields.skills = req.body.skills.split(',').map(skill => skill.trim());
+//         }
+//         else if (key === 'youtube' || key === 'instagram' || key === 'facebook' || key === 'twitter' || key === 'linkedin') {
+//             if (key) profileFields.social[key] = req.body[key];
+//         }
+//         else if (key) {
+//             profileFields[key] = req.body[key];
+//         }
+//     }
 
-    //check if profile exist
-    try {
-        let profile = await Profile.findOne({ user: req.user.id });
-        //if profile is found then update profile
-        if (profile) {
-            profile = await Profile.findOneAndUpdate({ user: req.user.id }, profileFields, { new: true });
+//     //check if profile exist
+//     try {
+//         let profile = await Profile.findOne({ user: req.user.id });
+//         //if profile is found then update profile
+//         if (profile) {
+//             profile = await Profile.findOneAndUpdate({ user: req.user.id }, profileFields, { new: true });
 
-            return res.send(profile);
-        }
+//             return res.send(profile);
+//         }
 
-        //if profile not found then create it
-        profile = new Profile(profileFields);
+//         //if profile not found then create it
+//         profile = new Profile(profileFields);
 
-        await profile.save();
-        res.send(profile);
-    }
-    catch (error) {
-        res.status(500).send('Server Error');
-    }
+//         await profile.save();
+//         res.send(profile);
+//     }
+//     catch (error) {
+//         res.status(500).send('Server Error');
+//     }
 
-});
+// });
 
 
 /*  @route GET /
@@ -184,8 +264,7 @@ router.delete('/', auth, async (req, res) => {
 */
 router.post('/experience', [auth, [
     check('title', 'Job title is required').not().isEmpty(),
-    check('company', 'Company is required').not().isEmpty(),
-    check('from', 'From date is required').not().isEmpty()
+    check('company', 'Company is required').not().isEmpty()
 ]], async (req, res) => {
 
     const error = validationResult(req);
@@ -260,8 +339,7 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
 router.patch('/experience/:exp_id', [auth, [
     //validate title, company and from
     check('title', 'Title is required').not().isEmpty(),
-    check('company', 'Company is required').not().isEmpty(),
-    check('from', 'From is required').not().isEmpty(),
+    check('company', 'Company is required').not().isEmpty()
 ]], async (req, res) => {
     const errors = validationResult(req);
 
@@ -308,9 +386,7 @@ router.patch('/experience/:exp_id', [auth, [
 */
 router.post('/education', [auth, [
     check('school', 'School is required').not().isEmpty(),
-    check('degree', 'Degree is required').not().isEmpty(),
-    check('field', 'Field of Study is required').not().isEmpty(),
-    check('from', 'From date is required').not().isEmpty()
+    check('degree', 'Degree is required').not().isEmpty()
 ]], async (req, res) => {
 
     const error = validationResult(req);
@@ -385,9 +461,7 @@ router.delete('/education/:edu_id', auth, async (req, res) => {
 router.patch('/education/:edu_id', [auth, [
     //validate title, company and from
     check('school', 'School is required').not().isEmpty(),
-    check('degree', 'Degree is required').not().isEmpty(),
-    check('field', 'Field of Study is required').not().isEmpty(),
-    check('from', 'From date is required').not().isEmpty()
+    check('degree', 'Degree is required').not().isEmpty()
 ]], async (req, res) => {
     const errors = validationResult(req);
 

@@ -8,6 +8,7 @@ const cryptoRandomString = require('crypto-random-string');
 const bcryptjs = require('bcryptjs');
 
 const User = require("../models/User");
+const Profile = require("../models/Profile");
 const auth = require('../middlewares/auth');
 const isVerified = require('../middlewares/isVerified');
 const { verifyEmail } = require('../email/account');
@@ -86,6 +87,11 @@ router.post(
 
       //save the user
       await user.save();
+
+      const profile = new Profile();
+      profile.user = user.id;
+
+      await profile.save();
 
       const payload = {
         user: {
