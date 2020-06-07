@@ -27,7 +27,7 @@ const AboutList = (props) => {
 
             {/* Personal information won't have delete option */}
 
-            {props.title !== 'Birthday' && props.title !== 'Gender' && props.title !== 'Address' && props.title !== 'Website' ? (
+            {props.title !== 'Birthday' && props.title !== 'Gender' && props.title !== 'Address' && props.title !== 'Website' && props.title !== 'Profession' ? (
                 <ListItemSecondaryAction>
                     <IconButton edge="end" aria-label="delete">
                         <Delete />

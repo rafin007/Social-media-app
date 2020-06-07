@@ -6,6 +6,7 @@ const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
         justifyContent: 'center',
+        alignItems: 'center',
         '& > * + *': {
             marginLeft: theme.spacing(2),
         },

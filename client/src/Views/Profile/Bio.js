@@ -1,6 +1,10 @@
 import React from 'react'
-import { Paper, Typography, makeStyles, Button, Grid } from '@material-ui/core';
-import { SaveOutlined } from '@material-ui/icons';
+import { Paper, Typography, makeStyles, Button, Grid, TextField } from '@material-ui/core';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addBio } from '../../Actions/profile';
+import Spinner from '../../Components/Spinner/Spinner';
+import CustomAlert from '../../Components/CustomAlert/CustomAlert';
 
 const useStyles = makeStyles(theme => ({
     bioContainer: {
@@ -13,21 +17,55 @@ const useStyles = makeStyles(theme => ({
     },
     root: {
         paddingBottom: theme.spacing(3)
+    },
+    bio: {
+        width: '100%'
+    },
+    errors: {
+        marginTop: theme.spacing(5)
     }
 }));
 
-const Bio = () => {
+const Bio = ({ profile }) => {
 
     const classes = useStyles();
 
+    const dispatch = useDispatch();
+
+    const [bio, setBio] = useState(profile && profile.bio);
+
+    //loading state
+    const loading = useSelector(state => state.profile.loading);
+
+    //error state
+    const errors = useSelector(state => state.profile.errors);
+
+    const submitBio = async () => {
+        const data = {
+            bio
+        };
+
+        dispatch(addBio(data));
+    }
+
     return (
-        <Grid container className={classes.root} >
+        <Grid container className={classes.root} justify="center" >
             <Grid item xs={12} >
                 <Paper elevation={3} className={classes.bioContainer}  >
                     <Typography variant="h6" gutterBottom >Bio</Typography>
-                    <Typography variant="body2" color="textSecondary" align="justify" contentEditable="true" >
-                        If you're really reading this text, then I am ecstatically delighted and disproportionately flabbergasted with enormous gratification and appreciation for the dispensation of such a tendering and mesmerizing information in which the prestidigitation of the concurrent and subsequent matter is thoroughly demonstrated through the innuances alluding to literal and metaphorical context. I thank you for your unequivocal Idealically, based on my intellectual capacity and my vast knowledge. I have come to a concrete, definite and profound conclusion that I actually have nothing to say... Thank you!
-                    </Typography>
+                    {/* <Typography variant="body2" color="textSecondary" align="justify" contentEditable="true" >
+                        {profile && profile.bio ? profile.bio : 'Add a bio..'}
+                    </Typography> */}
+                    {loading ? <Spinner /> : (<TextField
+                        id="outlined-textarea"
+                        label=""
+                        placeholder="Your bio..."
+                        multiline
+                        variant="outlined"
+                        className={classes.bio}
+                        value={bio}
+                        onChange={(event) => { setBio(event.target.value) }}
+                    />)}
                 </Paper>
             </Grid>
             <Grid item xs={12} className={classes.buttons} >
@@ -43,12 +81,17 @@ const Bio = () => {
                 <Button
                     variant="contained"
                     color="primary"
+                    onClick={submitBio}
+                    disabled={loading}
                 >
                     Save
                 </Button>
+            </Grid>
+            <Grid item xs={10} md={6} lg={4} className={classes.errors} className={classes.errors} >
+                {errors && errors.length > 0 ? errors.map((error, i) => <CustomAlert message={error} severity="error" key={i} />) : null}
             </Grid>
         </Grid>
     )
 }
 
-export default Bio
+export default Bio;

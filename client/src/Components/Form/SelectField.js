@@ -2,7 +2,7 @@ import React from 'react';
 import { FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@material-ui/core';
 import { useField } from 'formik';
 
-const SelectField = ({ label, options, ...props }) => {
+const SelectField = ({ label, options, defaultValue, ...props }) => {
 
     const [field, meta] = useField(props);
 

@@ -13,16 +13,39 @@ const User = require('../models/User');
 */
 router.get('/me', auth, async (req, res) => {
     try {
-        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'avatar']);
-
-        if (!profile) {
-            return res.status(400).send({ msg: 'This user has no profile' });
-        }
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'avatar', 'gender']);
 
         res.send(profile);
 
     }
     catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
+
+/*  @route POST /profile/bio
+    @desc Update/Post bio
+    @access Private
+*/
+router.post('/bio', [auth, [
+    check('bio', 'Bio is required').not().isEmpty()
+]], async (req, res) => {
+    const error = validationResult(req);
+
+    if (!error.isEmpty()) {
+        return res.status(400).send({ errors: error.array() });
+    }
+
+    try {
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'avatar', 'gender']);
+
+        profile.bio = req.body.bio;
+
+        await profile.save();
+
+        res.send(profile);
+    } catch (error) {
         console.error(error);
         res.status(500).send('Server error');
     }
@@ -34,10 +57,10 @@ router.get('/me', auth, async (req, res) => {
     @access Private
 */
 router.post('/personal', [auth, [
-    check('gender', 'Gender is required').not().isEmpty(),
+    check('profession', 'Profession is required').not().isEmpty(),
     check('birthday', 'Birthday is required').not().isEmpty(),
     check('address', 'Address cannot be empty').not().isEmpty(),
-    check('website', 'Must be a website').isURL()
+    // check('website', 'Must be a website').isURL()
 ]], async (req, res) => {
     //check for errors
     const error = validationResult(req);
@@ -56,11 +79,10 @@ router.post('/personal', [auth, [
 
     try {
         //check if the profile exists, if found modify
-        let profile = await Profile.findOne({ user: req.user.id });
 
-        profile = await Profile.findOneAndUpdate({ user: req.user.id }, profileFields, { new: true });
+        const profile = await Profile.findOneAndUpdate({ user: req.user.id }, profileFields, { new: true, useFindAndModify: false }).populate('user', ['name', 'avatar', 'gender']);
 
-        return res.send(profile);
+        res.send(profile);
 
     } catch (error) {
         console.error(error);
@@ -107,6 +129,35 @@ router.post('/social', [auth, [
 
 });
 
+
+/*  @route DELETE /profile/social
+    @desc Delete social links
+    @access Private
+*/
+router.delete('/social/:social_id', auth, async (req, res) => {
+    try {
+        //get the user profile
+        const profile = await Profile.findOne({ user: req.user.id });
+
+        const newMedias = [];
+
+        if (profile.social.length > 0) {
+            //delete the social link
+            newMedias = profile.social.filter(social => social.id !== req.params.social_id);
+        }
+
+        //assign it back to profile
+        profile.social = [...newMedias];
+
+        //save it and return the profile
+        await profile.save();
+        return res.send(profile);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
 
 /*  @route POST /profile
     @desc Update/Create Profile
@@ -169,7 +220,7 @@ router.post('/social', [auth, [
 */
 router.get('/', async (req, res) => {
     try {
-        const profiles = await Profile.find().populate('user', ['avatar', 'name']);
+        const profiles = await Profile.find().populate('user', ['avatar', 'name', 'gender']);
 
         res.send(profiles);
 
@@ -219,7 +270,7 @@ router.get('/education', auth, async (req, res) => {
 */
 router.get('/:user_id', async (req, res) => {
     try {
-        const profile = await Profile.findOne({ user: req.params.user_id }).populate('user', ['name', 'avatar']);
+        const profile = await Profile.findOne({ user: req.params.user_id }).populate('user', ['name', 'avatar', 'gender']);
 
         if (!profile) {
             return res.status(400).send({ msg: 'Profile not found' });

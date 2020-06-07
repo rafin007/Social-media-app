@@ -14,7 +14,7 @@ const profileSchema = new mongoose.Schema({
     address: {
         type: String
     },
-    status: {
+    profession: {
         type: String,
         // required: true
     },
