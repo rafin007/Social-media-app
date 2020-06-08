@@ -9,11 +9,9 @@ import Slide from '@material-ui/core/Slide';
 import { makeStyles } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import Text from '../Form/Text';
-import SelectField from '../Form/SelectField';
 import { personalValidationSchema, educationValidationSchema, experienceValidationSchema, socialValidationSchema } from '../../Validators/AboutValidation';
 import { useDispatch, useSelector } from 'react-redux';
-import { postPersonalInformation } from '../../Actions/profile';
-import Spinner from '../Spinner/Spinner';
+import { postPersonalInformation, postEducationalInformation, postExperienceInformation, postSocialInformation } from '../../Actions/profile';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -67,13 +65,13 @@ const Modal = ({ profile, ...props }) => {
         form = (
             <>
                 <Text placeholder="Degree" name="degree" type="text" />
-                <Text placeholder="Institute" name="institute" type="text" />
+                <Text placeholder="School" name="school" type="text" />
             </>
         );
 
         initialValues = {
-            degree: '',
-            institute: ''
+            degree: profile && profile.degree,
+            school: profile && profile.school
         };
 
         validationSchema = educationValidationSchema;
@@ -84,13 +82,13 @@ const Modal = ({ profile, ...props }) => {
         form = (
             <>
                 <Text placeholder="Company" name="company" type="text" />
-                <Text placeholder="Position" name="position" type="text" />
+                <Text placeholder="Title" name="title" type="text" />
             </>
         );
 
         initialValues = {
-            company: '',
-            position: ''
+            company: profile && profile.company,
+            title: profile && profile.title
         };
 
         validationSchema = experienceValidationSchema;
@@ -106,8 +104,8 @@ const Modal = ({ profile, ...props }) => {
         );
 
         initialValues = {
-            name: '',
-            username: ''
+            name: profile && profile.name,
+            username: profile && profile.username
         };
 
         validationSchema = socialValidationSchema;
@@ -115,19 +113,26 @@ const Modal = ({ profile, ...props }) => {
         title = "Social media account";
     }
 
-    const loading = useSelector(state => state.profile.loading);
-
     const dispatch = useDispatch();
 
     //submit handler
     const handleSubmit = async (data) => {
         //post [type] information
-        dispatch(postPersonalInformation(data));
-
-        //when loading is over close the modal
-        if (!loading) {
-            props.handleClose();
+        if (props.type === 'personal') {
+            dispatch(postPersonalInformation(data));
         }
+        else if (props.type === 'education') {
+            dispatch(postEducationalInformation(data));
+        }
+        else if (props.type === 'experience') {
+            dispatch(postExperienceInformation(data));
+        }
+        else if (props.type === 'social') {
+            dispatch(postSocialInformation(data));
+        }
+
+        // close the mocal immediately
+        props.handleClose();
     }
 
     return (
@@ -144,13 +149,14 @@ const Modal = ({ profile, ...props }) => {
                     validateOnChange={true}
                     initialValues={initialValues}
                     validationSchema={validationSchema}
-                    onSubmit={(data, { setSubmitting }) => {
+                    onSubmit={(data, { setSubmitting, resetForm }) => {
                         setSubmitting(true);
                         handleSubmit(data);
+                        resetForm({})
                         setSubmitting(false);
                     }} >
                     {({ values, errors, isSubmitting }) => (
-                        loading ? <Spinner /> : (<Form >
+                        <Form >
                             <DialogTitle id="alert-dialog-slide-title">{`Fill out your ${title} details`}</DialogTitle>
                             <DialogContent className={classes.form} >
                                 {/* <DialogContentText id="alert-dialog-slide-description">
@@ -167,7 +173,7 @@ const Modal = ({ profile, ...props }) => {
                                     Submit
                                 </Button>
                             </DialogActions>
-                        </Form>)
+                        </Form>
                     )}
                 </Formik>
             </Dialog>

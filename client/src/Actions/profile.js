@@ -86,3 +86,159 @@ export const postPersonalInformation = ({ address, birthday, profession, website
         });
     }
 };
+
+//-------------post educational information---------------
+export const postEducationalInformation = ({ school, degree }) => async dispatch => {
+
+    const body = JSON.stringify({ school, degree });
+
+    try {
+        //loading first
+        dispatch({
+            type: actionTypes.LOADING
+        });
+
+        //send data
+        const response = await axios.post('/profile/education', body, config);
+
+        dispatch({
+            type: actionTypes.POST_EDUCATIONAL,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.EDUCATIONAL_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};
+
+
+//------------------delete educational info by id-----------------
+export const deleteEducationalInformation = (id) => async dispatch => {
+    try {
+
+        //loading first
+        dispatch({
+            type: actionTypes.LOADING
+        });
+
+        const response = await axios.delete(`/profile/education/${id}`);
+
+        dispatch({
+            type: actionTypes.DELETE_EDUCATIONAL,
+            payload: response.data
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+//-------------post educational information---------------
+export const postExperienceInformation = ({ company, title }) => async dispatch => {
+
+    const body = JSON.stringify({ company, title });
+
+    try {
+        //loading first
+        dispatch({
+            type: actionTypes.LOADING
+        });
+
+        //send data
+        const response = await axios.post('/profile/experience', body, config);
+
+        dispatch({
+            type: actionTypes.POST_EXPERIENCE,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.EXPERIENCE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};
+
+
+
+//------------------delete experience info by id-----------------
+export const deleteExperienceInformation = (id) => async dispatch => {
+    try {
+
+        //loading first
+        dispatch({
+            type: actionTypes.LOADING
+        });
+
+        const response = await axios.delete(`/profile/experience/${id}`);
+
+        dispatch({
+            type: actionTypes.DELETE_EXPERIENCE,
+            payload: response.data
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+
+//-------------post social information---------------
+export const postSocialInformation = ({ name, username }) => async dispatch => {
+
+    const body = JSON.stringify({ name, username });
+
+    try {
+        //loading first
+        dispatch({
+            type: actionTypes.LOADING
+        });
+
+        //send data
+        const response = await axios.post('/profile/social', body, config);
+
+        dispatch({
+            type: actionTypes.POST_SOCIAL,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.SOCIAL_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};
+
+
+//------------------delete social info by id-----------------
+export const deleteSocialInformation = (id) => async dispatch => {
+    try {
+
+        //loading first
+        dispatch({
+            type: actionTypes.LOADING
+        });
+
+        const response = await axios.delete(`/profile/social/${id}`);
+
+        dispatch({
+            type: actionTypes.DELETE_SOCIAL,
+            payload: response.data
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+};

@@ -4,6 +4,9 @@ import { Grid, List, Button } from '@material-ui/core';
 import Expander from '../../Components/Expander/Expander';
 import AboutList from '../../Components/AboutList/AboutList';
 import Modal from '../../Components/Modal/Modal';
+import { useSelector } from 'react-redux';
+import CustomAlert from '../../Components/CustomAlert/CustomAlert';
+import Spinner from '../../Components/Spinner/Spinner';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -37,112 +40,127 @@ const About = ({ profile }) => {
     //info type logic
     const [type, setType] = useState('');
 
+    //error state
+    const errors = useSelector(state => state.profile.errors);
+
+    //loading state
+    const loading = useSelector(state => state.profile.loading);
+
     return (
-        <Grid item xs={12} className={classes.root} >
+        <>
+            <Grid item xs={12} className={classes.root} >
 
-            <Expander heading="Personal" secondaryHeading={`View ${profile && profile.user.name}'s personal details`} expanded={expanded} setExpanded={setExpanded} panel="panel1" >
-                <Grid container className={classes.list} >
-                    <Grid item xs={12} >
-                        <List >
-                            <AboutList
-                                title="Profession"
-                                description={profile && profile.profession} />
+                <Expander heading="Personal" secondaryHeading={`View ${profile && profile.user.name}'s personal details`} expanded={expanded} setExpanded={setExpanded} panel="panel1" >
+                    <Grid container className={classes.list} >
+                        <Grid item xs={12} >
+                            {loading ? <Spinner /> : (<List >
+                                <AboutList
+                                    title="Profession"
+                                    description={profile && profile.profession} />
 
-                            <AboutList
-                                title="Gender"
-                                description={profile && profile.user.gender} />
+                                <AboutList
+                                    title="Gender"
+                                    description={profile && profile.user.gender} />
 
-                            <AboutList
-                                title="Birthday"
-                                description={profile && profile.birthday} />
+                                <AboutList
+                                    title="Birthday"
+                                    description={profile && profile.birthday} />
 
-                            <AboutList
-                                title="Address"
-                                description={profile && profile.address} />
+                                <AboutList
+                                    title="Address"
+                                    description={profile && profile.address} />
 
-                            <AboutList
-                                title="Website"
-                                description={profile && profile.website} />
+                                <AboutList
+                                    title="Website"
+                                    description={profile && profile.website} />
 
-                        </List>
+                            </List>
+                            )}
+                        </Grid>
+                        <Grid item xs={12} >
+                            <Button variant="contained" color="primary" onClick={() => { setType('personal'); handleClickOpen(); }} >Edit</Button>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12} >
-                        <Button variant="contained" color="primary" onClick={() => { setType('personal'); handleClickOpen(); }} >Edit</Button>
+                </Expander>
+
+                <Expander heading="Education" secondaryHeading={`View ${profile && profile.user.name}'s educational background`} expanded={expanded} setExpanded={setExpanded} panel="panel2" >
+                    <Grid container className={classes.list} >
+                        <Grid item xs={12} >
+                            {loading ? <Spinner /> : (<List>
+                                {profile && profile.education.length > 0 && profile.education.map(edu => {
+                                    return (
+                                        <AboutList
+                                            title={edu.degree}
+                                            description={edu.school}
+                                            key={edu._id}
+                                            id={edu._id}
+                                            type="education" />
+                                    );
+                                })}
+
+                            </List>
+                            )}
+                        </Grid>
+                        <Grid item xs={12} >
+                            <Button variant="contained" color="primary" onClick={() => { setType('education'); handleClickOpen(); }} >ADD</Button>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Expander>
+                </Expander>
 
-            <Expander heading="Education" secondaryHeading="View Arefin's education background" expanded={expanded} setExpanded={setExpanded} panel="panel2" >
-                <Grid container className={classes.list} >
-                    <Grid item xs={12} >
-                        <List>
-                            <AboutList
-                                title="School"
-                                description="Jashore Zilla School" />
+                <Expander heading="Experiences" secondaryHeading={`View ${profile && profile.user.name}'s experiences`} expanded={expanded} setExpanded={setExpanded} panel="panel3" >
 
-                            <AboutList
-                                title="College"
-                                description="I'm not proud" />
+                    <Grid container className={classes.list} >
+                        <Grid item xs={12} >
+                            {loading ? <Spinner /> : (<List>
+                                {profile && profile.experience.length > 0 && profile.experience.map(exp => {
+                                    return (
+                                        <AboutList
+                                            title={exp.company}
+                                            description={exp.title}
+                                            key={exp._id}
+                                            id={exp._id}
+                                            type="experience" />
+                                    );
+                                })}
 
-                            <AboutList
-                                title="BSc in CSE"
-                                description="American International University, Bangladesh" />
-
-                        </List>
+                            </List>
+                            )}
+                        </Grid>
+                        <Grid item xs={12} >
+                            <Button variant="contained" color="primary" onClick={() => { setType('experience'); handleClickOpen(); }} >ADD</Button>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12} >
-                        <Button variant="contained" color="primary" onClick={() => { setType('education'); handleClickOpen(); }} >ADD</Button>
+
+                </Expander>
+
+                <Expander heading="Social" secondaryHeading={`View ${profile && profile.user.name}'s social links`} expanded={expanded} setExpanded={setExpanded} panel="panel4" >
+                    <Grid container className={classes.list} >
+                        <Grid item xs={12} >
+                            {loading ? <Spinner /> : (<List>
+                                {profile && profile.social.length > 0 && profile.social.map(soc => {
+                                    return (
+                                        <AboutList
+                                            title={soc.name}
+                                            description={soc.username}
+                                            key={soc._id}
+                                            id={soc._id}
+                                            type="social" />
+                                    );
+                                })}
+
+                            </List>)}
+                        </Grid>
+                        <Grid item xs={12} >
+                            <Button variant="contained" color="primary" onClick={() => { setType('social'); handleClickOpen(); }} >ADD</Button>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Expander>
-
-            <Expander heading="Experiences" secondaryHeading="View Arefin's experiences" expanded={expanded} setExpanded={setExpanded} panel="panel3" >
-
-                <Grid container className={classes.list} >
-                    <Grid item xs={12} >
-                        <List>
-                            <AboutList
-                                title="Oddyssey Apps LTD"
-                                description="iOS Developer" />
-
-                        </List>
-                    </Grid>
-                    <Grid item xs={12} >
-                        <Button variant="contained" color="primary" onClick={() => { setType('experience'); handleClickOpen(); }} >ADD</Button>
-                    </Grid>
-                </Grid>
-
-            </Expander>
-
-            <Expander heading="Social" secondaryHeading="View Arefin's social links" expanded={expanded} setExpanded={setExpanded} panel="panel4" >
-                <Grid container className={classes.list} >
-                    <Grid item xs={12} >
-                        <List>
-                            <AboutList
-                                title="Facebook"
-                                description="Rafin Ryan" />
-
-                            <AboutList
-                                title="Instagram"
-                                description="im_arefin" />
-
-                            <AboutList
-                                title="Github"
-                                description="rafin007" />
-
-                            <AboutList
-                                title="Linkedin"
-                                description="Arefin Mehedi" />
-
-                        </List>
-                    </Grid>
-                    <Grid item xs={12} >
-                        <Button variant="contained" color="primary" onClick={() => { setType('social'); handleClickOpen(); }} >ADD</Button>
-                    </Grid>
-                </Grid>
-            </Expander>
-            <Modal open={open} handleClose={handleClose} type={type} profile={profile} />
-        </Grid>
+                </Expander>
+                <Modal open={open} handleClose={handleClose} type={type} profile={profile} />
+            </Grid>
+            <Grid item xs={10} md={6} lg={4} className={classes.errors} className={classes.errors} >
+                {errors && errors.length > 0 ? errors.map((error, i) => <CustomAlert message={error} severity="error" key={i} />) : null}
+            </Grid>
+        </>
     )
 }
 

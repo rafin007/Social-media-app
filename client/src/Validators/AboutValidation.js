@@ -9,12 +9,12 @@ export const personalValidationSchema = yup.object({
 
 export const educationValidationSchema = yup.object({
     degree: yup.string().required(),
-    institute: yup.string().required()
+    school: yup.string().required()
 });
 
 export const experienceValidationSchema = yup.object({
     company: yup.string().required(),
-    position: yup.string().required()
+    title: yup.string().required()
 });
 
 export const socialValidationSchema = yup.object({

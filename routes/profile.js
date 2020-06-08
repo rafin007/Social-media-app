@@ -114,7 +114,7 @@ router.post('/social', [auth, [
     }
 
     try {
-        let profile = await Profile.findOne({ user: req.user.id });
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'gender', 'avatar']);
 
         profile.social.push(newMedia);
 
@@ -137,9 +137,9 @@ router.post('/social', [auth, [
 router.delete('/social/:social_id', auth, async (req, res) => {
     try {
         //get the user profile
-        const profile = await Profile.findOne({ user: req.user.id });
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'gender', 'avatar']);
 
-        const newMedias = [];
+        let newMedias = [];
 
         if (profile.social.length > 0) {
             //delete the social link
@@ -333,7 +333,7 @@ router.post('/experience', [auth, [
 
     try {
         //fetch the profile of the user
-        const profile = await Profile.findOne({ user: req.user.id });
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'gender', 'avatar']);
 
         //add the experience on top
         profile.experience.unshift(newExp);
@@ -356,7 +356,7 @@ router.post('/experience', [auth, [
 router.delete('/experience/:exp_id', auth, async (req, res) => {
     try {
         //get the profile of user
-        const profile = await Profile.findOne({ user: req.user.id });
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'gender', 'avatar']);
 
         let newExp = [];
 
@@ -455,7 +455,7 @@ router.post('/education', [auth, [
 
     try {
         //fetch the profile of the user
-        const profile = await Profile.findOne({ user: req.user.id });
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'gender', 'avatar']);
 
         //add the education on top
         profile.education.unshift(newEdu);
@@ -478,7 +478,7 @@ router.post('/education', [auth, [
 router.delete('/education/:edu_id', auth, async (req, res) => {
     try {
         //get the profile of user
-        const profile = await Profile.findOne({ user: req.user.id });
+        const profile = await Profile.findOne({ user: req.user.id }).populate('user', ['name', 'gender', 'avatar']);
 
         let newEdu = [];
 

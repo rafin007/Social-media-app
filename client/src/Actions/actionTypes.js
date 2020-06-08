@@ -27,3 +27,18 @@ export const BIO_ERROR = 'BIO_ERROR';
 //profile personal information
 export const POST_PERSONAL = 'POST_PERSONAL';
 export const PERSONAL_ERROR = 'PERSONAL_ERROR';
+
+//profile educational information
+export const POST_EDUCATIONAL = 'POST_EDUCATIONAL';
+export const EDUCATIONAL_ERROR = 'EDUCATIONAL_ERROR';
+export const DELETE_EDUCATIONAL = 'DELETE_EDUCATIONAL';
+
+//profile experience information
+export const POST_EXPERIENCE = 'POST_EXPERIENCE';
+export const EXPERIENCE_ERROR = 'EXPERIENCE_ERROR';
+export const DELETE_EXPERIENCE = 'DELETE_EXPERIENCE';
+
+//profile social information
+export const POST_SOCIAL = 'POST_SOCIAL';
+export const SOCIAL_ERROR = 'SOCIAL_ERROR';
+export const DELETE_SOCIAL = 'DELETE_SOCIAL';

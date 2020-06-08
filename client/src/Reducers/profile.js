@@ -21,6 +21,12 @@ const profileReducer = (state = initialState, action) => {
         case actionTypes.GET_PROFILE:
         case actionTypes.POST_PERSONAL:
         case actionTypes.ADD_BIO:
+        case actionTypes.POST_EDUCATIONAL:
+        case actionTypes.POST_EXPERIENCE:
+        case actionTypes.POST_SOCIAL:
+        case actionTypes.DELETE_EDUCATIONAL:
+        case actionTypes.DELETE_EXPERIENCE:
+        case actionTypes.DELETE_SOCIAL:
             return {
                 ...state,
                 loading: false,
@@ -30,6 +36,9 @@ const profileReducer = (state = initialState, action) => {
         case actionTypes.PROFILE_ERROR:
         case actionTypes.BIO_ERROR:
         case actionTypes.PERSONAL_ERROR:
+        case actionTypes.EDUCATIONAL_ERROR:
+        case actionTypes.EXPERIENCE_ERROR:
+        case actionTypes.SOCIAL_ERROR:
             return {
                 ...state,
                 loading: false,
