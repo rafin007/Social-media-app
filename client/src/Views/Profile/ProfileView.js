@@ -64,10 +64,10 @@ const ProfileView = () => {
     let pageContent = null;
 
     if (value === 0) {
-        pageContent = <Bio profile={profile} />
+        pageContent = <Bio profile={profile} />;
     }
     else if (value === 1) {
-        pageContent = <ProfilePosts profile={profile} />
+        pageContent = <ProfilePosts profile={profile} />;
     }
     else {
         pageContent = <About profile={profile} />;

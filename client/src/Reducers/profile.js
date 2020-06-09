@@ -45,26 +45,13 @@ const profileReducer = (state = initialState, action) => {
                 errors: payload
             }
 
-        // case actionTypes.ADD_BIO:
-        //     return {
-        //         ...state,
-        //         loading: false,
-        //         profile: payload
-        //     }
-
-        // case actionTypes.BIO_ERROR:
-        //     return {
-        //         ...state,
-        //         loading: false,
-        //         errors: payload
-        //     }
-
-        // case actionTypes.POST_PERSONAL:
-        //     return {
-        //         ...state,
-        //         loading: false,
-
-        //     }
+        case actionTypes.CLEAR_PROFILE:
+            return {
+                ...state,
+                profile: null,
+                loading: false,
+                errors: []
+            }
 
         default:
             return state;
