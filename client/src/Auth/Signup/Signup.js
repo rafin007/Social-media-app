@@ -100,12 +100,12 @@ const Signup = () => {
                                 setSubmitting(false);
                             }} >
 
-                            {({ values, errors, isSubmitting }) => (
+                            {({ values, errors, isSubmitting, handleChange }) => (
                                 loading ? <Spinner /> : (<Form className={classes.form} >
-                                    <Text placeholder="Name" name="name" />
-                                    <Text placeholder="Email" name="email" />
-                                    <Text placeholder="Password" name="password" type="password" />
-                                    <Text placeholder="Confrim Password" name="confirmPassword" type="password" />
+                                    <Text placeholder="Name" name="name" value={values.name} onChange={handleChange} />
+                                    <Text placeholder="Email" name="email" value={values.email} onChange={handleChange} />
+                                    <Text placeholder="Password" name="password" type="password" value={values.password} onChange={handleChange} />
+                                    <Text placeholder="Confrim Password" name="confirmPassword" type="password" value={values.confirmPassword} onChange={handleChange} />
                                     <SelectField name="gender" label="Choose Gender" options={['Male', 'Female', 'Other']} />
                                     <Button color="primary" className={classes.signup} variant="contained" disabled={isSubmitting} type="submit" >
                                         Sign up

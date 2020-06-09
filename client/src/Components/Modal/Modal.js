@@ -31,30 +31,57 @@ const Modal = ({ profile, ...props }) => {
 
     const classes = useStyles();
 
-    let form = null;
-
     let initialValues = {};
 
     let validationSchema = null;
 
     let title = "";
 
-    //change form, initialValues and validationSchema according to type
+    const getForm = (values, handleChange) => {
+        if (props.type === 'personal') {
+            return (
+                <>
+                    <Text placeholder="Profession" name="profession" type="text" value={values.profession || ''} onChange={handleChange} />
+                    <Text placeholder="Birthday" name="birthday" type="text" value={values.birthday || ''} onChange={handleChange} />
+                    <Text placeholder="Address" name="address" type="text" value={values.address || ''} onChange={handleChange} />
+                    <Text placeholder="Website" name="website" type="text" value={values.website || ''} onChange={handleChange} />
+                </>
+            );
+        }
+        else if (props.type === 'education') {
+            return (
+                <>
+                    <Text placeholder="Degree" name="degree" type="text" onChange={handleChange} value={values.degree || ''} />
+                    <Text placeholder="School" name="school" type="text" onChange={handleChange} value={values.school || ''} />
+                </>
+            );
+        }
+        else if (props.type === 'experience') {
+            return (
+                <>
+                    <Text placeholder="Company" name="company" type="text" onChange={handleChange} value={values.company || ''} />
+                    <Text placeholder="Title" name="title" type="text" onChange={handleChange} value={values.title || ''} />
+                </>
+            );
+        }
+        else if (props.type === 'social') {
+            return (
+                <>
+                    <Text placeholder="Social Media" name="name" type="text" onChange={handleChange} value={values.name || ''} />
+                    <Text placeholder="Username" name="username" type="text" onChange={handleChange} value={values.username || ''} />
+                </>
+            );
+        }
+    };
+
+    //change initialValues and validationSchema according to type
     if (props.type === 'personal') {
-        form = (
-            <>
-                <Text placeholder="Profession" name="profession" type="text" />
-                <Text placeholder="Birthday" name="birthday" type="text" />
-                <Text placeholder="Address" name="address" type="text" />
-                <Text placeholder="Website" name="website" type="text" />
-            </>
-        );
 
         initialValues = {
-            profession: profile && profile.profession,
-            birthday: profile && profile.birthday,
-            address: profile && profile.address,
-            website: profile && profile.website
+            profession: '',
+            birthday: '',
+            address: '',
+            website: ''
         };
 
         validationSchema = personalValidationSchema;
@@ -62,16 +89,10 @@ const Modal = ({ profile, ...props }) => {
         title = "Personal";
     }
     else if (props.type === 'education') {
-        form = (
-            <>
-                <Text placeholder="Degree" name="degree" type="text" />
-                <Text placeholder="School" name="school" type="text" />
-            </>
-        );
 
         initialValues = {
-            degree: profile && profile.degree,
-            school: profile && profile.school
+            degree: '',
+            school: ''
         };
 
         validationSchema = educationValidationSchema;
@@ -79,16 +100,10 @@ const Modal = ({ profile, ...props }) => {
         title = "Educational";
     }
     else if (props.type === 'experience') {
-        form = (
-            <>
-                <Text placeholder="Company" name="company" type="text" />
-                <Text placeholder="Title" name="title" type="text" />
-            </>
-        );
 
         initialValues = {
-            company: profile && profile.company,
-            title: profile && profile.title
+            company: '',
+            title: ''
         };
 
         validationSchema = experienceValidationSchema;
@@ -96,16 +111,10 @@ const Modal = ({ profile, ...props }) => {
         title = "Experience";
     }
     else if (props.type === 'social') {
-        form = (
-            <>
-                <Text placeholder="Social Media" name="name" type="text" />
-                <Text placeholder="Username" name="username" type="text" />
-            </>
-        );
 
         initialValues = {
-            name: profile && profile.name,
-            username: profile && profile.username
+            name: '',
+            username: ''
         };
 
         validationSchema = socialValidationSchema;
@@ -131,7 +140,7 @@ const Modal = ({ profile, ...props }) => {
             dispatch(postSocialInformation(data));
         }
 
-        // close the mocal immediately
+        // close the modal immediately
         props.handleClose();
     }
 
@@ -152,10 +161,10 @@ const Modal = ({ profile, ...props }) => {
                     onSubmit={(data, { setSubmitting, resetForm }) => {
                         setSubmitting(true);
                         handleSubmit(data);
-                        resetForm({})
                         setSubmitting(false);
+                        resetForm({});
                     }} >
-                    {({ values, errors, isSubmitting }) => (
+                    {({ values, errors, isSubmitting, handleChange }) => (
                         <Form >
                             <DialogTitle id="alert-dialog-slide-title">{`Fill out your ${title} details`}</DialogTitle>
                             <DialogContent className={classes.form} >
@@ -163,7 +172,7 @@ const Modal = ({ profile, ...props }) => {
                         Fill out your personal details below
                     </DialogContentText> */}
 
-                                {form}
+                                {getForm(values, handleChange)}
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={props.handleClose} color="secondary">

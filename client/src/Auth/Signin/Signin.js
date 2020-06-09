@@ -89,10 +89,10 @@ const Signin = () => {
                             }} >
 
 
-                            {({ values, errors, isSubmitting }) => (
+                            {({ values, errors, isSubmitting, handleChange }) => (
                                 loading ? <Spinner /> : (<Form className={classes.form} >
-                                    <Text placeholder="email" name="email" type="email" />
-                                    <Text placeholder="password" name="password" type="password" />
+                                    <Text placeholder="email" name="email" type="email" value={values.email} onChange={handleChange} />
+                                    <Text placeholder="password" name="password" type="password" value={values.password} onChange={handleChange} />
                                     <Button color="primary" className={classes.signin} variant="contained" disabled={isSubmitting} type="submit" >
                                         Sign in
                                     </Button>
