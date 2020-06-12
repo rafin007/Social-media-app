@@ -24,10 +24,12 @@ export const getCurrentProfile = () => async dispatch => {
             payload: response.data
         });
 
-    } catch (error) {
+    } catch (err) {
+        const errors = err.response.data.errors;
+
         dispatch({
-            type: actionTypes.PROFILE_ERROR,
-            payload: { msg: error.response.statusText, status: error.response.status }
+            type: actionTypes.BIO_ERROR,
+            payload: errors.map(error => error.msg)
         });
     }
 }
@@ -240,5 +242,32 @@ export const deleteSocialInformation = (id) => async dispatch => {
 
     } catch (error) {
         console.log(error);
+    }
+};
+
+
+//------------------ get all profiles-----------------------
+export const getAllProfiles = () => async dispatch => {
+    //clear personal profile to avoid conflict
+    dispatch({ type: actionTypes.CLEAR_PROFILE });
+
+    try {
+
+        //loading first
+        dispatch({ type: actionTypes.LOADING });
+
+        const response = await axios.get('/profile');
+
+        dispatch({
+            type: actionTypes.GET_PROFILES,
+            payload: response.data
+        });
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.PROFILE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
     }
 };

@@ -3,15 +3,15 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import { makeStyles } from '@material-ui/core';
 import { Form, Formik } from 'formik';
 import Text from '../Form/Text';
 import { personalValidationSchema, educationValidationSchema, experienceValidationSchema, socialValidationSchema } from '../../Validators/AboutValidation';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { postPersonalInformation, postEducationalInformation, postExperienceInformation, postSocialInformation } from '../../Actions/profile';
+import DatePicker from '../Form/DatePicker';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -42,7 +42,8 @@ const Modal = ({ profile, ...props }) => {
             return (
                 <>
                     <Text placeholder="Profession" name="profession" type="text" value={values.profession || ''} onChange={handleChange} />
-                    <Text placeholder="Birthday" name="birthday" type="text" value={values.birthday || ''} onChange={handleChange} />
+                    {/* <Text placeholder="Birthday" name="birthday" type="text" value={values.birthday || ''} onChange={handleChange} /> */}
+                    <DatePicker label="Birthday" type="date" name="birthday" onChange={handleChange} value={values.birthday || ''} />
                     <Text placeholder="Address" name="address" type="text" value={values.address || ''} onChange={handleChange} />
                     <Text placeholder="Website" name="website" type="text" value={values.website || ''} onChange={handleChange} />
                 </>
@@ -78,10 +79,10 @@ const Modal = ({ profile, ...props }) => {
     if (props.type === 'personal') {
 
         initialValues = {
-            profession: '',
-            birthday: '',
-            address: '',
-            website: ''
+            profession: profile && profile.profession,
+            birthday: profile && profile.birthday,
+            address: profile && profile.address,
+            website: profile && profile.website
         };
 
         validationSchema = personalValidationSchema;
@@ -158,11 +159,12 @@ const Modal = ({ profile, ...props }) => {
                     validateOnChange={true}
                     initialValues={initialValues}
                     validationSchema={validationSchema}
+                    enableReinitialize={true}
                     onSubmit={(data, { setSubmitting, resetForm }) => {
                         setSubmitting(true);
                         handleSubmit(data);
                         setSubmitting(false);
-                        resetForm({});
+                        resetForm(initialValues);
                     }} >
                     {({ values, errors, isSubmitting, handleChange }) => (
                         <Form >

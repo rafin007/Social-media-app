@@ -12,6 +12,8 @@
   "author": "Arefin",
   "license": "MIT",
   "dependencies": {
+    "@date-io/date-fns": "^2.6.2",
+    "@material-ui/pickers": "^3.2.10",
     "@n8tb1t/use-scroll-position": "^1.0.43",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",

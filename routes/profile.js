@@ -218,7 +218,7 @@ router.delete('/social/:social_id', auth, async (req, res) => {
     @desc Get all users' profile
     @access Public
 */
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const profiles = await Profile.find().populate('user', ['avatar', 'name', 'gender']);
 

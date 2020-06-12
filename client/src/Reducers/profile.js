@@ -53,6 +53,13 @@ const profileReducer = (state = initialState, action) => {
                 errors: []
             }
 
+        case actionTypes.GET_PROFILES:
+            return {
+                ...state,
+                loading: false,
+                profiles: payload
+            }
+
         default:
             return state;
     }

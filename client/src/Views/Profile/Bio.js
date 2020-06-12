@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addBio } from '../../Actions/profile';
 import Spinner from '../../Components/Spinner/Spinner';
 import CustomAlert from '../../Components/CustomAlert/CustomAlert';
+import { useEffect } from 'react';
 
 const useStyles = makeStyles(theme => ({
     bioContainer: {
@@ -32,7 +33,7 @@ const Bio = ({ profile }) => {
 
     const dispatch = useDispatch();
 
-    const [bio, setBio] = useState(profile && profile.bio);
+    const [bio, setBio] = useState('');
 
     //loading state
     const loading = useSelector(state => state.profile.loading);
@@ -47,6 +48,12 @@ const Bio = ({ profile }) => {
 
         dispatch(addBio(data));
     }
+
+    useEffect(() => {
+        if (!loading && profile) {
+            setBio(profile.bio);
+        }
+    }, [loading, profile]);
 
     return (
         <Grid container className={classes.root} justify="center" >
