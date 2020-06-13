@@ -271,3 +271,28 @@ export const getAllProfiles = () => async dispatch => {
         });
     }
 };
+
+
+//----------------Get profile by ID-------------------------
+export const getProfileById = id => async dispatch => {
+    try {
+
+        //loading first
+        dispatch({ type: actionTypes.LOADING });
+
+        const response = await axios.get(`/profile/${id}`);
+
+        dispatch({
+            type: actionTypes.GET_PROFILE,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.PROFILE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};

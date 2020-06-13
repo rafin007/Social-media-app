@@ -268,19 +268,19 @@ router.get('/education', auth, async (req, res) => {
     @desc Get profile by user_id
     @access Public
 */
-router.get('/:user_id', async (req, res) => {
+router.get('/:user_id', auth, async (req, res) => {
     try {
-        const profile = await Profile.findOne({ user: req.params.user_id }).populate('user', ['name', 'avatar', 'gender']);
+        const profile = await Profile.findById(req.params.user_id).populate('user', ['name', 'avatar', 'gender']);
 
         if (!profile) {
-            return res.status(400).send({ msg: 'Profile not found' });
+            return res.status(400).send({ errors: [{ msg: 'Profile not found!' }] });
         }
 
         res.send(profile);
 
     }
     catch (error) {
-        if (error.kind == 'ObjectId') return res.status(400).send({ msg: 'Profile not found' });
+        if (error.kind == 'ObjectId') return res.status(400).send({ errors: [{ msg: 'Profile not found!' }] });
 
         console.error('Server error');
     }
@@ -301,7 +301,7 @@ router.delete('/', auth, async (req, res) => {
         //delete user
         await User.findByIdAndRemove(req.user.id);
 
-        res.send({ msg: 'User deleted' });
+        res.send([{ msg: 'User deleted' }]);
 
     } catch (error) {
         console.error('Server error');

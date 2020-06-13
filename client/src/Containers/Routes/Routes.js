@@ -11,6 +11,7 @@ import MessagesView from '../../Views/Messages/MessagesView';
 import ProfileView from '../../Views/Profile/ProfileView';
 import NotificationsView from '../../Views/Notifications/NotificationsView';
 import HomeView from '../../Views/Home/HomeView';
+import ViewProfile from '../../Components/Profile';
 
 //routes contain all the routes after the user has logged in
 
@@ -27,6 +28,7 @@ const Routes = () => {
             <Route path="/profile" exact component={ProfileView} />
             <Route path="/notifications" exact component={NotificationsView} />
             <Route path="/home" exact component={HomeView} />
+            <Route path="/profile/:id" exact component={ViewProfile} />
         </Switch>
     );
 }

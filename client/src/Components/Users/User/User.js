@@ -1,27 +1,35 @@
 import React from 'react';
-import { ListItem, Avatar, ListItemAvatar, ListItemText, ListItemSecondaryAction, IconButton } from '@material-ui/core';
-import { FolderOutlined } from '@material-ui/icons';
+import { ListItem, Avatar, ListItemAvatar, ListItemText, ListItemSecondaryAction, IconButton, Button, makeStyles } from '@material-ui/core';
+import myImg from '../../../assets/images/avatar.jpg';
+import { Link } from 'react-router-dom';
 
-const User = () => {
 
-    //@TODO => Make User List component
+const useStyles = makeStyles(theme => ({
+    link: {
+        display: 'flex',
+        textDecoration: 'none',
+        color: '#000'
+    }
+}));
+
+const User = ({ profile }) => {
+
+    const classes = useStyles();
 
     return (
         <ListItem>
-            <ListItemAvatar>
-                <Avatar>
-                    <FolderOutlined />
-                </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-                primary="Single-line item"
-                secondary="some other text"
-            />
+            <Link to={`/profile/${profile._id}`} className={classes.link} >
+                <ListItemAvatar>
+                    <Avatar alt="avatar" src={myImg} />
+                </ListItemAvatar>
+                <ListItemText
+                    primary={profile.user.name}
+                    secondary={profile.profession}
+                />
 
+            </Link>
             <ListItemSecondaryAction>
-                <IconButton edge="end" aria-label="delete">
-                    <FolderOutlined />
-                </IconButton>
+                <Button color="primary" variant="contained" size="small" >Follow</Button>
             </ListItemSecondaryAction>
         </ListItem>
     );
