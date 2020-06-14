@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Paper, makeStyles, Typography, Button } from '@material-ui/core';
+import { Grid, Paper, makeStyles, Typography, Button, IconButton } from '@material-ui/core';
 import Avatar from '../Avatar/Avatar';
 import imageAvatar from '../../assets/images/avatar.jpg';
 import ProfileTabs from './ProfileTabs';
@@ -8,9 +8,10 @@ import ProfilePosts from './ProfilePosts';
 import About from './About';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../Spinner/Spinner';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getProfileById } from '../../Actions/profile';
+import { ArrowBackIos } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -35,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('lg')]: {
             padding: '0 20rem'
         }
+    },
+    link: {
+        textDecoration: 'none',
     }
 }));
 
@@ -87,6 +91,20 @@ const Profile = () => {
     else {
         profileContent = (
             <Grid container direction="row" justify="space-between" alignItems="stretch" className={classes.root} >
+                <Grid item xs={12} >
+                    <Link to={{
+                        pathname: '/home',
+                        state: {
+                            tab: 1
+                        }
+                    }} className={classes.link} >
+
+                        <IconButton aria-label="go back" color="primary" size="small" >
+                            <ArrowBackIos />
+                        back
+                    </IconButton>
+                    </Link>
+                </Grid>
                 <Grid item xs={6} >
                     <Avatar owner={imageAvatar} width={14} height={14} />
                     <Typography variant="h5" align="center" >
@@ -104,7 +122,7 @@ const Profile = () => {
                         </Typography>
                         <Typography variant="h6" className={classes.follow} >
                             {profile && profile.user.following.length}
-                            <Typography variant="body2" color="textSecondary" >Followings</Typography>
+                            <Typography variant="body2" color="textSecondary" >Following</Typography>
                         </Typography>
                     </div>
                     <Button variant="contained" color="primary" >Follow</Button>

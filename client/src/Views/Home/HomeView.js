@@ -3,6 +3,7 @@ import { Grid, makeStyles } from '@material-ui/core';
 import Tabs from '../../Components/Tabs/Tabs';
 import Feed from '../../Components/Feed/Feed';
 import Users from '../../Components/Users/Users';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -22,7 +23,10 @@ const HomeView = () => {
 
     const classes = useStyles();
 
-    const [tabValue, setTabValue] = useState(0);
+    //check if coming from individual profile route
+    const { state } = useLocation();
+
+    const [tabValue, setTabValue] = useState(state ? state.tab : 0);
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);

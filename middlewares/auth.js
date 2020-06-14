@@ -32,7 +32,9 @@ const auth = async (req, res, next) => {
     next();
   } catch (error) {
     console.error(error);
-    res.status(401).send({ msg: "Please authenticate" });
+    res.status(401).send({
+      errors: [{ msg: 'Please authenticate' }]
+    });
   }
 };
 

@@ -270,7 +270,7 @@ router.get('/education', auth, async (req, res) => {
 */
 router.get('/:user_id', auth, async (req, res) => {
     try {
-        const profile = await Profile.findById(req.params.user_id).populate('user', ['name', 'avatar', 'gender']);
+        const profile = await Profile.findById(req.params.user_id).populate('user', ['name', 'avatar', 'gender', 'followers', 'following']);
 
         if (!profile) {
             return res.status(400).send({ errors: [{ msg: 'Profile not found!' }] });

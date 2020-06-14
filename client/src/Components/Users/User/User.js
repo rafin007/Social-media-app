@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListItem, Avatar, ListItemAvatar, ListItemText, ListItemSecondaryAction, IconButton, Button, makeStyles } from '@material-ui/core';
+import { ListItem, Avatar, ListItemAvatar, ListItemText, ListItemSecondaryAction, Button, makeStyles } from '@material-ui/core';
 import myImg from '../../../assets/images/avatar.jpg';
 import { Link } from 'react-router-dom';
 
