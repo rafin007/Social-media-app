@@ -54,6 +54,10 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isPrivate: {
+    type: Boolean,
+    default: false
+  },
   randomString: {
     type: String
   }

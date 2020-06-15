@@ -343,6 +343,52 @@ router.post('/changePassword/:email', [
 });
 
 
+//----------------------------FOLLOW----------------------------------------
+
+/*  if user is private then user.followRequests++
+      Accept => user.followRequests--, user.followers++, req.user.following++
+      Reject => user.followRequests--
+    if not then req.user.following++ and user.followers++
+*/
+
+/*  @route GET /users/isPrivate/:user_id
+    @desc return if user is private
+    @access Private
+*/
+router.get('/isPrivate/:user_id', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user_id);
+
+    if (!user) {
+      return res.status(404).send({ errors: [{ msg: 'User not found!' }] });
+    }
+
+    return res.send(user.isPrivate);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+/*  @route PUT /users/isPrivate
+    @desc change user's privacy
+    @access Private
+*/
+router.put('/isPrivate', auth, async (req, res) => {
+  try {
+    req.user.isPrivate = !req.user.isPrivate;
+
+    await req.user.save();
+
+    return res.send(req.user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
 
 /*  @route PUT /users/follow/:user_id
     @desc Follow user by id
@@ -352,30 +398,47 @@ router.put('/follow/:user_id', auth, async (req, res) => {
   try {
     //if the req.user wants to follow himself
     if (req.params.user_id === req.user.id) {
-      return res.status(400).send({ msg: 'You cannot follow yourself' });
+      return res.status(400).send({ errors: [{ msg: 'You cannot follow yourself' }] });
     }
 
+    //find the user
     const user = await User.findById(req.params.user_id);
 
+    // //find the user that is logged in
+    // const reqUser = await User.findById(req.user.id);
+
     if (!user) {
-      return res.status(404).send({ msg: 'User does not exist' });
+      return res.status(404).send({ errors: [{ msg: 'User does not exist' }] });
     }
 
     //check if the req.user is already following the user
     if (user.followers.filter(follower => follower.user.toString() === req.user.id).length > 0) {
-      return res.status(400).send({ msg: 'Already following this user' });
+      return res.status(400).send({ errors: [{ msg: 'Already following this user' }] });
     }
 
     //check if the req.user has already sent a follow request
     if (user.followRequests.filter(followReq => followReq.user.toString() === req.user.id).length > 0) {
-      return res.status(400).send({ msg: 'You have already sent a follow request to this user!' });
+      return res.status(400).send({ errors: [{ msg: 'You have already sent a follow request to this user!' }] });
     }
 
-    //if not following, then push in followRequests 
-    user.followRequests.unshift({ user: req.user.id });
+    //check if user's profile isPrivate
+    if (user.isPrivate) {
+      //if not following, then push in followRequests 
+      user.followRequests.unshift({ user: req.user.id });
 
-    //save user
-    await user.save();
+      await user.save();
+    }
+    else {
+      //add req.user to user's followers list
+      user.followers.unshift({ user: req.user.id });
+
+      //add the user to req.user's following list
+      req.user.following.unshift({ user: user.id });
+
+      //save both
+      await req.user.save();
+      await user.save();
+    }
 
     //get the req.user
     // const reqUser = await User.findById(req.user.id);
@@ -385,7 +448,7 @@ router.put('/follow/:user_id', auth, async (req, res) => {
 
     // await reqUser.save();
 
-    res.send(user.followers);
+    res.send(req.user);
 
     //check if the user is already in req.user's following list
     // if (reqUser.following.filter(follow => follow.user.toString() === req.params.user_id).length > 0) {
@@ -442,7 +505,7 @@ router.put('/acceptFollow/:user_id', auth, async (req, res) => {
     //save that other user
     await user.save();
 
-    res.send({ msg: 'Request accepted' });
+    res.send(reqUser);
 
   } catch (error) {
     console.error(error);
@@ -466,7 +529,7 @@ router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
 
     //check if the other user is in logged in user's followRequests
     if (index === -1) {
-      return res.status(404).send({ msg: 'This person did not request to follow you' });
+      return res.status(404).send({ errors: [{ msg: 'This person did not request to follow you' }] });
     }
 
     //remove that index from array
@@ -475,7 +538,7 @@ router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
     //save the user
     await reqUser.save();
 
-    res.send(reqUser.followRequests);
+    res.send(reqUser);
 
   } catch (error) {
     console.error(error);
@@ -493,19 +556,19 @@ router.put('/unfollow/:user_id', auth, async (req, res) => {
   try {
     //check if the req.user wants to unfollow himself
     if (req.params.user_id === req.user.id) {
-      return res.status(400).send({ msg: 'You cannot unfollow yourself' });
+      return res.status(400).send({ errors: [{ msg: 'You cannot unfollow yourself' }] });
     }
 
     const user = await User.findById(req.params.user_id);
 
     //if user does not exist then exit
     if (!user) {
-      return res.status(404).send({ msg: 'User not found!' });
+      return res.status(404).send({ errors: [{ msg: 'User not found!' }] });
     }
 
     //check if req.user deos NOT exist in the user's followers' list
     if (user.followers.filter(follower => follower.user.toString() === req.user.id).length === 0) {
-      return res.status(400).send({ msg: 'User has not been followed yet!' });
+      return res.status(400).send([{ errors: { msg: 'User has not been followed yet!' } }]);
     }
 
     //get the index to remove from followers' list
@@ -529,7 +592,7 @@ router.put('/unfollow/:user_id', auth, async (req, res) => {
     //save the req.user
     await reqUser.save();
 
-    res.send(user.followers);
+    res.send(reqUser);
 
   } catch (error) {
     console.error(error);

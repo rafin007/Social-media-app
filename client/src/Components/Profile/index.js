@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Paper, makeStyles, Typography, Button, IconButton } from '@material-ui/core';
+import { Grid, makeStyles, Typography, Button, IconButton } from '@material-ui/core';
 import Avatar from '../Avatar/Avatar';
 import imageAvatar from '../../assets/images/avatar.jpg';
 import ProfileTabs from './ProfileTabs';
@@ -39,6 +39,10 @@ const useStyles = makeStyles((theme) => ({
     },
     link: {
         textDecoration: 'none',
+    },
+    link2: {
+        textDecoration: 'none',
+        color: '#fff'
     }
 }));
 
@@ -54,12 +58,14 @@ const Profile = () => {
         dispatch(getProfileById(id));
     }, []);
 
-
     //profile state
     const profile = useSelector(state => state.profile.profile);
 
     //loading state
     const loading = useSelector(state => state.profile.loading);
+
+    //user state from auth
+    const user = useSelector(state => state.auth.user);
 
     //tab switching
     const [value, setValue] = React.useState(0);
@@ -101,8 +107,8 @@ const Profile = () => {
 
                         <IconButton aria-label="go back" color="primary" size="small" >
                             <ArrowBackIos />
-                        back
-                    </IconButton>
+                            back
+                        </IconButton>
                     </Link>
                 </Grid>
                 <Grid item xs={6} >
@@ -125,7 +131,7 @@ const Profile = () => {
                             <Typography variant="body2" color="textSecondary" >Following</Typography>
                         </Typography>
                     </div>
-                    <Button variant="contained" color="primary" >Follow</Button>
+                    <Button variant="contained" color="primary" >{!loading && profile && user._id === profile.user._id ? <Link to="/profile" className={classes.link2} >Edit Profile</Link> : 'Follow'}</Button>
                 </Grid>
                 <Grid item xs={12} >
                     <ProfileTabs value={value} handleChange={handleChange} />
