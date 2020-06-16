@@ -377,7 +377,24 @@ router.get('/isPrivate/:user_id', auth, async (req, res) => {
 */
 router.put('/isPrivate', auth, async (req, res) => {
   try {
-    req.user.isPrivate = !req.user.isPrivate;
+
+    //if !isPrivate then make it true otherwise make it false and take everything from followRequests to following
+    if (!req.user.isPrivate) {
+      req.user.isPrivate = true;
+    }
+    else {
+      req.user.isPrivate = false;
+      req.user.followers = [...req.user.followRequests];
+      req.user.followRequests = [];
+
+      //add this user's id to each follower's following list
+      req.user.followers.forEach(async follower => {
+        let user = await User.findById(follower.user);
+
+        user.following.unshift({ user: req.user.id });
+        await user.save();
+      });
+    }
 
     await req.user.save();
 
@@ -388,6 +405,36 @@ router.put('/isPrivate', auth, async (req, res) => {
   }
 });
 
+
+
+/*  @route GET /users/checkFollow/:user_id
+    @desc check the follow status for a user with corelation with the logged in user 
+    @access Private
+*/
+router.get('/checkFollow/:user_id', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user_id);
+
+    if (!user) {
+      res.status(404).send({ errors: [{ msg: 'User not found!' }] });
+    }
+
+    //check if the logged in user is currently following the user
+    if (user.followers.filter(follower => follower.user.toString() === req.user.id).length > 0) {
+      return res.send({ status: 'unfollow' });
+    }
+
+    //check if the logged in user is currently in the follow request of the user
+    if (user.followRequests.filter(followReq => followReq.user.toString() === req.user.id).length > 0) {
+      return res.send({ status: 'requested' });
+    }
+
+    res.send({ status: 'follow' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
 
 
 /*  @route PUT /users/follow/:user_id

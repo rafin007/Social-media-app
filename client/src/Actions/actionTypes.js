@@ -47,3 +47,7 @@ export const DELETE_EXPERIENCE = 'DELETE_EXPERIENCE';
 export const POST_SOCIAL = 'POST_SOCIAL';
 export const SOCIAL_ERROR = 'SOCIAL_ERROR';
 export const DELETE_SOCIAL = 'DELETE_SOCIAL';
+
+
+//follow
+export const CHECK_FOLLOW = 'CHECK_FOLLOW';

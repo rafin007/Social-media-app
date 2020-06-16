@@ -5,7 +5,8 @@ const initalState = {
     isAuthenticated: null,
     user: null,
     loading: false,
-    errors: []
+    errors: [],
+    followStatus: null
 };
 
 const authReducer = (state = initalState, action) => {
@@ -50,6 +51,13 @@ const authReducer = (state = initalState, action) => {
                 ...state,
                 loading: true
             };
+
+        case actionTypes.CHECK_FOLLOW:
+            return {
+                ...state,
+                loading: false,
+                followStatus: payload.status
+            }
 
         default:
             return state;

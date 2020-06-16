@@ -8,10 +8,11 @@ import ProfilePosts from './ProfilePosts';
 import About from './About';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../Spinner/Spinner';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getProfileById } from '../../Actions/profile';
 import { ArrowBackIos } from '@material-ui/icons';
+import { checkFollow } from '../../Actions/follow';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -42,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
     },
     link2: {
         textDecoration: 'none',
-        color: '#fff'
+        color: '#fff',
+        margin: '0 auto'
     }
 }));
 
@@ -53,10 +55,18 @@ const Profile = () => {
 
     //get the id of profile from url
     const { id } = useParams();
-
+    //get the profile
     useEffect(() => {
         dispatch(getProfileById(id));
-    }, []);
+    }, [id]);
+
+    //get the user_id of this profile
+    const { state } = useLocation();
+
+    //get the follow status of the profile
+    useEffect(() => {
+        dispatch(checkFollow(state.user_id));
+    }, [state.user_id]);
 
     //profile state
     const profile = useSelector(state => state.profile.profile);
@@ -67,7 +77,10 @@ const Profile = () => {
     //user state from auth
     const user = useSelector(state => state.auth.user);
 
-    //tab switching
+    //followStatus state
+    const followStatus = useSelector(state => state.auth.followStatus);
+
+    //tab switching logic
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event, newValue) => {
@@ -131,7 +144,12 @@ const Profile = () => {
                             <Typography variant="body2" color="textSecondary" >Following</Typography>
                         </Typography>
                     </div>
-                    <Button variant="contained" color="primary" >{!loading && profile && user._id === profile.user._id ? <Link to="/profile" className={classes.link2} >Edit Profile</Link> : 'Follow'}</Button>
+                    {!loading && profile && user._id === profile.user._id ? (
+                        <Link className={classes.link2} >
+                            <Button variant="contained" color="primary" >Edit profile</Button>
+                        </Link>) : (
+                            <Button variant="contained" color={followStatus && followStatus === 'follow' ? 'primary' : 'secondary'} >{followStatus && followStatus}</Button>
+                        )}
                 </Grid>
                 <Grid item xs={12} >
                     <ProfileTabs value={value} handleChange={handleChange} />

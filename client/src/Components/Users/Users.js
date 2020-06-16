@@ -20,6 +20,8 @@ const Users = () => {
     //profiles state
     const profiles = useSelector(state => state.profile.profiles);
 
+    //@TODO => Change backend accordingly and pass followers and following there...
+
     return (
         <Grid item xs={12}>
             <List>

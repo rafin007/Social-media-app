@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ListItem, Avatar, ListItemAvatar, ListItemText, ListItemSecondaryAction, Button, makeStyles } from '@material-ui/core';
 import myImg from '../../../assets/images/avatar.jpg';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 
 const useStyles = makeStyles(theme => ({
@@ -16,9 +18,28 @@ const User = ({ profile }) => {
 
     const classes = useStyles();
 
+    const user = useSelector(state => state.auth.user);
+
+    const [followStatus, setFollowStatus] = useState('');
+
+    //check if the user is in logged user's following list
+    useEffect(() => {
+        if (user.following.filter(item => item._id === profile.user._id).length > 0) {
+            setFollowStatus('unfollow');
+        }
+        else {
+            setFollowStatus('follow');
+        }
+    }, []);
+
     return (
         <ListItem>
-            <Link to={`/profile/${profile._id}`} className={classes.link} >
+            <Link to={{
+                pathname: `/profile/${profile._id}`,
+                state: {
+                    user_id: profile.user._id
+                }
+            }} className={classes.link} >
                 <ListItemAvatar>
                     <Avatar alt="avatar" src={myImg} />
                 </ListItemAvatar>
@@ -29,7 +50,7 @@ const User = ({ profile }) => {
 
             </Link>
             <ListItemSecondaryAction>
-                <Button color="primary" variant="contained" size="small" >Follow</Button>
+                <Button color={followStatus === 'follow' ? 'primary' : 'secondary'} variant="contained" size="small" >{followStatus}</Button>
             </ListItemSecondaryAction>
         </ListItem>
     );
