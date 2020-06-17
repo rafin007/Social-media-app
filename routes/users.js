@@ -589,7 +589,7 @@ router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send({ errors: error });
   }
 });
 
@@ -643,7 +643,7 @@ router.put('/unfollow/:user_id', auth, async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send({ errors: error });
   }
 });
 

@@ -51,3 +51,5 @@ export const DELETE_SOCIAL = 'DELETE_SOCIAL';
 
 //follow
 export const CHECK_FOLLOW = 'CHECK_FOLLOW';
+export const FOLLOW_USER = 'FOLLOW_USER';
+export const UNFOLLOW_USER = 'UNFOLLOW_USER';

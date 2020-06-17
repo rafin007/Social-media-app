@@ -60,6 +60,13 @@ const profileReducer = (state = initialState, action) => {
                 profiles: payload
             }
 
+        case actionTypes.FOLLOW_USER:
+        case actionTypes.UNFOLLOW_USER:
+            return {
+                ...state,
+                loading: false
+            }
+
         default:
             return state;
     }

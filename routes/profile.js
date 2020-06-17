@@ -220,7 +220,7 @@ router.delete('/social/:social_id', auth, async (req, res) => {
 */
 router.get('/', auth, async (req, res) => {
     try {
-        const profiles = await Profile.find().populate('user', ['avatar', 'name', 'gender']);
+        const profiles = await Profile.find().populate('user', ['avatar', 'name', 'gender', 'followers', 'followRequests']);
 
         res.send(profiles);
 
@@ -270,7 +270,7 @@ router.get('/education', auth, async (req, res) => {
 */
 router.get('/:user_id', auth, async (req, res) => {
     try {
-        const profile = await Profile.findById(req.params.user_id).populate('user', ['name', 'avatar', 'gender', 'followers', 'following']);
+        const profile = await Profile.findById(req.params.user_id).populate('user', ['name', 'avatar', 'gender', 'followers', 'following', 'followRequests']);
 
         if (!profile) {
             return res.status(400).send({ errors: [{ msg: 'Profile not found!' }] });

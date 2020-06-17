@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Grid, makeStyles, Typography, Button, IconButton } from '@material-ui/core';
 import Avatar from '../Avatar/Avatar';
 import imageAvatar from '../../assets/images/avatar.jpg';
@@ -12,7 +12,6 @@ import { useParams, Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getProfileById } from '../../Actions/profile';
 import { ArrowBackIos } from '@material-ui/icons';
-import { checkFollow } from '../../Actions/follow';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -55,18 +54,11 @@ const Profile = () => {
 
     //get the id of profile from url
     const { id } = useParams();
+
     //get the profile
     useEffect(() => {
         dispatch(getProfileById(id));
     }, [id]);
-
-    //get the user_id of this profile
-    const { state } = useLocation();
-
-    //get the follow status of the profile
-    useEffect(() => {
-        dispatch(checkFollow(state.user_id));
-    }, [state.user_id]);
 
     //profile state
     const profile = useSelector(state => state.profile.profile);
@@ -77,11 +69,25 @@ const Profile = () => {
     //user state from auth
     const user = useSelector(state => state.auth.user);
 
-    //followStatus state
-    const followStatus = useSelector(state => state.auth.followStatus);
+    const [followStatus, setFollowStatus] = useState('');
+
+    //check if the user is in logged user's following list/follow requests list
+    useEffect(() => {
+        if (profile && !loading) {
+            if (profile.user.followers.filter(follower => follower.user === user._id).length > 0) {
+                setFollowStatus('unfollow');
+            }
+            else if (profile.user.followRequests.filter(followReq => followReq.user === user._id).length > 0) {
+                setFollowStatus('requested');
+            }
+            else {
+                setFollowStatus('follow');
+            }
+        }
+    }, [profile, loading]);
 
     //tab switching logic
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -145,10 +151,10 @@ const Profile = () => {
                         </Typography>
                     </div>
                     {!loading && profile && user._id === profile.user._id ? (
-                        <Link className={classes.link2} >
+                        <Link className={classes.link2} to="/profile" >
                             <Button variant="contained" color="primary" >Edit profile</Button>
                         </Link>) : (
-                            <Button variant="contained" color={followStatus && followStatus === 'follow' ? 'primary' : 'secondary'} >{followStatus && followStatus}</Button>
+                            <Button variant="contained" color={followStatus === 'follow' ? 'primary' : 'secondary'} >{followStatus}</Button>
                         )}
                 </Grid>
                 <Grid item xs={12} >

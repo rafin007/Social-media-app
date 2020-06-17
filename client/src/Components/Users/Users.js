@@ -5,14 +5,14 @@ import { getAllProfiles } from '../../Actions/profile';
 import Spinner from '../Spinner/Spinner';
 import User from './User/User';
 
+// function useForceUpdate() {
+//     const [value, setValue] = useState(0); // integer state
+//     return () => setValue(value => ++value); // update the state to force render
+// }
+
 const Users = () => {
 
     const dispatch = useDispatch();
-
-    //get all the profiles when the component loads
-    useEffect(() => {
-        dispatch(getAllProfiles());
-    }, []);
 
     //loading state
     const loading = useSelector(state => state.profile.loading);
@@ -20,7 +20,10 @@ const Users = () => {
     //profiles state
     const profiles = useSelector(state => state.profile.profiles);
 
-    //@TODO => Change backend accordingly and pass followers and following there...
+    //get all the profiles when the component loads
+    useEffect(() => {
+        dispatch(getAllProfiles());
+    }, []);
 
     return (
         <Grid item xs={12}>
