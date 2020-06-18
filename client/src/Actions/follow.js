@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as actionTypes from './actionTypes';
+import { getProfileById } from './profile';
 
 // export const checkFollow = (id) => async dispatch => {
 //     try {
@@ -24,52 +25,58 @@ import * as actionTypes from './actionTypes';
 // };
 
 //--------------follow user by id---------------------
-export const followUserById = id => async dispatch => {
+export const followUserById = (user_id, id = null) => async dispatch => {
     try {
         //loading first
-        dispatch({ type: actionTypes.LOADING });
+        dispatch({ type: actionTypes.FOLLOW_LOADING });
 
-        const response = await axios.put(`/users/follow/${id}`);
+        const response = await axios.put(`/users/follow/${user_id}`);
 
         //send back data
         dispatch({
             type: actionTypes.FOLLOW_USER,
             payload: response.data
         });
+
+        //get other profile
+        if (id) {
+            dispatch(getProfileById(id));
+        }
     } catch (err) {
         const errors = err.response.data.errors;
 
-        console.log(errors);
-
-        // dispatch({
-        //     type: actionTypes.PROFILE_ERROR,
-        //     payload: errors.map(error => error.msg)
-        // });
+        dispatch({
+            type: actionTypes.PROFILE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
     }
 };
 
 
 //--------------follow user by id---------------------
-export const unfollowUserById = id => async dispatch => {
+export const unfollowUserById = (user_id, id = null) => async dispatch => {
     try {
         //loading first
-        dispatch({ type: actionTypes.LOADING });
+        dispatch({ type: actionTypes.FOLLOW_LOADING });
 
-        const response = await axios.put(`/users/unfollow/${id}`);
+        const response = await axios.put(`/users/unfollow/${user_id}`);
 
         //send back data
         dispatch({
             type: actionTypes.UNFOLLOW_USER,
             payload: response.data
         });
+
+        //get other profile
+        if (id) {
+            dispatch(getProfileById(id));
+        }
     } catch (err) {
         const errors = err.response.data.errors;
 
-        console.log(errors);
-
-        // dispatch({
-        //     type: actionTypes.PROFILE_ERROR,
-        //     payload: errors.map(error => error.msg)
-        // });
+        dispatch({
+            type: actionTypes.PROFILE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
     }
 };

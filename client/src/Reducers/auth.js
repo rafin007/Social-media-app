@@ -60,9 +60,16 @@ const authReducer = (state = initalState, action) => {
             };
 
         case actionTypes.GET_PROFILES:
+        case actionTypes.GET_PROFILE:
             return {
                 ...state,
                 loading: false
+            }
+
+        case actionTypes.FOLLOW_LOADING:
+            return {
+                ...state,
+                loading: true
             }
 
         default:

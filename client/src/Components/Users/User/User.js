@@ -54,7 +54,7 @@ const User = ({ profile }) => {
         return () => {
             setFollowStatus('');
         }
-    }, []);
+    }, [loading, profile]);
 
     const handleFollow = async () => {
         if (followStatus === 'follow') {

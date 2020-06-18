@@ -12,6 +12,8 @@ import { useParams, Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getProfileById } from '../../Actions/profile';
 import { ArrowBackIos } from '@material-ui/icons';
+import { followUserById, unfollowUserById } from '../../Actions/follow';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -66,6 +68,9 @@ const Profile = () => {
     //loading state
     const loading = useSelector(state => state.profile.loading);
 
+    //follow load from auth
+    const followLoading = useSelector(state => state.auth.loading);
+
     //user state from auth
     const user = useSelector(state => state.auth.user);
 
@@ -73,18 +78,31 @@ const Profile = () => {
 
     //check if the user is in logged user's following list/follow requests list
     useEffect(() => {
-        if (profile && !loading) {
-            if (profile.user.followers.filter(follower => follower.user === user._id).length > 0) {
-                setFollowStatus('unfollow');
-            }
-            else if (profile.user.followRequests.filter(followReq => followReq.user === user._id).length > 0) {
-                setFollowStatus('requested');
-            }
-            else {
-                setFollowStatus('follow');
-            }
+        // if (profile && !loading) {
+        //     if (profile.user.followers.filter(follower => follower.user === user._id).length > 0) {
+        //         setFollowStatus('unfollow');
+        //     }
+        //     else if (profile.user.followRequests.filter(followReq => followReq.user === user._id).length > 0) {
+        //         setFollowStatus('requested');
+        //     }
+        //     else {
+        //         setFollowStatus('follow');
+        //     }
+        // }
+        if (profile) {
+            axios.get(`/users/checkFollow/${profile.user._id}`).then(response => setFollowStatus(response.data.status)).catch(error => console.log(error));
         }
-    }, [profile, loading]);
+    }, [followLoading, profile]);
+
+    //follow action
+    const handleFollow = async () => {
+        if (followStatus === 'follow') {
+            dispatch(followUserById(profile.user._id, id));
+        }
+        else if (followStatus === 'unfollow') {
+            dispatch(unfollowUserById(profile.user._id, id));
+        }
+    };
 
     //tab switching logic
     const [value, setValue] = useState(0);
@@ -154,7 +172,7 @@ const Profile = () => {
                         <Link className={classes.link2} to="/profile" >
                             <Button variant="contained" color="primary" >Edit profile</Button>
                         </Link>) : (
-                            <Button variant="contained" color={followStatus === 'follow' ? 'primary' : 'secondary'} >{followStatus}</Button>
+                            <Button variant="contained" color={followStatus === 'follow' ? 'primary' : 'secondary'} disabled={followLoading} onClick={handleFollow} >{followStatus}</Button>
                         )}
                 </Grid>
                 <Grid item xs={12} >
