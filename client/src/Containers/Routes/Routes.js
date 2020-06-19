@@ -29,6 +29,8 @@ const Routes = () => {
             <Route path="/notifications" exact component={NotificationsView} />
             <Route path="/home" exact component={HomeView} />
             <Route path="/profile/:id" exact component={ViewProfile} />
+            <Route path="/followers/:user_id" exact component={Followers} />
+            <Route path="/following/:user_id" exact component={Following} />
         </Switch>
     );
 }

@@ -13,6 +13,7 @@ const auth = require('../middlewares/auth');
 const isVerified = require('../middlewares/isVerified');
 const { verifyEmail } = require('../email/account');
 const mongoose = require('mongoose');
+const isFollowing = require("../middlewares/isFollowing");
 
 const router = express.Router();
 
@@ -649,15 +650,24 @@ router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
 });
 
 
-/*  @route GET /users/followers
-    @desc Get followers' list
+/*  @route GET /users/followers/:user_id
+    @desc Get followers' list of profiles for a particular user
     @access Private
 */
-router.get('/followers', auth, async (req, res) => {
+router.get('/followers/:user_id', [auth, isFollowing], async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    // res.send(req.otheruser.followers);
+    let profiles = [];
+    req.otherUser.followers.forEach(async follower => {
+      let profile = await Profile.findOne({ user: follower.user });
+      console.log(profile);
+      profiles.push(profile);
 
-    res.send(user.followers);
+      //@TODO => create async forEach
+    });
+
+    console.log(profiles);
+    res.send(profiles);
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
@@ -665,15 +675,19 @@ router.get('/followers', auth, async (req, res) => {
 });
 
 
-/*  @route GET /users/following
-    @desc Get following's list
+/*  @route GET /users/following/:user_id
+    @desc Get following's list of profiles for a particular user
     @access Private
 */
-router.get('/following', auth, async (req, res) => {
+router.get('/following/:user_id', [auth, isFollowing], async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const profiles = [];
+    req.otherUser.following.forEach(async follow => {
+      let profile = await Profile.findOne({ user: follow.user });
+      profiles.push(profile);
+    });
 
-    res.send(user.following);
+    res.send(profiles);
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');

@@ -8,7 +8,7 @@ import ProfilePosts from './ProfilePosts';
 import About from './About';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../Spinner/Spinner';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getProfileById } from '../../Actions/profile';
 import { ArrowBackIos } from '@material-ui/icons';
@@ -46,6 +46,10 @@ const useStyles = makeStyles((theme) => ({
         textDecoration: 'none',
         color: '#fff',
         margin: '0 auto'
+    },
+    link3: {
+        textDecoration: 'none',
+        color: '#000'
     }
 }));
 
@@ -93,6 +97,20 @@ const Profile = () => {
             axios.get(`/users/checkFollow/${profile.user._id}`).then(response => setFollowStatus(response.data.status)).catch(error => console.log(error));
         }
     }, [followLoading, profile]);
+
+
+    const [isFollowing, setIsFollowing] = useState(false);
+
+
+    //check if the logged in user is following the user and whether s/he can see their posts
+    useEffect(() => {
+        if (followStatus === 'follow') {
+            setIsFollowing(false);
+        }
+        else if (followStatus === 'unfollow') {
+            setIsFollowing(true);
+        }
+    }, [followStatus]);
 
     //follow action
     const handleFollow = async () => {
@@ -159,14 +177,18 @@ const Profile = () => {
                 </Grid>
                 <Grid item xs={6} className={classes.followSystem} >
                     <div className={classes.follows} >
-                        <Typography variant="h6" className={classes.follow} >
-                            {profile && profile.user.followers.length}
-                            <Typography variant="body2" color="textSecondary" >Followers</Typography>
-                        </Typography>
-                        <Typography variant="h6" className={classes.follow} >
-                            {profile && profile.user.following.length}
-                            <Typography variant="body2" color="textSecondary" >Following</Typography>
-                        </Typography>
+                        <Link to={{ pathname: `/followers/${profile && profile.user._id}`, state: { profile } }} className={classes.link3} >
+                            <Typography variant="h6" className={classes.follow} >
+                                {profile && profile.user.followers && profile.user.followers.length}
+                                <Typography variant="body2" color="textSecondary" >Followers</Typography>
+                            </Typography>
+                        </Link>
+                        <Link to={{ pathname: `/following/${profile && profile.user._id}`, state: { profile } }} className={classes.link3} >
+                            <Typography variant="h6" className={classes.follow} >
+                                {profile && profile.user.following && profile.user.following.length}
+                                <Typography variant="body2" color="textSecondary" >Following</Typography>
+                            </Typography>
+                        </Link>
                     </div>
                     {!loading && profile && user._id === profile.user._id ? (
                         <Link className={classes.link2} to="/profile" >
@@ -176,7 +198,7 @@ const Profile = () => {
                         )}
                 </Grid>
                 <Grid item xs={12} >
-                    <ProfileTabs value={value} handleChange={handleChange} />
+                    <ProfileTabs value={value} handleChange={handleChange} isFollowing={isFollowing} />
                 </Grid>
                 {pageContent}
             </Grid>

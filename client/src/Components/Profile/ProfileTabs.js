@@ -24,7 +24,7 @@ export default function CenteredTabs(props) {
                 centered
             >
                 <Tab label="Bio" />
-                <Tab label="Posts" />
+                <Tab label="Posts" disabled={!props.isFollowing} />
                 <Tab label="About" />
             </Tabs>
         </Paper>

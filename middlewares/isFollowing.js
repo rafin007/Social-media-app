@@ -7,7 +7,7 @@ const isFollowing = async (req, res, next) => {
 
         //if no user found, throw error
         if (!user) {
-            return res.status(404).send({ msg: 'User not found!' });
+            return res.status(404).send({ errors: [{ msg: 'User not found!' }] });
         }
 
         //if the logged in user wants to see their own posts
@@ -17,9 +17,10 @@ const isFollowing = async (req, res, next) => {
 
         //check if the req.user is NOT following the user
         if (user.followers.filter(follower => follower.user.toString() === req.user.id).length === 0) {
-            return res.status(400).send({ msg: "Sorry, you are not connected with this user" });
+            return res.status(400).send({ errors: [{ msg: "Sorry, you are not connected with this user" }] });
         }
 
+        req.otherUser = user;
         next();
     } catch (error) {
         console.error(error);
