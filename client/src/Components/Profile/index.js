@@ -177,13 +177,13 @@ const Profile = () => {
                 </Grid>
                 <Grid item xs={6} className={classes.followSystem} >
                     <div className={classes.follows} >
-                        <Link to={{ pathname: `/followers/${profile && profile.user._id}`, state: { profile } }} className={classes.link3} >
+                        <Link to={{ pathname: isFollowing ? `/followers/${profile && profile.user._id}` : "", state: { profile } }} className={classes.link3} >
                             <Typography variant="h6" className={classes.follow} >
                                 {profile && profile.user.followers && profile.user.followers.length}
                                 <Typography variant="body2" color="textSecondary" >Followers</Typography>
                             </Typography>
                         </Link>
-                        <Link to={{ pathname: `/following/${profile && profile.user._id}`, state: { profile } }} className={classes.link3} >
+                        <Link to={{ pathname: isFollowing ? `/following/${profile && profile.user._id}` : "", state: { profile } }} className={classes.link3} >
                             <Typography variant="h6" className={classes.follow} >
                                 {profile && profile.user.following && profile.user.following.length}
                                 <Typography variant="body2" color="textSecondary" >Following</Typography>

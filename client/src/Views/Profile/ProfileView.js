@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentProfile } from '../../Actions/profile';
 import Spinner from '../../Components/Spinner/Spinner';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -34,6 +35,18 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('lg')]: {
             padding: '0 20rem'
         }
+    },
+    link: {
+        textDecoration: 'none',
+    },
+    link2: {
+        textDecoration: 'none',
+        color: '#fff',
+        margin: '0 auto'
+    },
+    link3: {
+        textDecoration: 'none',
+        color: '#000'
     }
 }));
 
@@ -97,16 +110,20 @@ const ProfileView = () => {
                 </Grid>
                 <Grid item xs={6} className={classes.followSystem} >
                     <div className={classes.follows} >
-                        <Typography variant="h6" className={classes.follow} >
-                            {user && user.followers.length}
-                            <Typography variant="body2" color="textSecondary" >Followers</Typography>
-                        </Typography>
-                        <Typography variant="h6" className={classes.follow} >
-                            {user && user.following.length}
-                            <Typography variant="body2" color="textSecondary" >Followings</Typography>
-                        </Typography>
+                        <Link to="/followers" className={classes.link3} >
+                            <Typography variant="h6" className={classes.follow} >
+                                {user && user.followers.length}
+                                <Typography variant="body2" color="textSecondary" >Followers</Typography>
+                            </Typography>
+                        </Link>
+                        <Link to="/following" className={classes.link3} >
+                            <Typography variant="h6" className={classes.follow} >
+                                {user && user.following.length}
+                                <Typography variant="body2" color="textSecondary" >Following</Typography>
+                            </Typography>
+                        </Link>
                     </div>
-                    <Button variant="contained" color="primary" >Follow</Button>
+                    {/* <Button variant="contained" color="primary" >Follow</Button> */}
                 </Grid>
                 <Grid item xs={12} >
                     <ProfileTabs value={value} handleChange={handleChange} />

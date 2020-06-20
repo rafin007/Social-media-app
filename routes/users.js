@@ -410,7 +410,7 @@ router.put('/isPrivate', auth, async (req, res) => {
 
 
 /*  @route GET /users/checkFollow/:user_id
-    @desc check the follow status for a user with corelation with the logged in user 
+    @desc check the follow status for a user with correlation with the logged in user 
     @access Private
 */
 router.get('/checkFollow/:user_id', auth, async (req, res) => {
@@ -650,6 +650,48 @@ router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
 });
 
 
+/*  @route GET /users/followers
+    @desc Get followers' list of logged in user
+    @access Private
+*/
+router.get('/followers', auth, async (req, res) => {
+  try {
+    let profiles = [];
+
+    for (let follower of req.user.followers) {
+      let profile = await Profile.findOne({ user: follower.user }).populate('user', ['avatar', 'name', 'gender']);
+      profiles.push(profile);
+    }
+
+    res.send(profiles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+/*  @route GET /users/following
+    @desc Get followers' list of logged in user
+    @access Private
+*/
+router.get('/following', auth, async (req, res) => {
+  try {
+
+    let profiles = [];
+
+    for (let follow of req.user.following) {
+      let profile = await Profile.findOne({ user: follow.user }).populate('user', ['avatar', 'name', 'gender']);
+      profiles.push(profile);
+    }
+
+    res.send(profiles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
+
+
 /*  @route GET /users/followers/:user_id
     @desc Get followers' list of profiles for a particular user
     @access Private
@@ -658,15 +700,12 @@ router.get('/followers/:user_id', [auth, isFollowing], async (req, res) => {
   try {
     // res.send(req.otheruser.followers);
     let profiles = [];
-    req.otherUser.followers.forEach(async follower => {
-      let profile = await Profile.findOne({ user: follower.user });
-      console.log(profile);
+
+    for (let follower of req.otherUser.followers) {
+      let profile = await Profile.findOne({ user: follower.user }).populate('user', ['avatar', 'name', 'gender']);
       profiles.push(profile);
+    }
 
-      //@TODO => create async forEach
-    });
-
-    console.log(profiles);
     res.send(profiles);
   } catch (error) {
     console.error(error);
@@ -682,10 +721,11 @@ router.get('/followers/:user_id', [auth, isFollowing], async (req, res) => {
 router.get('/following/:user_id', [auth, isFollowing], async (req, res) => {
   try {
     const profiles = [];
-    req.otherUser.following.forEach(async follow => {
-      let profile = await Profile.findOne({ user: follow.user });
+
+    for (let follow of req.otherUser.following) {
+      let profile = await Profile.findOne({ user: follow.user }).populate('user', ['avatar', 'name', 'gender']);
       profiles.push(profile);
-    });
+    }
 
     res.send(profiles);
   } catch (error) {
