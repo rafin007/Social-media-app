@@ -7,7 +7,7 @@ import owner from '../../assets/images/avatar.jpg';
 import Post1 from '../../assets/images/post1.jpg';
 import Post2 from '../../assets/images/post2.jpg';
 import Post3 from '../../assets/images/post3.jpg';
-import ScrollToTop from '../ScrollToTop/ScrollToTop';
+import FloatingAction from '../FloatingAction/FloatingAction';
 import { useScrollPosition } from '@n8tb1t/use-scroll-position';
 
 const Feed = () => {
@@ -16,15 +16,18 @@ const Feed = () => {
     //scroll to top logic
     const [shouldScroller, setShouldScroller] = useState(false);
 
-    let scroller = null;
+    let action = null;
 
     if (shouldScroller) {
-        scroller = <ScrollToTop />;
+        action = <FloatingAction action="scroller" />;
+    }
+    else {
+        action = <FloatingAction action="button" />;
     }
 
     // if scrolled down scroll to top will appear
     useScrollPosition(({ prevPos, currPos }) => {
-        if (currPos.y < 0) {
+        if (currPos.y < 0 && currPos.y < prevPos.y) {
             setShouldScroller(true);
         }
         else {
@@ -54,7 +57,7 @@ const Feed = () => {
             <Grid item xs={12} >
                 <Post owner={owner} image={Post1} title="arefin" />
             </Grid>
-            {scroller}
+            {action}
         </Fragment>
     );
 }

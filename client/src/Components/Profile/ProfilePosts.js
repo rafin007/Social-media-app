@@ -7,7 +7,7 @@ import owner from '../../assets/images/avatar.jpg';
 import Post1 from '../../assets/images/post1.jpg';
 import Post2 from '../../assets/images/post2.jpg';
 import Post3 from '../../assets/images/post3.jpg';
-import ScrollToTop from '../../Components/ScrollToTop/ScrollToTop';
+import FloatingAction from '../FloatingAction/FloatingAction';
 import { useScrollPosition } from '@n8tb1t/use-scroll-position';
 
 const useStyles = makeStyles(theme => ({
@@ -24,7 +24,7 @@ const ProfilePosts = () => {
     let scroller = null;
 
     if (shouldScroller) {
-        scroller = <ScrollToTop />;
+        scroller = <FloatingAction />;
     }
 
     // if scrolled down scroll to top will appear

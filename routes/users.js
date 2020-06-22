@@ -656,7 +656,7 @@ router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
 */
 router.get('/followers', auth, async (req, res) => {
   try {
-    let profiles = [];
+    const profiles = [];
 
     for (let follower of req.user.followers) {
       let profile = await Profile.findOne({ user: follower.user }).populate('user', ['avatar', 'name', 'gender']);
@@ -671,13 +671,13 @@ router.get('/followers', auth, async (req, res) => {
 });
 
 /*  @route GET /users/following
-    @desc Get followers' list of logged in user
+    @desc Get following list of logged in user
     @access Private
 */
 router.get('/following', auth, async (req, res) => {
   try {
 
-    let profiles = [];
+    const profiles = [];
 
     for (let follow of req.user.following) {
       let profile = await Profile.findOne({ user: follow.user }).populate('user', ['avatar', 'name', 'gender']);
@@ -699,7 +699,7 @@ router.get('/following', auth, async (req, res) => {
 router.get('/followers/:user_id', [auth, isFollowing], async (req, res) => {
   try {
     // res.send(req.otheruser.followers);
-    let profiles = [];
+    const profiles = [];
 
     for (let follower of req.otherUser.followers) {
       let profile = await Profile.findOne({ user: follower.user }).populate('user', ['avatar', 'name', 'gender']);

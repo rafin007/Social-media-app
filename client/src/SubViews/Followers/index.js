@@ -6,6 +6,8 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import Spinner from '../../Components/Spinner/Spinner';
 import User from '../../Components/Users/User/User';
 import { ArrowBackIos } from '@material-ui/icons';
+import { useSelector, useDispatch } from 'react-redux';
+import { getFollowers } from '../../Actions/follow';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -37,27 +39,20 @@ const Followers = () => {
 
     const classes = useStyles();
 
-    const [profiles, setProfiles] = useState([]);
-
-    const [loading, setLoading] = useState(true);
-
     const { user_id } = useParams();
 
     const { state } = useLocation();
 
+    const dispatch = useDispatch();
+
+    //loading state
+    const loading = useSelector(state => state.profile.loading);
+
+    //profiles state
+    const profiles = useSelector(state => state.profile.profiles);
+
     useEffect(() => {
-        if (user_id) {
-            axios.get(`/users/followers/${user_id}`).then(response => {
-                setProfiles(response.data);
-                setLoading(false);
-            }).catch(error => console.log(error));
-        }
-        else {
-            axios.get('/users/followers').then(response => {
-                setProfiles(response.data);
-                setLoading(false);
-            }).catch(error => console.log(error));
-        }
+        dispatch(getFollowers(user_id));
     }, []);
 
     return (

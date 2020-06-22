@@ -80,3 +80,65 @@ export const unfollowUserById = (user_id, id = null) => async dispatch => {
         });
     }
 };
+
+
+//----------------Get followers' profiles for a particular user---------------------
+export const getFollowers = (user_id = null) => async dispatch => {
+    try {
+        //loading first
+        dispatch({ type: actionTypes.LOADING });
+
+        let response = null;
+
+        if (user_id) {
+            response = await axios.get(`/users/followers/${user_id}`);
+        }
+        else {
+            response = await axios.get('/users/followers');
+        }
+
+        dispatch({
+            type: actionTypes.GET_FOLLOWERS,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.PROFILE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+}
+
+
+//----------------Get followings' profiles for a particular user---------------------
+export const getFollowings = (user_id = null) => async dispatch => {
+    try {
+        //loading first
+        dispatch({ type: actionTypes.LOADING });
+
+        let response = null;
+
+        if (user_id) {
+            response = await axios.get(`/users/following/${user_id}`);
+        }
+        else {
+            response = await axios.get('/users/following');
+        }
+
+        dispatch({
+            type: actionTypes.GET_FOLLOWINGS,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.PROFILE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+}

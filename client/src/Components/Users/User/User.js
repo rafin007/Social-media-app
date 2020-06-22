@@ -80,7 +80,9 @@ const User = ({ profile }) => {
 
             </Link>
             <ListItemSecondaryAction>
-                <Button color={followStatus === 'follow' ? 'primary' : 'secondary'} variant="outlined" size="small" disabled={profile.user._id === user._id || loading} onClick={handleFollow} >{followStatus}</Button>
+                {profile.user._id !== user._id &&
+                    <Button color={followStatus === 'follow' ? 'primary' : 'secondary'} variant="outlined" size="small" disabled={loading} onClick={handleFollow} >{followStatus === 'follow' ? 'follow' : 'unfollow'}</Button>
+                }
             </ListItemSecondaryAction>
         </ListItem>
     );
