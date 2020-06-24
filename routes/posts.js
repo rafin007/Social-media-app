@@ -21,6 +21,9 @@ const upload = multer({
         if (!file.originalname.match(/\.(jpg|jpeg|png|JPG|PNG|JPEG)$/)) {
             return new Error('Please upload an image');
         }
+        else if (file.size > 1024 * 1024 * 2) {
+            return new Error('Image size must be less than 2MB');
+        }
 
         //everything goes well
         cb(undefined, true);
@@ -65,7 +68,7 @@ router.post('/', [auth, upload.single('upload'), [
         res.status(500).send('Server error');
     }
 }, (error, req, res, next) => {
-    res.status(400).send({ msg: error.message });
+    res.status(400).send({ errors: [{ msg: error.message }] });
 });
 
 

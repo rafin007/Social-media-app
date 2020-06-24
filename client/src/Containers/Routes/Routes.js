@@ -12,6 +12,7 @@ import ProfileView from '../../Views/Profile/ProfileView';
 import NotificationsView from '../../Views/Notifications/NotificationsView';
 import HomeView from '../../Views/Home/HomeView';
 import ViewProfile from '../../Components/Profile';
+import CreatePost from '../../SubViews/CreatePost/CreatePost';
 
 //routes contain all the routes after the user has logged in
 
@@ -31,6 +32,8 @@ const Routes = () => {
             <Route path="/profile/:id" exact component={ViewProfile} />
             <Route path="/followers/:user_id" exact component={Followers} />
             <Route path="/following/:user_id" exact component={Following} />
+            <Route path="/create" exact component={CreatePost} />
+            {/* <Route path="/post/:id" exact component={} /> */}
         </Switch>
     );
 }

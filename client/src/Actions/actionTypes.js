@@ -58,3 +58,7 @@ export const GET_FOLLOWINGS = 'GET_FOLLOWINGS';
 
 //follow loading
 export const FOLLOW_LOADING = 'FOLLOW_LOADING';
+
+//post
+export const CREATE_POST = 'CREATE_POST';
+export const POST_ERROR = 'POST_ERROR';

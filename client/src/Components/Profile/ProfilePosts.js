@@ -21,15 +21,18 @@ const ProfilePosts = () => {
     //scroll to top logic
     const [shouldScroller, setShouldScroller] = useState(false);
 
-    let scroller = null;
+    let action = null;
 
     if (shouldScroller) {
-        scroller = <FloatingAction />;
+        action = <FloatingAction action="scroller" />;
+    }
+    else {
+        action = <FloatingAction action="button" />;
     }
 
     // if scrolled down scroll to top will appear
     useScrollPosition(({ prevPos, currPos }) => {
-        if (currPos.y < 0) {
+        if (currPos.y < 0 && currPos.y < prevPos.y) {
             setShouldScroller(true);
         }
         else {
@@ -62,7 +65,7 @@ const ProfilePosts = () => {
             <Grid item xs={12} >
                 <Post owner={owner} image={Post1} title="arefin" />
             </Grid>
-            {scroller}
+            {action}
         </Grid>
     );
 }

@@ -125,7 +125,7 @@ const Signin = () => {
                     </CardActions>
                 </Card>
             </Grid>
-            <Grid item xs={10} md={6} lg={4} className={classes.errors} className={classes.errors} >
+            <Grid item xs={10} md={6} lg={4} className={classes.errors} >
                 {errors && errors.length > 0 ? errors.map((error, i) => <CustomAlert message={error} severity="error" key={i} />) : null}
             </Grid>
         </Grid>

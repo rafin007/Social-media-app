@@ -32,7 +32,7 @@ const FloatingAction = ({ action }) => {
                     </Fab>
                 </Link>
             ) : (
-                <DOMLink to="/createPost" >
+                <DOMLink to="/create" >
                     <Fab color="primary" aria-label="add" className={classes.button} >
                         <Add />
                     </Fab>
