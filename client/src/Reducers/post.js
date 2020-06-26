@@ -12,13 +12,14 @@ const postReducer = (state = initalState, action) => {
 
     switch (type) {
 
-        case actionTypes.LOADING:
+        case actionTypes.POST_LOADING:
             return {
                 ...state,
                 loading: true
             }
 
         case actionTypes.CREATE_POST:
+        case actionTypes.GET_POST:
             return {
                 ...state,
                 loading: false,
@@ -30,6 +31,19 @@ const postReducer = (state = initalState, action) => {
                 ...state,
                 loading: false,
                 errors: payload
+            }
+
+        case actionTypes.CLEAR_POST:
+            return {
+                ...state,
+                post: null
+            }
+
+        case actionTypes.GET_USER_POSTS:
+            return {
+                ...state,
+                loading: false,
+                posts: payload
             }
 
         default:

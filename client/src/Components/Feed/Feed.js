@@ -9,9 +9,18 @@ import Post2 from '../../assets/images/post2.jpg';
 import Post3 from '../../assets/images/post3.jpg';
 import FloatingAction from '../FloatingAction/FloatingAction';
 import { useScrollPosition } from '@n8tb1t/use-scroll-position';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { clearPost } from '../../Actions/post';
 
 const Feed = () => {
 
+    const dispatch = useDispatch();
+
+    //clear the post state
+    useEffect(() => {
+        dispatch(clearPost());
+    }, []);
 
     //scroll to top logic
     const [shouldScroller, setShouldScroller] = useState(false);
@@ -38,7 +47,7 @@ const Feed = () => {
     // feed contains all the posts from all users
     return (
         <Fragment>
-            <Grid item xs={12} >
+            {/* <Grid item xs={12} >
                 <Post owner={owner} image={Post2} title="arefin" />
             </Grid>
 
@@ -56,7 +65,7 @@ const Feed = () => {
 
             <Grid item xs={12} >
                 <Post owner={owner} image={Post1} title="arefin" />
-            </Grid>
+            </Grid> */}
             {action}
         </Fragment>
     );

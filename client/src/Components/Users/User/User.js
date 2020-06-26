@@ -50,10 +50,6 @@ const User = ({ profile }) => {
         //     setFollowStatus('follow');
         // }
         axios.get(`/users/checkFollow/${profile.user._id}`).then(response => setFollowStatus(response.data.status)).catch(error => console.log(error));
-
-        return () => {
-            setFollowStatus('');
-        }
     }, [loading, profile]);
 
     const handleFollow = async () => {

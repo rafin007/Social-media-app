@@ -9,6 +9,10 @@ import Post2 from '../../assets/images/post2.jpg';
 import Post3 from '../../assets/images/post3.jpg';
 import FloatingAction from '../../Components/FloatingAction/FloatingAction';
 import { useScrollPosition } from '@n8tb1t/use-scroll-position';
+import { useEffect } from 'react';
+import { getAllPosts } from '../../Actions/post';
+import { useDispatch, useSelector } from 'react-redux';
+import Spinner from '../../Components/Spinner/Spinner';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -43,27 +47,22 @@ const ProfilePosts = () => {
     // ProfilePosts contains all the posts from this user
 
     const classes = useStyles();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getAllPosts());
+    }, []);
+
+    //loading state
+    const loading = useSelector(state => state.post.loading);
+
+    //posts state
+    const posts = useSelector(state => state.post.posts);
 
     return (
         <Grid container className={classes.root}>
             <Grid item xs={12} >
-                <Post owner={owner} image={Post2} title="arefin" />
-            </Grid>
-
-            <Grid item xs={12} >
-                <Post owner={owner} image={Post1} title="arefin" />
-            </Grid>
-
-            <Grid item xs={12} >
-                <Post owner={owner} image={Post3} title="arefin" />
-            </Grid>
-
-            <Grid item xs={12} >
-                <Post owner={owner} image={Post2} title="arefin" />
-            </Grid>
-
-            <Grid item xs={12} >
-                <Post owner={owner} image={Post1} title="arefin" />
+                {loading ? <Spinner /> : posts && posts.length > 0 && posts.map(post => <Post post={post} key={post._id} />)}
             </Grid>
             {action}
         </Grid>

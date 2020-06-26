@@ -60,5 +60,9 @@ export const GET_FOLLOWINGS = 'GET_FOLLOWINGS';
 export const FOLLOW_LOADING = 'FOLLOW_LOADING';
 
 //post
+export const POST_LOADING = 'POST_LOADING';
 export const CREATE_POST = 'CREATE_POST';
 export const POST_ERROR = 'POST_ERROR';
+export const CLEAR_POST = 'CLEAR_POST';
+export const GET_POST = 'GET_POST';
+export const GET_USER_POSTS = 'GET_USER_POSTS';

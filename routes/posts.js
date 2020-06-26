@@ -49,7 +49,7 @@ router.post('/', [auth, upload.single('upload'), [
     //check if there is a file
     if (req.file) {
         //resize and convert to png
-        buffer = await sharp(req.file.buffer).resize({ width: 600, height: 600 }).png().toBuffer();
+        buffer = await sharp(req.file.buffer).rotate().resize({ width: 800, height: 800, fit: 'contain', background: { r: 255, g: 255, b: 255 } }).png().toBuffer();
     }
 
     //create a new post
@@ -73,6 +73,26 @@ router.post('/', [auth, upload.single('upload'), [
 
 
 
+/*  @route GET /posts/me
+    @desc Get all posts of logged in user
+    @access Private
+*/
+router.get('/me', auth, async (req, res) => {
+    try {
+        const posts = await Post.find({ user: req.user.id }).sort({ 'date': -1 }).populate('user', ['name', 'avatar']);
+
+        if (posts.length === 0) {
+            return res.status(404).send({ errors: [{ msg: 'You have no posts yet' }] });
+        }
+
+        res.send(posts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+});
+
+
 /*  @route GET /posts/:post_id
     @desc Get post by id
     @access Private
@@ -87,9 +107,18 @@ router.get('/:post_id', [auth, isFollowingPost], async (req, res) => {
     }
 });
 
+
+/*  @route GET /posts/:post_id/image
+    @desc Get post's image by id
+    @access Private
+*/
 router.get('/:post_id/image', [auth, isFollowingPost], async (req, res) => {
     try {
         const post = req.post;
+
+        if (!post.image) {
+            return res.status(400).send({ errors: [{ msg: 'No image found for this post' }] });
+        }
 
         res.set('Content-Type', 'image/png');
 
@@ -102,15 +131,17 @@ router.get('/:post_id/image', [auth, isFollowingPost], async (req, res) => {
 
 
 /*  @route GET /posts
-    @desc Get all posts of logged in user
+    @desc Get all posts of their following
     @access Private
 */
 router.get('/', auth, async (req, res) => {
+    //map through req.user's following list
+    const posts = [];
     try {
-        const posts = await Post.find({ user: req.user.id });
-
-        if (posts.length === 0) {
-            return res.status(400).send({ msg: 'You have no posts yet' });
+        for (let follow of req.user.following) {
+            //get the posts of the user
+            let userPosts = await Post.find({ user: follow.user }).sort({ 'date': -1 }).populate('user', ['name', 'avatar']);
+            posts.unshift(userPosts);
         }
 
         res.send(posts);
@@ -128,7 +159,7 @@ router.get('/', auth, async (req, res) => {
 //uses the isFollowing middleware to check if the logged in user is a follower of the searched user
 router.get('/users/:user_id', [auth, isFollowing], async (req, res) => {
     try {
-        const posts = await Post.find({ user: req.params.user_id });
+        const posts = await Post.find({ user: req.params.user_id }).sort({ 'date': -1 }).populate('user', ['name', 'avatar']);
 
         if (posts.length === 0) {
             return res.send({ msg: 'This user has no posts' });

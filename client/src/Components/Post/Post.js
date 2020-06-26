@@ -14,6 +14,11 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { Collapse, List, Divider } from '@material-ui/core';
+import Moment from 'react-moment';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import Comment from '../Comment/Comment';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -43,15 +48,33 @@ const useStyles = makeStyles((theme) => ({
     avatar: {
         backgroundColor: red[500],
     },
+    comments: {
+        marginLeft: 'auto',
+    }
 }));
 
-const Post = (props) => {
+const Post = ({ post, ...props }) => {
+
     const classes = useStyles();
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+
+
+    //do some weird sorcery shit to convert the buffer to image url
+    const [imageURL, setImageURL] = useState('');
+    useEffect(() => {
+        if (post.image) {
+            const arrayBufferView = new Uint8Array(post.image.data);
+            const blob = new Blob([arrayBufferView], { type: "image/png" });
+            const urlCreator = window.URL || window.webkitURL;
+            const imageUrl = urlCreator.createObjectURL(blob);
+
+            setImageURL(imageUrl);
+        }
+    }, [post]);
 
     return (
         <Card className={classes.root}>
@@ -64,28 +87,49 @@ const Post = (props) => {
                         <MoreVertIcon />
                     </IconButton>
                 }
-                title={props.title}
-                subheader="September 14, 2016"
+                title={post.user.name}
+                subheader={<Moment fromNow >{post.date}</Moment>}
             />
-            <CardMedia
+            {post.image && <CardMedia
                 className={classes.media}
-                image={props.image}
-                title="Paella dish"
-            />
+                // component="img"
+                image={imageURL && imageURL}
+            // title={post.text}
+            />}
             <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                <Typography variant="body1" color="textSecondary" component="p" >
+                    {post.text}
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
+                <IconButton aria-label="add to favorites" color="secondary" >
                     <FavoriteIcon />
                 </IconButton>
                 <Typography >49</Typography>
                 <IconButton aria-label="share">
                     <ShareIcon />
                 </IconButton>
+                <div className={classes.comments} onClick={handleExpandClick} >
+                    Comments
+                <IconButton
+                        className={clsx(classes.expand, {
+                            [classes.expandOpen]: expanded,
+                        })}
+                        aria-expanded={expanded}
+                        aria-label="show more"
+                    >
+                        <ExpandMoreIcon />
+                    </IconButton>
+                </div>
             </CardActions>
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
+                <CardContent>
+                    <List>
+                        <Comment />
+                        <Divider variant="middle" component="li" />
+                    </List>
+                </CardContent>
+            </Collapse>
         </Card>
     );
 }

@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
-import { Grid, Button, TextField, CardContent } from '@material-ui/core';
+import { Grid, Button, TextField, CardContent, Divider } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPost } from '../../Actions/post';
 import CustomAlert from '../../Components/CustomAlert/CustomAlert';
-import { Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
     header: {
         display: 'flex',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
     form: {
         '& > *': {
@@ -78,10 +79,10 @@ const useStyles = makeStyles((theme) => ({
     errors: {
         marginTop: theme.spacing(3)
     },
-    // postButton: {
-    //     height: '3rem',
-    //     width: '3rem'
-    // }
+    divider: {
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(2)
+    }
 }));
 
 const CreatePost = (props) => {
@@ -89,7 +90,7 @@ const CreatePost = (props) => {
 
     const dispatch = useDispatch();
 
-    const FILE_SIZE_MAX = 2048;
+    const FILE_SIZE_MAX = 2; //max 2MB
 
     //errors state
     const errors = useSelector(state => state.post.errors);
@@ -114,7 +115,6 @@ const CreatePost = (props) => {
         setFileURL(event.target.files[0] ? URL.createObjectURL(event.target.files[0]) : '');
     }
 
-
     const onSubmit = async event => {
         event.preventDefault();
 
@@ -123,21 +123,26 @@ const CreatePost = (props) => {
         formData.append('text', text);
 
         dispatch(createPost(formData));
-
-        if (errors.length === 0 && post) {
-            console.log('redirecting...');
-            return <Redirect to={`/post/${post._id}`} />;
-        }
     }
 
+    const history = useHistory();
+
+    //if not loading and there is a post then redirect the user to a single post
+    useEffect(() => {
+        if (!loading && post) {
+            history.replace(`/post/${post._id}`);
+        }
+    }, [loading, post]);
+
     return (
-        <Grid container className={classes.root}>
+        <Grid container className={classes.root} justify="center" >
             <Grid item xs={12} >
                 <form className={classes.form} onSubmit={onSubmit} >
                     <div className={classes.header}>
                         <Typography variant="h6" color="textSecondary" >Create Post</Typography>
-                        <Button variant="outlined" color="primary" size="large" type="submit" disabled={loading} className={classes.postButton} >Post</Button>
+                        <Button variant="outlined" color="primary" size="large" type="submit" disabled={loading || !text} className={classes.postButton} >Post</Button>
                     </div>
+                    <Divider className={classes.divider} />
                     <Card className={classes.card}>
                         <CardMedia
                             component="img"
@@ -146,9 +151,9 @@ const CreatePost = (props) => {
                             image={fileURL}
                         />
                     </Card>
-                    <TextField placeholder="Say something about this photo.." type="text" variant="outlined" value={text} onChange={(event) => setText(event.target.value)} label="Caption" />
-                    <Typography variant="body1" color="secondary" component="p" align="center" style={{ marginTop: '1rem' }} >
-                        {file.size / (1024 * 2) > FILE_SIZE_MAX && 'Image must be less than 2MB'}
+                    <TextField placeholder="Say something interesting..." type="text" variant="outlined" value={text} onChange={(event) => setText(event.target.value)} label="Caption" />
+                    <Typography variant="body2" color="secondary" component="p" align="center" style={{ marginTop: '1rem' }} >
+                        {file && file.size / 1000000 > FILE_SIZE_MAX && 'Image must be smaller than 2MB'}
                     </Typography>
                     <div className={classes.upload} >
                         <input

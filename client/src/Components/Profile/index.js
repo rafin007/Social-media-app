@@ -8,7 +8,7 @@ import ProfilePosts from './ProfilePosts';
 import About from './About';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../Spinner/Spinner';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useHistory } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getProfileById } from '../../Actions/profile';
 import { ArrowBackIos } from '@material-ui/icons';
@@ -141,6 +141,7 @@ const Profile = () => {
         pageContent = <About profile={profile} />;
     }
 
+    const history = useHistory()
 
     //JSX
     let profileContent = null;
@@ -153,18 +154,18 @@ const Profile = () => {
         profileContent = (
             <Grid container direction="row" justify="space-between" alignItems="stretch" className={classes.root} >
                 <Grid item xs={12} >
-                    <Link to={{
+                    {/* <Link to={{
                         pathname: '/home',
                         state: {
                             tab: 1
                         }
-                    }} className={classes.link} >
+                    }} className={classes.link} > */}
 
-                        <IconButton aria-label="go back" color="primary" size="small" >
-                            <ArrowBackIos />
+                    <IconButton aria-label="go back" color="primary" size="small" onClick={history.goBack} >
+                        <ArrowBackIos />
                             back
                         </IconButton>
-                    </Link>
+                    {/* </Link> */}
                 </Grid>
                 <Grid item xs={6} >
                     <Avatar owner={imageAvatar} width={14} height={14} />
@@ -194,7 +195,7 @@ const Profile = () => {
                         <Link className={classes.link2} to="/profile" >
                             <Button variant="contained" color="primary" >Edit profile</Button>
                         </Link>) : (
-                            <Button variant="contained" color={followStatus === 'follow' ? 'primary' : 'secondary'} disabled={followLoading} onClick={handleFollow} >{followStatus}</Button>
+                            <Button variant="contained" color={followStatus === 'follow' ? 'primary' : 'secondary'} disabled={followLoading} onClick={handleFollow} >{followStatus === 'follow' ? 'follow' : 'unfollow'}</Button>
                         )}
                 </Grid>
                 <Grid item xs={12} >

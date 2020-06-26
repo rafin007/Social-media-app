@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentProfile } from '../../Actions/profile';
 import Spinner from '../../Components/Spinner/Spinner';
 import { Link } from 'react-router-dom';
+import { clearPost } from '../../Actions/post';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -54,6 +55,11 @@ const ProfileView = () => {
 
     const classes = useStyles();
     const dispatch = useDispatch();
+
+    //clear the post state
+    useEffect(() => {
+        dispatch(clearPost());
+    }, []);
 
     //profile state
     const profile = useSelector(state => state.profile.profile);

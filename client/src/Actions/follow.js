@@ -85,8 +85,10 @@ export const unfollowUserById = (user_id, id = null) => async dispatch => {
 //----------------Get followers' profiles for a particular user---------------------
 export const getFollowers = (user_id = null) => async dispatch => {
     try {
+
         //loading first
         dispatch({ type: actionTypes.LOADING });
+        dispatch({ type: actionTypes.CLEAR_PROFILE });
 
         let response = null;
 
@@ -118,6 +120,8 @@ export const getFollowings = (user_id = null) => async dispatch => {
     try {
         //loading first
         dispatch({ type: actionTypes.LOADING });
+        dispatch({ type: actionTypes.CLEAR_PROFILE });
+
 
         let response = null;
 
