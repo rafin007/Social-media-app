@@ -178,7 +178,7 @@ router.get('/users/:user_id', [auth, isFollowing], async (req, res) => {
     @desc Update post by id
     @access Private
 */
-router.patch('/:post_id', [auth, [
+router.patch('/:post_id', [auth, upload.single('upload'), [
     check('text', 'Text is required').not().isEmpty()
 ]], async (req, res) => {
     const errors = validationResult(req);
@@ -194,18 +194,26 @@ router.patch('/:post_id', [auth, [
 
         //check if the post exists
         if (!post) {
-            return res.status(404).send({ msg: 'Post not found' });
+            return res.status(404).send({ errors: [{ msg: 'Post not found' }] });
         }
 
         //check if the request is made by the author of the post
         if (post.user.toString() !== req.user.id) {
-            return res.status(401).send({ msg: 'Unauthorized' });
+            return res.status(401).send({ errors: [{ msg: 'Unauthorized' }] });
+        }
+
+        let buffer;
+
+        //check if there is a file
+        if (req.file) {
+            //resize and convert to png
+            buffer = await sharp(req.file.buffer).rotate().resize({ width: 800, height: 800, fit: 'contain', background: { r: 255, g: 255, b: 255 } }).png().toBuffer();
         }
 
         //edit the post
-        for (let key in req.body) {
-            post[key] = req.body[key];
-        }
+        post.text = req.body.text;
+        post.image = req.file ? buffer : null;
+
         //save the post
         await post.save();
 
@@ -213,8 +221,7 @@ router.patch('/:post_id', [auth, [
 
     } catch (error) {
         console.error(error);
-        if (error.kind === 'ObjectId') return res.status(404).send({ msg: 'Post not found!' });
-
+        if (error.kind === 'ObjectId') return res.status(404).send({ errors: [{ msg: 'Post not found!' }] });
         res.status(500).send('Server error');
     }
 

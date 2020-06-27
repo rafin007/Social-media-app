@@ -62,6 +62,7 @@ export const FOLLOW_LOADING = 'FOLLOW_LOADING';
 //post
 export const POST_LOADING = 'POST_LOADING';
 export const CREATE_POST = 'CREATE_POST';
+export const EDIT_POST = 'EDIT_POST';
 export const POST_ERROR = 'POST_ERROR';
 export const CLEAR_POST = 'CLEAR_POST';
 export const GET_POST = 'GET_POST';

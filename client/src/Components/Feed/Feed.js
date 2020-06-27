@@ -11,16 +11,10 @@ import FloatingAction from '../FloatingAction/FloatingAction';
 import { useScrollPosition } from '@n8tb1t/use-scroll-position';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { clearPost } from '../../Actions/post';
 
 const Feed = () => {
 
     const dispatch = useDispatch();
-
-    //clear the post state
-    useEffect(() => {
-        dispatch(clearPost());
-    }, []);
 
     //scroll to top logic
     const [shouldScroller, setShouldScroller] = useState(false);

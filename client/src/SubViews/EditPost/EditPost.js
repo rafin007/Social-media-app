@@ -8,8 +8,9 @@ import { Grid, Button, TextField, CardContent, Divider } from '@material-ui/core
 import { useDispatch, useSelector } from 'react-redux';
 import { createPost, getPostById, editPost } from '../../Actions/post';
 import CustomAlert from '../../Components/CustomAlert/CustomAlert';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import Spinner from '../../Components/Spinner/Spinner';
+import bufferToImage from '../../utils/bufferToImage';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -86,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const CreatePost = (props) => {
+const EditPost = (props) => {
     const classes = useStyles();
 
     const dispatch = useDispatch();
@@ -108,10 +109,57 @@ const CreatePost = (props) => {
     //file url to display the image in real time
     const [fileURL, setFileURL] = useState('');
 
+    //newUpload state to check if a new file has been uploaded whether to display imageURL or fileURL
+    const [newUpload, setNewUpload] = useState(false);
+
     const onChange = event => {
         setFile(event.target.files[0]);
         setFileURL(event.target.files[0] ? URL.createObjectURL(event.target.files[0]) : '');
+        setNewUpload(true);
     }
+
+    //-------------edit post logic----------------
+
+    // get the post id from url if there is any
+    const { post_id } = useParams();
+
+    //retrieve the post by its id
+    useEffect(() => {
+        if (post_id) {
+            dispatch(getPostById(post_id));
+        }
+    }, [post_id]);
+
+    // const blobToFile = (theBlob, fileName) => {
+    //     //A Blob() is almost a File() - it's just missing the two properties below which we will add
+    //     theBlob.lastModifiedDate = new Date();
+    //     theBlob.name = fileName;
+    //     return theBlob;
+    // }
+
+    //post state
+    const post = useSelector(state => state.post.post);
+
+    const [imageURL, setImageURL] = useState('');
+
+    useEffect(() => {
+        if (post) {
+            setText(post.text);
+
+            if (post.image) {
+                const imageUrl = bufferToImage(post.image.data);
+                //image URL to display image
+                setImageURL(imageUrl);
+
+                //create file from the blob
+                const newFile = new File([imageUrl], 'image.png');
+                setFile(newFile);
+                setFileURL(newFile ? URL.createObjectURL(newFile) : '');
+            }
+        }
+    }, [post]);
+
+    //----------------------------------------------
 
     const history = useHistory();
 
@@ -123,7 +171,7 @@ const CreatePost = (props) => {
         formData.append('text', text);
 
         //pass the history object to redirect to SinglePost component from post actions
-        dispatch(createPost(formData, history));
+        dispatch(editPost(post._id, formData, history));
     }
 
     return (
@@ -131,18 +179,23 @@ const CreatePost = (props) => {
             <Grid item xs={12} >
                 <form className={classes.form} onSubmit={onSubmit} >
                     <div className={classes.header}>
-                        <Typography variant="h6" color="textSecondary" >Create Post</Typography>
+                        <Typography variant="h6" color="textSecondary" >Edit Post</Typography>
                         <Button variant="outlined" color="primary" size="large" type="submit" disabled={loading || !text} className={classes.postButton} >Post</Button>
                     </div>
                     <Divider className={classes.divider} />
                     {loading ? <Spinner /> : <Fragment>
                         <Card className={classes.card}>
-                            <CardMedia
+                            {newUpload ? <CardMedia
                                 component="img"
                                 // height="500"
                                 className={classes.media}
                                 image={fileURL}
-                            />
+                            /> : <CardMedia
+                                    component="img"
+                                    // height="500"
+                                    className={classes.media}
+                                    image={imageURL}
+                                />}
                         </Card>
                         <TextField placeholder="Say something interesting..." type="text" variant="outlined" value={text} onChange={(event) => setText(event.target.value)} label="Caption" /></Fragment>}
                     <Typography variant="body2" color="secondary" component="p" align="center" style={{ marginTop: '1rem' }} >
@@ -172,4 +225,4 @@ const CreatePost = (props) => {
 }
 
 
-export default CreatePost;
+export default EditPost;

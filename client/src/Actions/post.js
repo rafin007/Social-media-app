@@ -9,7 +9,7 @@ const config = {
 };
 
 //-------------create post-----------------
-export const createPost = (formData) => async dispatch => {
+export const createPost = (formData, history) => async dispatch => {
     try {
 
         //loading first
@@ -21,6 +21,37 @@ export const createPost = (formData) => async dispatch => {
             type: actionTypes.CREATE_POST,
             payload: response.data
         });
+
+        //redirect to single post component
+        history.replace(`/post/${response.data._id}`);
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.POST_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};
+
+
+//-------------edit post-----------------
+export const editPost = (post_id, formData, history) => async dispatch => {
+    try {
+
+        //loading first
+        dispatch({ type: actionTypes.POST_LOADING });
+
+        const response = await axios.patch(`/posts/${post_id}`, formData, config);
+
+        dispatch({
+            type: actionTypes.EDIT_POST,
+            payload: response.data
+        });
+
+        //redirect to single post component
+        history.replace(`/post/${response.data._id}`);
 
     } catch (err) {
         const errors = err.response.data.errors;

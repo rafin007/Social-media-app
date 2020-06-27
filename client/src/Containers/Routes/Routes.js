@@ -14,6 +14,7 @@ import HomeView from '../../Views/Home/HomeView';
 import ViewProfile from '../../Components/Profile';
 import CreatePost from '../../SubViews/CreatePost/CreatePost';
 import SinglePost from '../../SubViews/SinglePost/SinglePost';
+import EditPost from '../../SubViews/EditPost/EditPost';
 
 //routes contain all the routes after the user has logged in
 
@@ -34,6 +35,7 @@ const Routes = () => {
             <Route path="/followers/:user_id" exact component={Followers} />
             <Route path="/following/:user_id" exact component={Following} />
             <Route path="/create" exact component={CreatePost} />
+            <Route path="/edit/:post_id" exact component={EditPost} />
             <Route path="/post/:post_id" exact component={SinglePost} />
         </Switch>
     );

@@ -19,6 +19,7 @@ const postReducer = (state = initalState, action) => {
             }
 
         case actionTypes.CREATE_POST:
+        case actionTypes.EDIT_POST:
         case actionTypes.GET_POST:
             return {
                 ...state,

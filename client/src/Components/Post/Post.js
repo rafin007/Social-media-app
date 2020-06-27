@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
@@ -19,6 +19,8 @@ import Moment from 'react-moment';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Comment from '../Comment/Comment';
+import SimpleMenu from '../SimpleMenu/SimpleMenu';
+import bufferToImage from '../../utils/bufferToImage';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -56,25 +58,34 @@ const useStyles = makeStyles((theme) => ({
 const Post = ({ post, ...props }) => {
 
     const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false);
+
+    //comment section handler
+    const [expanded, setExpanded] = useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
-
-    //do some weird sorcery shit to convert the buffer to image url
+    //convert the buffer to image URL
     const [imageURL, setImageURL] = useState('');
     useEffect(() => {
         if (post.image) {
-            const arrayBufferView = new Uint8Array(post.image.data);
-            const blob = new Blob([arrayBufferView], { type: "image/png" });
-            const urlCreator = window.URL || window.webkitURL;
-            const imageUrl = urlCreator.createObjectURL(blob);
-
+            const imageUrl = bufferToImage(post.image.data);
             setImageURL(imageUrl);
         }
     }, [post]);
+
+
+    //menu handler
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     return (
         <Card className={classes.root}>
@@ -83,12 +94,21 @@ const Post = ({ post, ...props }) => {
                     <Avatar alt="Avatar" src={props.owner} />
                 }
                 action={
-                    <IconButton aria-label="settings">
-                        <MoreVertIcon />
-                    </IconButton>
+                    <Fragment>
+                        <IconButton aria-label="settings" onClick={handleClick} >
+                            <MoreVertIcon />
+                        </IconButton>
+                        <SimpleMenu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)} postId={post._id} />
+                    </Fragment>
                 }
                 title={post.user.name}
-                subheader={<Moment fromNow >{post.date}</Moment>}
+                subheader={
+                    <Fragment>
+                        {/* <Moment fromNow >{post.date}</Moment>
+                        <br /> */}
+                        <Moment format="D MMM YYYY HH:mm" withTitle >{post.date}</Moment>
+                    </Fragment>
+                }
             />
             {post.image && <CardMedia
                 className={classes.media}
