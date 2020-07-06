@@ -145,6 +145,103 @@ export const getPostsByUserId = (user_id) => async dispatch => {
 };
 
 
+//------------------delete post by id-------------------
+export const deletePostById = (post_id) => async dispatch => {
+    try {
+        //loading first
+        dispatch({ type: actionTypes.POST_LOADING });
+
+        //delete
+        const response = await axios.delete(`/posts/${post_id}`);
+
+        dispatch({
+            type: actionTypes.DELETE_POST,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.POST_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};
+
+
+//----------------------add like to post---------------------
+export const addLike = (post_id) => async dispatch => {
+    try {
+        //loading first
+        dispatch({ type: actionTypes.LIKE_LOADING });
+
+        const response = await axios.put(`/posts/like/${post_id}`);
+
+        dispatch({
+            type: actionTypes.UPDATE_LIKES,
+            payload: { id: post_id, likes: response.data }
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.POST_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};
+
+
+//----------------------remove like from post---------------------
+export const removeLike = (post_id) => async dispatch => {
+    try {
+        //loading first
+        dispatch({ type: actionTypes.LIKE_LOADING });
+
+        const response = await axios.put(`/posts/unlike/${post_id}`);
+
+        dispatch({
+            type: actionTypes.UPDATE_LIKES,
+            payload: { id: post_id, likes: response.data }
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.POST_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+};
+
+
+//------------------post comment on post by id------------------
+// export const postCommentOnPostById = (post_id, comment) => async dispatch => {
+//     try {
+//         //loading first
+//         dispatch({ type: actionTypes.LIKE_LOADING });
+
+//         const response = await axios.post(`/posts/comments/${post_id}`, comment);
+
+//         dispatch({
+//             type: actionTypes.POST_COMMENT,
+//             payload: { id: post_id, comments: response.data }
+//         });
+
+//     } catch (err) {
+//         const errors = err.response.data.errors;
+
+//         dispatch({
+//             type: actionTypes.POST_ERROR,
+//             payload: errors.map(error => error.msg)
+//         });
+//     }
+// }
+
+
 // //---------------get post image by id----------------
 // export const getPostImageById = (post_id) => async dispatch => {
 //     try {

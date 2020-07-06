@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import { ListItemIcon, Typography } from '@material-ui/core';
+import { ListItemIcon } from '@material-ui/core';
 import { EditOutlined, DeleteOutlined } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
+import { useDispatch } from 'react-redux';
+import { deletePostById } from '../../Actions/post';
 
 const SimpleMenu = ({ postId, ...props }) => {
 
@@ -13,6 +16,34 @@ const SimpleMenu = ({ postId, ...props }) => {
         props.onClose();
         history.push(`/edit/${postId}`);
     }
+
+
+    //confirm modal logic
+    const [open, setOpen] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    //open confirm modal
+    const openConfirmModal = () => {
+        props.onClose();
+        handleClickOpen();
+    }
+
+    const dispatch = useDispatch();
+
+    //delete post
+    const deletePost = () => {
+        dispatch(deletePostById(postId));
+
+        handleClose();
+    }
+
 
     return (
         <Menu
@@ -26,14 +57,15 @@ const SimpleMenu = ({ postId, ...props }) => {
                 <ListItemIcon>
                     <EditOutlined fontSize="small" />
                 </ListItemIcon>
-                <Typography variant="inherit">Edit Post</Typography>
+                Edit Post
             </MenuItem>
-            <MenuItem onClick={props.onClose}>
+            <MenuItem onClick={openConfirmModal}>
                 <ListItemIcon>
                     <DeleteOutlined fontSize="small" />
                 </ListItemIcon>
-                <Typography variant="inherit">Delete Post</Typography>
+                Delete Post
             </MenuItem>
+            <ConfirmDialog open={open} handleClose={handleClose} deletePost={deletePost} />
         </Menu>
     );
 }

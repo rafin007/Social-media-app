@@ -4,7 +4,8 @@ const initalState = {
     posts: [],
     post: null,
     errors: [],
-    loading: false
+    loading: false,
+    likeLoading: false
 };
 
 const postReducer = (state = initalState, action) => {
@@ -46,6 +47,35 @@ const postReducer = (state = initalState, action) => {
                 loading: false,
                 posts: payload
             }
+
+        case actionTypes.DELETE_POST:
+            return {
+                ...state,
+                loading: false,
+                posts: state.posts.filter(post => post._id !== payload._id)
+            }
+
+        case actionTypes.UPDATE_LIKES:
+            return {
+                ...state,
+                likeLoading: false,
+                posts: state.posts && state.posts.map(post => post._id === payload.id ? { ...post, likes: payload.likes } : post),
+                post: state.post && { ...state.post, likes: payload.likes }
+            }
+
+        case actionTypes.LIKE_LOADING:
+            return {
+                ...state,
+                likeLoading: true
+            }
+
+        // case actionTypes.POST_COMMENT:
+        //     return {
+        //         ...state,
+        //         likeLoading: false,
+        //         posts: state.posts && state.posts.map(post => post._id === payload.id ? { ...post, comments: payload.comments } : post),
+        //         post: state.post && { ...state.post, comments: payload.comments }
+        //     }
 
         default:
             return state;

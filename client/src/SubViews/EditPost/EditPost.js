@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
 import { Grid, Button, TextField, CardContent, Divider } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPost, getPostById, editPost } from '../../Actions/post';
+import { getPostById, editPost } from '../../Actions/post';
 import CustomAlert from '../../Components/CustomAlert/CustomAlert';
 import { useHistory, useParams } from 'react-router-dom';
 import Spinner from '../../Components/Spinner/Spinner';

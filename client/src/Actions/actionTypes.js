@@ -67,3 +67,11 @@ export const POST_ERROR = 'POST_ERROR';
 export const CLEAR_POST = 'CLEAR_POST';
 export const GET_POST = 'GET_POST';
 export const GET_USER_POSTS = 'GET_USER_POSTS';
+export const DELETE_POST = 'DELETE_POST';
+
+//likes
+export const UPDATE_LIKES = 'UPDATE_LIKES';
+export const LIKE_LOADING = 'LIKE_LOADING';
+
+//comment
+// export const POST_COMMENT = 'POST_COMMENT';

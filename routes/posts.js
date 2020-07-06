@@ -162,7 +162,7 @@ router.get('/users/:user_id', [auth, isFollowing], async (req, res) => {
         const posts = await Post.find({ user: req.params.user_id }).sort({ 'date': -1 }).populate('user', ['name', 'avatar']);
 
         if (posts.length === 0) {
-            return res.send({ msg: 'This user has no posts' });
+            return res.send();
         }
 
         res.send(posts);
@@ -238,22 +238,22 @@ router.delete('/:post_id', auth, async (req, res) => {
 
         //check if the post exists
         if (!post) {
-            return res.status(404).send({ msg: 'Post not found!' });
+            return res.status(404).send({ errors: [{ msg: 'Post not found!' }] });
         }
 
         //check if the request is made by the author of the post
         if (post.user.toString() !== req.user.id) {
-            return res.status(401).send({ msg: 'Unauthorized' });
+            return res.status(401).send({ errors: [{ msg: 'Unauthorized' }] });
         }
 
         await post.remove();
 
-        res.send({ msg: 'Post removed' });
+        res.send(post);
 
 
     } catch (error) {
         console.error(error);
-        if (error.kind === 'ObjectId') return res.status(404).send({ msg: 'Post not found!' });
+        if (error.kind === 'ObjectId') return res.status(404).send({ errors: [{ msg: 'Post not found!' }] });
 
         res.status(500).send('Server error');
     }
@@ -270,7 +270,7 @@ router.put('/like/:post_id', [auth, isFollowingPost], async (req, res) => {
 
         //check if that post is already liked
         if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
-            return res.status(400).send({ msg: 'Post already liked' });
+            return res.status(400).send({ errors: [{ msg: 'Post already liked' }] });
         }
 
         //if not liked then like it
@@ -298,7 +298,7 @@ router.put('/unlike/:post_id', [auth, isFollowingPost], async (req, res) => {
 
         //check if that post is already liked
         if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
-            return res.status(400).send({ msg: 'Post not liked yet' });
+            return res.status(400).send({ errors: [{ msg: 'Post not liked yet' }] });
         }
 
         //get the index of the like
@@ -366,7 +366,7 @@ router.post('/comments/:post_id', [auth, isFollowingPost, [
         //save the comment
         await req.post.save();
 
-        res.send(req.post);
+        res.send(req.post.comments);
 
     } catch (error) {
         console.error(error);

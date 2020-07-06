@@ -11,16 +11,17 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { Collapse, List, Divider } from '@material-ui/core';
+import { Collapse, List, Divider, TextField, Button, Grid } from '@material-ui/core';
 import Moment from 'react-moment';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Comment from '../Comment/Comment';
 import SimpleMenu from '../SimpleMenu/SimpleMenu';
 import bufferToImage from '../../utils/bufferToImage';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeLike, addLike, postCommentOnPostById } from '../../Actions/post';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -52,12 +53,22 @@ const useStyles = makeStyles((theme) => ({
     },
     comments: {
         marginLeft: 'auto',
+    },
+    // comment: {
+    //     display: 'flex',
+    //     justifyContent: 'space-between',
+    //     width: '100%',
+    //     alignItems: 'center',
+    // },
+    commentBox: {
+        width: '100%'
     }
 }));
 
 const Post = ({ post, ...props }) => {
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     //comment section handler
     const [expanded, setExpanded] = useState(false);
@@ -66,7 +77,7 @@ const Post = ({ post, ...props }) => {
         setExpanded(!expanded);
     };
 
-    //convert the buffer to image URL
+    //convert the buffer to image URL/blob
     const [imageURL, setImageURL] = useState('');
     useEffect(() => {
         if (post.image) {
@@ -86,6 +97,53 @@ const Post = ({ post, ...props }) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    //user state from auth
+    const user = useSelector(state => state.auth.user);
+
+    //check post like
+    const [isLiked, setIsLiked] = useState(null);
+
+    //check if the current user liked this post
+    useEffect(() => {
+        if (post.likes.filter(like => like.user === user._id).length > 0) {
+            setIsLiked(Boolean(true));
+        }
+        else {
+            setIsLiked(Boolean(false));
+        }
+    }, [user._id, isLiked, post]);
+
+    //update like
+    const updateLike = () => {
+        if (isLiked) {
+            dispatch(removeLike(post._id));
+        }
+        else {
+            dispatch(addLike(post._id));
+        }
+    }
+
+    let likeString = '';
+
+    if (isLiked && post.likes.length === 1) {
+        likeString = 'You like this';
+    }
+    else if (isLiked && post.likes.length > 1) {
+        likeString = `You and ${post.likes.length - 1} others`;
+    }
+    else if (!isLiked && post.likes.length > 0) {
+        likeString = `${post.likes.length}`;
+    }
+
+    const likeLoading = useSelector(state => state.post.likeLoading);
+
+    //comment logic
+    // const [comment, setComment] = useState('');
+
+    // const postComment = () => {
+    //     dispatch(postCommentOnPostById(post._id, comment));
+    // }
 
     return (
         <Card className={classes.root}>
@@ -122,16 +180,13 @@ const Post = ({ post, ...props }) => {
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites" color="secondary" >
+                <IconButton aria-label="add to favorites" color={isLiked ? 'secondary' : 'default'} onClick={updateLike} disabled={likeLoading} >
                     <FavoriteIcon />
                 </IconButton>
-                <Typography >49</Typography>
-                <IconButton aria-label="share">
-                    <ShareIcon />
-                </IconButton>
+                <Typography >{likeString}</Typography>
                 <div className={classes.comments} onClick={handleExpandClick} >
                     Comments
-                <IconButton
+                    <IconButton
                         className={clsx(classes.expand, {
                             [classes.expandOpen]: expanded,
                         })}
@@ -142,12 +197,28 @@ const Post = ({ post, ...props }) => {
                     </IconButton>
                 </div>
             </CardActions>
+            <CardContent>
+                <Grid container className={classes.comment} alignItems="center" justify="space-evenly" >
+                    <Grid item xs={9} >
+                        {/* <TextField variant="standard" placeholder="Write a comment.." multiline className={classes.commentBox} size="small" value={comment} onChange={(event) => setComment(event.target.value)} /> */}
+                    </Grid>
+                    <Grid item xs={2} >
+                        <Button variant="outlined" color="primary" disabled={!comment} >post</Button>
+                    </Grid>
+                </Grid>
+            </CardContent>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
-                    <List>
-                        <Comment />
-                        <Divider variant="middle" component="li" />
-                    </List>
+                    {/* <List>
+                        {post.comments && post.comments.length > 0 && post.comments.map(comment => {
+                            return (
+                                <Fragment>
+                                    <Comment />
+                                    <Divider variant="middle" component="li" />
+                                </Fragment>
+                            );
+                        })}
+                    </List> */}
                 </CardContent>
             </Collapse>
         </Card>
