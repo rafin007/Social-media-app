@@ -751,27 +751,25 @@ router.get('/followRequests', auth, async (req, res) => {
 });
 
 
-/*  Example file upload
+/*  @route GET /users/:user_id
+    @desc Get an individual user
+    @access Private
 */
-// const multer = require('multer');
-// const upload = multer({
-//   dest: 'avatars',
-//   limits: {
-//     fileSize: 1024 * 1024
-//   },
-//   fileFilter(req, file, cb) {
-//     if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {
-//       return cb(new Error('Please upload an image'));
-//     }
-//     cb(undefined, true);
-//   }
-// });
+router.get('/:user_id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user_id).select('-password');
 
-// router.post('/me/avatar', upload.single('upload'), (req, res) => {
-//   res.send('file uploaded');
-// }, (error, req, res, next) => {
-//   res.status(400).send({ error: error.message });
-// });
+    //if any of user or avatar not found, throw error
+    if (!user) {
+      return res.status(404).send({ errors: [{ msg: 'User not found' }] });
+    }
+
+    //send back the user
+    res.send(user);
+  } catch (error) {
+    res.status(404).send({ msg: error });
+  }
+});
 
 
 /*  @route POST /users/avatar/me

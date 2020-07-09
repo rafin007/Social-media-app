@@ -6,15 +6,22 @@ import { EditOutlined, DeleteOutlined } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 import { useDispatch } from 'react-redux';
-import { deletePostById } from '../../Actions/post';
+import { deletePostById, deletePostCommentById } from '../../Actions/post';
 
-const SimpleMenu = ({ postId, ...props }) => {
+const SimpleMenu = ({ postId, commentId, ...props }) => {
 
     const history = useHistory();
 
-    const editPost = () => {
-        props.onClose();
-        history.push(`/edit/${postId}`);
+    //edit comment or post
+    const edit = () => {
+        if (commentId) {
+            //edit post
+            console.log('edit comment');
+        }
+        else {
+            props.onClose();
+            history.push(`/edit/${postId}`);
+        }
     }
 
 
@@ -37,9 +44,16 @@ const SimpleMenu = ({ postId, ...props }) => {
 
     const dispatch = useDispatch();
 
-    //delete post
-    const deletePost = () => {
-        dispatch(deletePostById(postId));
+    //remove comment or post
+    const remove = () => {
+        if (commentId) {
+            //delete comment
+            // console.log('delete comment');
+            dispatch(deletePostCommentById(postId, commentId));
+        }
+        else {
+            dispatch(deletePostById(postId));
+        }
 
         handleClose();
     }
@@ -53,19 +67,19 @@ const SimpleMenu = ({ postId, ...props }) => {
             open={props.open}
             onClose={props.onClose}
         >
-            <MenuItem onClick={editPost}>
+            <MenuItem onClick={edit}>
                 <ListItemIcon>
                     <EditOutlined fontSize="small" />
                 </ListItemIcon>
-                Edit Post
+                Edit {props.criteria}
             </MenuItem>
             <MenuItem onClick={openConfirmModal}>
                 <ListItemIcon>
                     <DeleteOutlined fontSize="small" />
                 </ListItemIcon>
-                Delete Post
+                Delete {props.criteria}
             </MenuItem>
-            <ConfirmDialog open={open} handleClose={handleClose} deletePost={deletePost} />
+            <ConfirmDialog open={open} handleClose={handleClose} deleteCriteria={remove} criteria={props.criteria} />
         </Menu>
     );
 }

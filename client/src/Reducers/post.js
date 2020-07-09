@@ -69,13 +69,21 @@ const postReducer = (state = initalState, action) => {
                 likeLoading: true
             }
 
-        // case actionTypes.POST_COMMENT:
-        //     return {
-        //         ...state,
-        //         likeLoading: false,
-        //         posts: state.posts && state.posts.map(post => post._id === payload.id ? { ...post, comments: payload.comments } : post),
-        //         post: state.post && { ...state.post, comments: payload.comments }
-        //     }
+        case actionTypes.POST_COMMENT:
+            return {
+                ...state,
+                likeLoading: false,
+                posts: state.posts && state.posts.map(post => post._id === payload.id ? { ...post, comments: payload.comments } : post),
+                post: state.post && { ...state.post, comments: payload.comments }
+            }
+
+        case actionTypes.DELETE_COMMENT:
+            return {
+                ...state,
+                likeLoading: false,
+                posts: state.posts && state.posts.map(post => post._id === payload.postId ? { ...post, comments: post.comments.filter(comment => comment._id !== payload.commentId) } : post),
+                post: null
+            }
 
         default:
             return state;

@@ -139,11 +139,18 @@ const Post = ({ post, ...props }) => {
     const likeLoading = useSelector(state => state.post.likeLoading);
 
     //comment logic
-    // const [comment, setComment] = useState('');
+    const [comment, setComment] = useState('');
 
-    // const postComment = () => {
-    //     dispatch(postCommentOnPostById(post._id, comment));
-    // }
+    const postComment = () => {
+        const data = {
+            text: comment
+        };
+
+        dispatch(postCommentOnPostById(post._id, data));
+
+        setComment('');
+        setExpanded(true);
+    }
 
     return (
         <Card className={classes.root}>
@@ -152,12 +159,13 @@ const Post = ({ post, ...props }) => {
                     <Avatar alt="Avatar" src={props.owner} />
                 }
                 action={
-                    <Fragment>
+                    user._id === post.user._id &&
+                    (<Fragment>
                         <IconButton aria-label="settings" onClick={handleClick} >
                             <MoreVertIcon />
                         </IconButton>
-                        <SimpleMenu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)} postId={post._id} />
-                    </Fragment>
+                        <SimpleMenu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)} postId={post._id} criteria="Post" />
+                    </Fragment>)
                 }
                 title={post.user.name}
                 subheader={
@@ -185,7 +193,7 @@ const Post = ({ post, ...props }) => {
                 </IconButton>
                 <Typography >{likeString}</Typography>
                 <div className={classes.comments} onClick={handleExpandClick} >
-                    Comments
+                    Comments {post.comments.length > 0 && `(${post.comments.length})`}
                     <IconButton
                         className={clsx(classes.expand, {
                             [classes.expandOpen]: expanded,
@@ -200,25 +208,25 @@ const Post = ({ post, ...props }) => {
             <CardContent>
                 <Grid container className={classes.comment} alignItems="center" justify="space-evenly" >
                     <Grid item xs={9} >
-                        {/* <TextField variant="standard" placeholder="Write a comment.." multiline className={classes.commentBox} size="small" value={comment} onChange={(event) => setComment(event.target.value)} /> */}
+                        <TextField variant="standard" placeholder="Write a comment.." multiline className={classes.commentBox} size="small" value={comment} onChange={(event) => setComment(event.target.value)} />
                     </Grid>
                     <Grid item xs={2} >
-                        <Button variant="outlined" color="primary" disabled={!comment} >post</Button>
+                        <Button variant="outlined" color="primary" disabled={!comment} onClick={postComment} >post</Button>
                     </Grid>
                 </Grid>
             </CardContent>
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
-                    {/* <List>
+                    <List>
                         {post.comments && post.comments.length > 0 && post.comments.map(comment => {
                             return (
-                                <Fragment>
-                                    <Comment />
+                                <Fragment key={comment._id} >
+                                    <Comment comment={comment} postId={post._id} />
                                     <Divider variant="middle" component="li" />
                                 </Fragment>
                             );
                         })}
-                    </List> */}
+                    </List>
                 </CardContent>
             </Collapse>
         </Card>

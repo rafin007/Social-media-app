@@ -2,15 +2,17 @@ import axios from 'axios';
 import * as actionTypes from './actionTypes';
 
 //axios config
-const config = {
-    headers: {
-        'Content-Type': 'multipart/form-data'
-    }
-};
+let config = null;
 
 //-------------create post-----------------
 export const createPost = (formData, history) => async dispatch => {
     try {
+
+        config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        };
 
         //loading first
         dispatch({ type: actionTypes.POST_LOADING });
@@ -39,6 +41,12 @@ export const createPost = (formData, history) => async dispatch => {
 //-------------edit post-----------------
 export const editPost = (post_id, formData, history) => async dispatch => {
     try {
+
+        config = {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        };
 
         //loading first
         dispatch({ type: actionTypes.POST_LOADING });
@@ -219,27 +227,58 @@ export const removeLike = (post_id) => async dispatch => {
 
 
 //------------------post comment on post by id------------------
-// export const postCommentOnPostById = (post_id, comment) => async dispatch => {
-//     try {
-//         //loading first
-//         dispatch({ type: actionTypes.LIKE_LOADING });
+export const postCommentOnPostById = (post_id, { text }) => async dispatch => {
+    try {
 
-//         const response = await axios.post(`/posts/comments/${post_id}`, comment);
+        config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
 
-//         dispatch({
-//             type: actionTypes.POST_COMMENT,
-//             payload: { id: post_id, comments: response.data }
-//         });
+        const body = JSON.stringify({ text });
 
-//     } catch (err) {
-//         const errors = err.response.data.errors;
+        //loading first
+        dispatch({ type: actionTypes.LIKE_LOADING });
 
-//         dispatch({
-//             type: actionTypes.POST_ERROR,
-//             payload: errors.map(error => error.msg)
-//         });
-//     }
-// }
+        const response = await axios.post(`/posts/comments/${post_id}`, body, config);
+
+        dispatch({
+            type: actionTypes.POST_COMMENT,
+            payload: { id: post_id, comments: response.data }
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.POST_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+}
+
+export const deletePostCommentById = (post_id, comment_id) => async dispatch => {
+    try {
+        //loading first
+        dispatch({ type: actionTypes.LIKE_LOADING });
+
+        const response = await axios.delete(`/posts/comments/${post_id}/${comment_id}`);
+
+        dispatch({
+            type: actionTypes.DELETE_COMMENT,
+            payload: { postId: post_id, commentId: comment_id }
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.POST_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+}
 
 
 // //---------------get post image by id----------------

@@ -22,17 +22,17 @@ const ConfirmDialog = (props) => {
             aria-labelledby="alert-dialog-slide-title"
             aria-describedby="alert-dialog-slide-description"
         >
-            <DialogTitle id="alert-dialog-slide-title">Delete this post?</DialogTitle>
+            <DialogTitle id="alert-dialog-slide-title">Delete this {props.criteria}?</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
-                    Are you sure you want to delete this post? This action cannot be undone.
+                    Are you sure you want to delete this {props.criteria}? This action cannot be undone.
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={props.handleClose} color="primary">
                     Cancel
                 </Button>
-                <Button onClick={props.deletePost} color="secondary">
+                <Button onClick={props.deleteCriteria} color="secondary">
                     Delete
                 </Button>
             </DialogActions>

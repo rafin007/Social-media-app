@@ -74,4 +74,5 @@ export const UPDATE_LIKES = 'UPDATE_LIKES';
 export const LIKE_LOADING = 'LIKE_LOADING';
 
 //comment
-// export const POST_COMMENT = 'POST_COMMENT';
+export const POST_COMMENT = 'POST_COMMENT';
+export const DELETE_COMMENT = 'DELETE_COMMENT';
