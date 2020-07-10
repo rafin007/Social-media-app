@@ -5,6 +5,7 @@ import SimpleMenu from '../SimpleMenu/SimpleMenu';
 import axios from 'axios';
 import bufferToImage from '../../utils/bufferToImage';
 import Moment from 'react-moment';
+import { useSelector } from 'react-redux';
 
 const Comment = ({ comment, postId }) => {
 
@@ -34,6 +35,9 @@ const Comment = ({ comment, postId }) => {
         }
     }, [comment]);
 
+    //user state from auth
+    const loggedUser = useSelector(state => state.auth.user);
+
     return (
         <ListItem>
             <ListItemAvatar>
@@ -48,12 +52,12 @@ const Comment = ({ comment, postId }) => {
                     </Fragment>
                 }
             />
-            <ListItemSecondaryAction>
+            {loggedUser._id === user.id && <ListItemSecondaryAction>
                 <IconButton aria-label="settings" onClick={handleClick} >
                     <MoreVert />
                 </IconButton>
                 <SimpleMenu onClose={handleClose} anchorEl={anchorEl} open={Boolean(anchorEl)} criteria="Comment" commentId={comment._id} postId={postId} />
-            </ListItemSecondaryAction>
+            </ListItemSecondaryAction>}
         </ListItem>
     );
 }

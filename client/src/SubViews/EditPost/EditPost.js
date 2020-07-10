@@ -130,13 +130,6 @@ const EditPost = (props) => {
         }
     }, [post_id]);
 
-    // const blobToFile = (theBlob, fileName) => {
-    //     //A Blob() is almost a File() - it's just missing the two properties below which we will add
-    //     theBlob.lastModifiedDate = new Date();
-    //     theBlob.name = fileName;
-    //     return theBlob;
-    // }
-
     //post state
     const post = useSelector(state => state.post.post);
 
@@ -152,9 +145,9 @@ const EditPost = (props) => {
                 setImageURL(imageUrl);
 
                 //create file from the blob
-                const newFile = new File([imageUrl], 'image.png');
-                setFile(newFile);
-                setFileURL(newFile ? URL.createObjectURL(newFile) : '');
+                // const newFile = new File([imageUrl], 'image.png');
+                // setFile(newFile);
+                // setFileURL(newFile ? URL.createObjectURL(newFile) : '');
             }
         }
     }, [post]);
@@ -167,8 +160,14 @@ const EditPost = (props) => {
         event.preventDefault();
 
         const formData = new FormData();
-        formData.append('upload', file);
-        formData.append('text', text);
+        //if not a newUpload then just upload the caption
+        if (newUpload) {
+            formData.append('upload', file);
+            formData.append('text', text);
+        }
+        else {
+            formData.append('text', text);
+        }
 
         //pass the history object to redirect to SinglePost component from post actions
         dispatch(editPost(post._id, formData, history));

@@ -82,7 +82,7 @@ const postReducer = (state = initalState, action) => {
                 ...state,
                 likeLoading: false,
                 posts: state.posts && state.posts.map(post => post._id === payload.postId ? { ...post, comments: post.comments.filter(comment => comment._id !== payload.commentId) } : post),
-                post: null
+                post: state.post && { ...state.post, comments: state.post.comments.filter(comment => comment._id !== payload.commentId) }
             }
 
         default:

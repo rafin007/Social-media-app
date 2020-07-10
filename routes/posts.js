@@ -212,7 +212,7 @@ router.patch('/:post_id', [auth, upload.single('upload'), [
 
         //edit the post
         post.text = req.body.text;
-        post.image = req.file ? buffer : null;
+        post.image = req.file ? buffer : post.image;
 
         //save the post
         await post.save();
