@@ -21,27 +21,27 @@ const useStyles = makeStyles(theme => ({
 
 const ProfilePosts = ({ profile }) => {
 
-    //scroll to top logic
-    const [shouldScroller, setShouldScroller] = useState(false);
+    // //scroll to top logic
+    // const [shouldScroller, setShouldScroller] = useState(false);
 
-    let action = null;
+    const action = <FloatingAction action="scroller" />;
 
-    if (shouldScroller) {
-        action = <FloatingAction action="scroller" />;
-    }
-    else {
-        action = <FloatingAction action="button" />;
-    }
+    // if (shouldScroller) {
+    //     action = <FloatingAction action="scroller" />;
+    // }
+    // else {
+    //     action = <FloatingAction action="button" />;
+    // }
 
-    // if scrolled down scroll to top will appear
-    useScrollPosition(({ prevPos, currPos }) => {
-        if (currPos.y < 0 && currPos.y < prevPos.y) {
-            setShouldScroller(true);
-        }
-        else {
-            setShouldScroller(false);
-        }
-    });
+    // // if scrolled down scroll to top will appear
+    // useScrollPosition(({ prevPos, currPos }) => {
+    //     if (currPos.y < 0 && currPos.y < prevPos.y) {
+    //         setShouldScroller(true);
+    //     }
+    //     else {
+    //         setShouldScroller(false);
+    //     }
+    // });
 
     // ProfilePosts contains all the posts from this user
 

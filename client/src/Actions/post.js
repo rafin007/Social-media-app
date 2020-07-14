@@ -258,6 +258,40 @@ export const postCommentOnPostById = (post_id, { text }) => async dispatch => {
     }
 }
 
+//------------------edit comment on post by id------------------
+export const editCommentOnPostById = (post_id, commnet_id, { text }) => async dispatch => {
+    try {
+
+        config = {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const body = JSON.stringify({ text });
+
+        //loading first
+        dispatch({ type: actionTypes.LIKE_LOADING });
+
+        const response = await axios.patch(`/posts/comments/${post_id}/${commnet_id}`, body, config);
+
+        dispatch({
+            type: actionTypes.EDIT_COMMENT,
+            payload: { id: post_id, comments: response.data }
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.POST_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+}
+
+
+//-----------------delete comment on post by id
 export const deletePostCommentById = (post_id, comment_id) => async dispatch => {
     try {
         //loading first

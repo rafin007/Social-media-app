@@ -15,10 +15,15 @@ const SimpleMenu = ({ postId, commentId, ...props }) => {
     //edit comment or post
     const edit = () => {
         if (commentId) {
-            //edit post
+            //edit comment
             console.log('edit comment');
+            //close simple menu
+            props.closeMenu();
+            //update dom for editing comment
+            props.setEditComment(true);
         }
         else {
+            //edit post
             props.onClose();
             history.push(`/edit/${postId}`);
         }

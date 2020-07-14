@@ -70,6 +70,7 @@ const postReducer = (state = initalState, action) => {
             }
 
         case actionTypes.POST_COMMENT:
+        case actionTypes.EDIT_COMMENT:
             return {
                 ...state,
                 likeLoading: false,
