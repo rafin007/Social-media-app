@@ -112,22 +112,22 @@ router.get('/:post_id', [auth, isFollowingPost], async (req, res) => {
     @desc Get post's image by id
     @access Private
 */
-router.get('/:post_id/image', [auth, isFollowingPost], async (req, res) => {
-    try {
-        const post = req.post;
+// router.get('/:post_id/image', [auth, isFollowingPost], async (req, res) => {
+//     try {
+//         const post = req.post;
 
-        if (!post.image) {
-            return res.status(400).send({ errors: [{ msg: 'No image found for this post' }] });
-        }
+//         if (!post.image) {
+//             return res.status(400).send({ errors: [{ msg: 'No image found for this post' }] });
+//         }
 
-        res.set('Content-Type', 'image/png');
+//         res.set('Content-Type', 'image/png');
 
-        res.send(post.image);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server error');
-    }
-});
+//         res.send(post.image);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Server error');
+//     }
+// });
 
 
 /*  @route GET /posts

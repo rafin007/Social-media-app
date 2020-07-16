@@ -1,12 +1,12 @@
 import React from 'react';
-import { Grid, Paper, makeStyles, Typography, Button } from '@material-ui/core';
+import { Grid, Paper, makeStyles, Typography, Button, Menu, MenuItem } from '@material-ui/core';
 import Avatar from '../../Components/Avatar/Avatar';
 import imageAvatar from '../../assets/images/avatar.jpg';
 import ProfileTabs from './ProfileTabs';
 import Bio from './Bio';
 import ProfilePosts from './ProfilePosts';
 import About from './About';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentProfile } from '../../Actions/profile';
 import Spinner from '../../Components/Spinner/Spinner';
@@ -48,6 +48,9 @@ const useStyles = makeStyles((theme) => ({
     link3: {
         textDecoration: 'none',
         color: '#000'
+    },
+    input: {
+        display: 'none',
     }
 }));
 
@@ -55,6 +58,21 @@ const ProfileView = () => {
 
     const classes = useStyles();
     const dispatch = useDispatch();
+
+    /**
+     *---------------- menu logic----------------
+     */
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    //---------------------------
 
     //clear the post state
     useEffect(() => {
@@ -74,7 +92,7 @@ const ProfileView = () => {
 
 
     //tab switching
-    const [value, setValue] = React.useState(0);
+    const [value, setValue] = useState(0);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -106,7 +124,36 @@ const ProfileView = () => {
         profileContent = (
             <Grid container direction="row" justify="space-between" alignItems="stretch" className={classes.root} >
                 <Grid item xs={6} >
-                    <Avatar owner={imageAvatar} width={14} height={14} />
+                    <div onClick={handleClick} >
+                        <Avatar image={user && user.avatar && user.avatar} width={14} height={14} />
+                    </div>
+                    <Menu
+                        id="simple-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                    >
+                        <MenuItem onClick={handleClose} >
+                            <div className={classes.upload} >
+                                <input
+                                    accept="image/*"
+                                    className={classes.input}
+                                    id="contained-button-file"
+                                    type="file"
+                                // onChange={onChange}
+                                />
+                                <label htmlFor="contained-button-file" className={classes.label} >
+                                    <Button variant="outlined" color="primary" component="span">
+                                        Choose an image
+                                    </Button>
+                                </label>
+                            </div>
+                        </MenuItem>
+                        <MenuItem>
+                            Remove image
+                        </MenuItem>
+                    </Menu>
                     <Typography variant="h5" align="center" >
                         {user && user.name}
                     </Typography>

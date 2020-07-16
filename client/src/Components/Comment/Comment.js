@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton, Typography, TextField, Button, makeStyles } from '@material-ui/core';
+import { ListItem, ListItemAvatar, ListItemText, ListItemSecondaryAction, IconButton, Typography, TextField, Button, makeStyles } from '@material-ui/core';
 import { MoreVert } from '@material-ui/icons';
 import SimpleMenu from '../SimpleMenu/SimpleMenu';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import bufferToImage from '../../utils/bufferToImage';
 import Moment from 'react-moment';
 import { useSelector, useDispatch } from 'react-redux';
 import { editCommentOnPostById } from '../../Actions/post';
+import Avatar from '../Avatar/Avatar';
 
 const useStyles = makeStyles(theme => ({
     update: {
@@ -44,7 +45,7 @@ const Comment = ({ comment, postId }) => {
                 const profile = response.data;
                 setUser({
                     name: profile.name,
-                    avatar: profile.avatar && bufferToImage(profile.avatar),
+                    avatar: profile.avatar && profile.avatar,
                     id: profile._id
                 });
             }).catch(error => console.log(error));
@@ -76,7 +77,7 @@ const Comment = ({ comment, postId }) => {
     return (
         <ListItem className={classes.listItem} >
             <ListItemAvatar>
-                <Avatar />
+                <Avatar image={user && user.avatar} height={5} width={5} />
             </ListItemAvatar>
             {!editComment ? <ListItemText
                 primary={user && user.name}

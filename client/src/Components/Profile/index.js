@@ -69,6 +69,26 @@ const Profile = () => {
     //profile state
     const profile = useSelector(state => state.profile.profile);
 
+    //-------------tab switching logic-------------
+    const [value, setValue] = useState(0);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
+    let pageContent = null;
+
+    if (value === 0) {
+        pageContent = <Bio profile={profile} />;
+    }
+    else if (value === 1) {
+        pageContent = <ProfilePosts profile={profile} />;
+    }
+    else {
+        pageContent = <About profile={profile} />;
+    }
+    //------------------------
+
     //loading state
     const loading = useSelector(state => state.profile.loading);
 
@@ -106,6 +126,7 @@ const Profile = () => {
     useEffect(() => {
         if (followStatus === 'follow') {
             setIsFollowing(false);
+            setValue(0);
         }
         else if (followStatus === 'unfollow') {
             setIsFollowing(true);
@@ -122,26 +143,7 @@ const Profile = () => {
         }
     };
 
-    //tab switching logic
-    const [value, setValue] = useState(0);
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
-
-    let pageContent = null;
-
-    if (value === 0) {
-        pageContent = <Bio profile={profile} />;
-    }
-    else if (value === 1) {
-        pageContent = <ProfilePosts profile={profile} />;
-    }
-    else {
-        pageContent = <About profile={profile} />;
-    }
-
-    const history = useHistory()
+    const history = useHistory();
 
     //JSX
     let profileContent = null;

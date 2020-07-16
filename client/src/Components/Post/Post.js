@@ -6,7 +6,8 @@ import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
-import Avatar from '@material-ui/core/Avatar';
+// import Avatar from '@material-ui/core/Avatar';
+import Avatar from '../Avatar/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
@@ -156,7 +157,8 @@ const Post = ({ post, ...props }) => {
         <Card className={classes.root}>
             <CardHeader
                 avatar={
-                    <Avatar alt="Avatar" src={props.owner} />
+                    // <Avatar alt="Avatar" src={post.user.avatar} />
+                    <Avatar image={post.user.avatar} height={6} width={6} />
                 }
                 action={
                     user._id === post.user._id &&

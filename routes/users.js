@@ -20,10 +20,10 @@ const router = express.Router();
 //for file upload
 const upload = multer({
   limits: {
-    fileSize: 1024 * 1024
+    fileSize: 1024 * 1024 * 2
   },
   fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|JPG|JPEG|PNG)$/)) {
       return cb(new Error('Please upload an image'));
     }
 
@@ -772,6 +772,30 @@ router.get('/:user_id', async (req, res) => {
 });
 
 
+/*  @route GET /users/me/avatar
+    @desc Get logged in user's avatar
+    @access Private
+*/
+// router.get('/me/avatar', auth, async (req, res) => {
+//   try {
+//     const user = req.user;
+
+//     //if any of user or avatar not found, throw error
+//     if (!user.avatar) {
+//       return res.status(404).send({ errors: [{ msg: 'No avatar' }] });
+//     }
+
+//     //set the content type to image
+//     res.set('Content-Type', 'image/png');
+
+//     //send the image
+//     res.send(user.avatar);
+//   } catch (error) {
+//     res.status(404).send({ errors: [{ msg: error }] });
+//   }
+// });
+
+
 /*  @route POST /users/avatar/me
     @desc Post users' profile picture
     @access Private
@@ -781,7 +805,8 @@ router.post('/me/avatar', [auth, upload.single('upload')], async (req, res) => {
     const user = await User.findById(req.user.id);
 
     //resize and convert to png
-    const buffer = await sharp(req.file.buffer).resize({ width: 300, height: 300 }).png().toBuffer();
+    const buffer = await sharp(req.file.buffer).rotate().resize({ width: 300, height: 300, fit: 'contain', background: { r: 255, g: 255, b: 255 } }).png().toBuffer();
+
     //save the buffer file in avatar field
     user.avatar = buffer;
 
@@ -818,11 +843,11 @@ router.delete('/me/avatar', auth, async (req, res) => {
 });
 
 
-/*  @route GET /users/avatar/me
+/*  @route GET /users/:user_id/avatar
     @desc Get users' profile picture
     @access Private
 */
-router.get('/:user_id/avatar', async (req, res) => {
+router.get('/:user_id/avatar', auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.user_id);
 

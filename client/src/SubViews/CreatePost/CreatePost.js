@@ -99,7 +99,7 @@ const CreatePost = (props) => {
     //loading state
     const loading = useSelector(state => state.post.loading);
 
-    //text for picture
+    //text for caption
     const [text, setText] = useState('');
 
     //file for image
