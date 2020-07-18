@@ -74,6 +74,20 @@ const authReducer = (state = initalState, action) => {
                 loading: true
             }
 
+        case actionTypes.REMOVE_AVATAR:
+            return {
+                ...state,
+                loading: false,
+                user: payload
+            }
+
+        case actionTypes.SET_AVATAR:
+            return {
+                ...state,
+                loading: false,
+                user: payload
+            }
+
         default:
             return state;
 

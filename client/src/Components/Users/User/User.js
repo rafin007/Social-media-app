@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ListItem, Avatar, ListItemAvatar, ListItemText, ListItemSecondaryAction, Button, makeStyles } from '@material-ui/core';
+import { ListItem, ListItemAvatar, ListItemText, ListItemSecondaryAction, Button, makeStyles } from '@material-ui/core';
 import myImg from '../../../assets/images/avatar.jpg';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { followUserById, unfollowUserById } from '../../../Actions/follow';
+import Avatar from '../../Avatar/Avatar';
 import axios from 'axios';
 
 
@@ -67,7 +68,7 @@ const User = ({ profile }) => {
         <ListItem>
             <Link to={`/profile/${profile._id}`} className={classes.link} >
                 <ListItemAvatar>
-                    <Avatar alt="avatar" src={myImg} />
+                    <Avatar image={profile.user.avatar && profile.user.avatar} width={5} height={5} />
                 </ListItemAvatar>
                 <ListItemText
                     primary={profile.user.name}

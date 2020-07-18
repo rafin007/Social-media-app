@@ -4,9 +4,9 @@ import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
-import { Grid, Button, TextField, CardContent, Divider } from '@material-ui/core';
+import { Grid, Button, TextField, Divider } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPost, getPostById, editPost } from '../../Actions/post';
+import { createPost } from '../../Actions/post';
 import CustomAlert from '../../Components/CustomAlert/CustomAlert';
 import { useHistory } from 'react-router-dom';
 import Spinner from '../../Components/Spinner/Spinner';
@@ -102,6 +102,8 @@ const CreatePost = (props) => {
     //text for caption
     const [text, setText] = useState('');
 
+    const history = useHistory();
+
     //file for image
     const [file, setFile] = useState('');
 
@@ -113,7 +115,6 @@ const CreatePost = (props) => {
         setFileURL(event.target.files[0] ? URL.createObjectURL(event.target.files[0]) : '');
     }
 
-    const history = useHistory();
 
     const onSubmit = async event => {
         event.preventDefault();

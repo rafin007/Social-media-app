@@ -77,3 +77,7 @@ export const LIKE_LOADING = 'LIKE_LOADING';
 export const POST_COMMENT = 'POST_COMMENT';
 export const DELETE_COMMENT = 'DELETE_COMMENT';
 export const EDIT_COMMENT = 'EDIT_COMMENT';
+
+//avatar
+export const REMOVE_AVATAR = 'REMOVE_AVATAR';
+export const SET_AVATAR = 'SET_AVATAR';

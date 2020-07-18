@@ -796,13 +796,13 @@ router.get('/:user_id', async (req, res) => {
 // });
 
 
-/*  @route POST /users/avatar/me
+/*  @route POST /users/me/avatar
     @desc Post users' profile picture
     @access Private
 */
 router.post('/me/avatar', [auth, upload.single('upload')], async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = req.user;
 
     //resize and convert to png
     const buffer = await sharp(req.file.buffer).rotate().resize({ width: 300, height: 300, fit: 'contain', background: { r: 255, g: 255, b: 255 } }).png().toBuffer();
@@ -813,23 +813,23 @@ router.post('/me/avatar', [auth, upload.single('upload')], async (req, res) => {
     //save the user
     await user.save();
 
-    res.send({ msg: 'Image uploaded' });
+    res.send(user);
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
   }
 }, (error, req, res, next) => {
-  res.status(400).send({ msg: error.message });
+  res.status(400).send({ errors: [{ msg: error.message }] });
 });
 
 
-/*  @route DELETE /users/avatar/me
+/*  @route DELETE /users/me/avatar
     @desc Delete users' profile picture
     @access Private
 */
 router.delete('/me/avatar', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = req.user;
 
     user.avatar = null;
 

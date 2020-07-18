@@ -64,6 +64,8 @@ const profileReducer = (state = initialState, action) => {
 
         case actionTypes.FOLLOW_USER:
         case actionTypes.UNFOLLOW_USER:
+        case actionTypes.REMOVE_AVATAR:
+        case actionTypes.SET_AVATAR:
             return {
                 ...state,
                 loading: false

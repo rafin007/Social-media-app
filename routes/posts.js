@@ -72,7 +72,6 @@ router.post('/', [auth, upload.single('upload'), [
 });
 
 
-
 /*  @route GET /posts/me
     @desc Get all posts of logged in user
     @access Private

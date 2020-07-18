@@ -1,7 +1,6 @@
 import React from 'react';
-import { Grid, Paper, makeStyles, Typography, Button, Menu, MenuItem } from '@material-ui/core';
+import { Grid, Paper, makeStyles, Typography, Button, Menu, MenuItem, Badge } from '@material-ui/core';
 import Avatar from '../../Components/Avatar/Avatar';
-import imageAvatar from '../../assets/images/avatar.jpg';
 import ProfileTabs from './ProfileTabs';
 import Bio from './Bio';
 import ProfilePosts from './ProfilePosts';
@@ -12,6 +11,9 @@ import { getCurrentProfile } from '../../Actions/profile';
 import Spinner from '../../Components/Spinner/Spinner';
 import { Link } from 'react-router-dom';
 import { clearPost } from '../../Actions/post';
+import { removeUserAvatar, setAvatar } from '../../Actions/auth';
+import ErrorDialog from '../../Components/ErrorDialog/ErrorDialog';
+import { AddCircle } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
     follows: {
@@ -74,6 +76,15 @@ const ProfileView = () => {
 
     //---------------------------
 
+    /**
+     * --------------Remove avatar logic
+     */
+    const removeAvatar = () => {
+        handleClose();
+        dispatch(removeUserAvatar());
+    }
+    //----------------------
+
     //clear the post state
     useEffect(() => {
         dispatch(clearPost());
@@ -113,11 +124,55 @@ const ProfileView = () => {
     //loading state
     const loading = useSelector(state => state.profile.loading);
 
+
+    /**
+     * -------------Avatar upload logic----------------
+     */
+    const FILE_SIZE_MAX = 2; //max 2MB
+
+    //error
+    const [errorOpen, setErrorOpen] = useState(false);
+
+    const handleErrorOpen = () => {
+        setErrorOpen(true);
+    };
+
+    const handleErrorClose = () => {
+        setErrorOpen(false);
+    };
+
+    //file for image
+    const [file, setFile] = useState('');
+
+    // const submitAvatar = () => {
+    // }
+
+    useEffect(() => {
+        if (file) {
+            const formData = new FormData();
+            formData.append('upload', file);
+
+            dispatch(setAvatar(formData));
+        }
+    }, [file]);
+
+    const onChange = event => {
+
+        if (event.target.files[0].size / 1000000 > FILE_SIZE_MAX) {
+            handleErrorOpen();
+        }
+        else {
+            setFile(event.target.files[0]);
+        }
+    }
+
+    //--------------------------------------
+
     //JSX
     let profileContent = null;
 
     //if loading show spinner otherwise profile
-    if (loading && profile === null) {
+    if (loading) {
         profileContent = <Spinner />;
     }
     else {
@@ -125,7 +180,9 @@ const ProfileView = () => {
             <Grid container direction="row" justify="space-between" alignItems="stretch" className={classes.root} >
                 <Grid item xs={6} >
                     <div onClick={handleClick} >
-                        <Avatar image={user && user.avatar && user.avatar} width={14} height={14} />
+                        {!user.avatar ? <Badge badgeContent={<AddCircle fontSize="large" color="primary" />} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} overlap="circle" >
+                            <Avatar width={12} height={12} />
+                        </Badge> : <Avatar image={user && user.avatar} width={12} height={12} />}
                     </div>
                     <Menu
                         id="simple-menu"
@@ -141,19 +198,26 @@ const ProfileView = () => {
                                     className={classes.input}
                                     id="contained-button-file"
                                     type="file"
-                                // onChange={onChange}
+                                    onChange={onChange}
                                 />
-                                <label htmlFor="contained-button-file" className={classes.label} >
+                                <label htmlFor="contained-button-file" >
                                     <Button variant="outlined" color="primary" component="span">
                                         Choose an image
                                     </Button>
                                 </label>
                             </div>
                         </MenuItem>
-                        <MenuItem>
-                            Remove image
-                        </MenuItem>
+                        {user.avatar && <MenuItem>
+                            <label >
+                                <Button variant="outlined" color="secondary" component="span" onClick={removeAvatar} >
+                                    Remove image
+                                </Button>
+                            </label>
+                        </MenuItem>}
                     </Menu>
+
+                    <ErrorDialog open={errorOpen} handleClose={handleErrorClose} message="File must be smaller than 2MB" />
+
                     <Typography variant="h5" align="center" >
                         {user && user.name}
                     </Typography>

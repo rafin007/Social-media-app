@@ -170,7 +170,7 @@ const Profile = () => {
                     {/* </Link> */}
                 </Grid>
                 <Grid item xs={6} >
-                    <Avatar owner={imageAvatar} width={14} height={14} />
+                    <Avatar image={profile && profile.user.avatar && profile.user.avatar} width={12} height={12} />
                     <Typography variant="h5" align="center" >
                         {profile && profile.user.name}
                     </Typography>
@@ -204,6 +204,9 @@ const Profile = () => {
                     <ProfileTabs value={value} handleChange={handleChange} isFollowing={isFollowing} />
                 </Grid>
                 {pageContent}
+                <Grid item xs={12} md={6} lg={4} >
+                    {!loading && !isFollowing && profile && user._id !== profile.user._id && <Typography variant="body1" align="center" color="primary" >Follow this user to see their Posts and About</Typography>}
+                </Grid>
             </Grid>
         );
     }

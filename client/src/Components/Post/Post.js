@@ -23,6 +23,7 @@ import SimpleMenu from '../SimpleMenu/SimpleMenu';
 import bufferToImage from '../../utils/bufferToImage';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeLike, addLike, postCommentOnPostById } from '../../Actions/post';
+import Spinner from '../Spinner/Spinner';
 
 const useStyles = makeStyles((theme) => ({
     root: {

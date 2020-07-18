@@ -13,7 +13,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { MenuList, MenuItem, ListItemIcon } from '@material-ui/core';
 import { HomeOutlined, MessageOutlined, AccountCircleOutlined, NotificationsOutlined, SupervisorAccountOutlined, ImageOutlined, GroupOutlined, GroupAddOutlined, SettingsOutlined, ExitToAppOutlined } from '@material-ui/icons';
 import Avatar from '../Avatar/Avatar';
-import imageAvatar from '../../assets/images/avatar.jpg';
+import { useSelector } from 'react-redux';
+import Spinner from '../Spinner/Spinner';
 
 
 const drawerWidth = 240;
@@ -94,11 +95,17 @@ const ResponsiveDrawer = (props) => {
 
     // console.log(pathname);
 
+    //user state
+    const user = useSelector(state => state.auth.user);
+
+    //loading state
+    const loading = useSelector(state => state.auth.loading);
+
     const drawer = (
         <div>
             <div className={classes.toolbar} />
-            <Avatar owner={imageAvatar} width={10} height={10} />
-            <Typography variant="h5" align="center" gutterBottom color="textPrimary" >Arefin</Typography>
+            {loading ? <Spinner /> : <Avatar image={user && user.avatar && user.avatar} width={10} height={10} />}
+            <Typography variant="h5" align="center" gutterBottom color="textPrimary" >{user && user.name}</Typography>
             <Divider />
             <MenuList>
 

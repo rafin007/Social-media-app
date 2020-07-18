@@ -3,11 +3,7 @@ import * as actionTypes from './actionTypes';
 import setAuthToken from '../utils/setAuthToken';
 
 //axios config
-const config = {
-    headers: {
-        'Content-Type': 'application/json'
-    }
-}
+let config = null;
 
 
 //--------------Load user--------------------------
@@ -42,6 +38,12 @@ export const loadUser = () => async dispatch => {
 //--------------register user-------------------------
 export const register = ({ name, email, password, gender }) => async dispatch => {
 
+    config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
     const body = JSON.stringify({ name, email, password, gender });
 
     try {
@@ -75,6 +77,12 @@ export const register = ({ name, email, password, gender }) => async dispatch =>
 
 //-----------------login user---------------------
 export const login = ({ email, password }) => async dispatch => {
+
+    config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
 
     const body = JSON.stringify({ email, password });
 
@@ -115,4 +123,54 @@ export const logout = () => dispatch => {
     dispatch({
         type: actionTypes.LOGOUT
     });
+}
+
+
+//---------------Set avatar-------------------
+export const setAvatar = (formData) => async dispatch => {
+
+    config = {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    };
+
+    try {
+
+        //loading first
+        dispatch({ type: actionTypes.LOADING });
+
+        const response = await axios.post('/users/me/avatar', formData, config);
+
+        dispatch({
+            type: actionTypes.SET_AVATAR,
+            payload: response.data
+        });
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+
+        dispatch({
+            type: actionTypes.PROFILE_ERROR,
+            payload: errors.map(error => error.msg)
+        });
+    }
+}
+
+
+//---------------Remove avatar---------------
+export const removeUserAvatar = () => async dispatch => {
+    //loading first
+    dispatch({ type: actionTypes.LOADING });
+
+    try {
+        const response = await axios.delete('/users/me/avatar');
+
+        dispatch({
+            type: actionTypes.REMOVE_AVATAR,
+            payload: response.data
+        })
+    } catch (err) {
+        console.log(err);
+    }
 }
