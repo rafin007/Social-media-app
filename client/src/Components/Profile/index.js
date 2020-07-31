@@ -1,217 +1,289 @@
-import React, { useState } from 'react';
-import { Grid, makeStyles, Typography, Button, IconButton } from '@material-ui/core';
-import Avatar from '../Avatar/Avatar';
-import imageAvatar from '../../assets/images/avatar.jpg';
-import ProfileTabs from './ProfileTabs';
-import Bio from './Bio';
-import ProfilePosts from './ProfilePosts';
-import About from './About';
-import { useDispatch, useSelector } from 'react-redux';
-import Spinner from '../Spinner/Spinner';
-import { useParams, Link, useHistory } from 'react-router-dom';
-import { useEffect } from 'react';
-import { getProfileById } from '../../Actions/profile';
-import { ArrowBackIos } from '@material-ui/icons';
-import { followUserById, unfollowUserById } from '../../Actions/follow';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  Grid,
+  makeStyles,
+  Typography,
+  Button,
+  IconButton,
+} from "@material-ui/core";
+import Avatar from "../Avatar/Avatar";
+import ProfileTabs from "./ProfileTabs";
+import Bio from "./Bio";
+import ProfilePosts from "./ProfilePosts";
+import About from "./About";
+import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../Spinner/Spinner";
+import { useParams, Link, useHistory, Redirect } from "react-router-dom";
+import { useEffect } from "react";
+import { getProfileById } from "../../Actions/profile";
+import { ArrowBackIos } from "@material-ui/icons";
+import { followUserById, unfollowUserById } from "../../Actions/follow";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
-    follows: {
-        display: 'flex',
-        justifyContent: 'space-evenly',
+  follows: {
+    display: "flex",
+    justifyContent: "space-evenly",
+  },
+  follow: {
+    textAlign: "center",
+  },
+  followSystem: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-around",
+  },
+  root: {
+    // height: '90vh',
+    overflowY: "auto",
+    paddingBottom: "3rem",
+    [theme.breakpoints.up("md")]: {
+      padding: "0 12rem",
     },
-    follow: {
-        textAlign: 'center',
+    [theme.breakpoints.up("lg")]: {
+      padding: "0 20rem",
     },
-    followSystem: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-    },
-    root: {
-        // height: '90vh',
-        overflowY: 'auto',
-        paddingBottom: '3rem',
-        [theme.breakpoints.up('md')]: {
-            padding: '0 12rem'
-        },
-        [theme.breakpoints.up('lg')]: {
-            padding: '0 20rem'
-        }
-    },
-    link: {
-        textDecoration: 'none',
-    },
-    link2: {
-        textDecoration: 'none',
-        color: '#fff',
-        margin: '0 auto'
-    },
-    link3: {
-        textDecoration: 'none',
-        color: '#000'
-    }
+  },
+  link: {
+    textDecoration: "none",
+  },
+  link2: {
+    textDecoration: "none",
+    color: "#fff",
+    margin: "0 auto",
+  },
+  link3: {
+    textDecoration: "none",
+    color: "#000",
+  },
 }));
 
 const Profile = () => {
+  const classes = useStyles();
+  const dispatch = useDispatch();
 
-    const classes = useStyles();
-    const dispatch = useDispatch();
+  //get the id of profile from url
+  const { id } = useParams();
 
-    //get the id of profile from url
-    const { id } = useParams();
+  //get the profile
+  useEffect(() => {
+    dispatch(getProfileById(id));
+  }, [id, dispatch]);
 
-    //get the profile
-    useEffect(() => {
-        dispatch(getProfileById(id));
-    }, [id]);
+  //profile state
+  const profile = useSelector((state) => state.profile.profile);
 
-    //profile state
-    const profile = useSelector(state => state.profile.profile);
+  //-------------tab switching logic-------------
+  const [value, setValue] = useState(0);
 
-    //-------------tab switching logic-------------
-    const [value, setValue] = useState(0);
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+  let pageContent = null;
 
-    let pageContent = null;
+  if (value === 0) {
+    pageContent = <Bio profile={profile} />;
+  } else if (value === 1) {
+    pageContent = <ProfilePosts profile={profile} />;
+  } else {
+    pageContent = <About profile={profile} />;
+  }
+  //------------------------
 
-    if (value === 0) {
-        pageContent = <Bio profile={profile} />;
+  //loading state
+  const loading = useSelector((state) => state.profile.loading);
+
+  //follow load from auth
+  const followLoading = useSelector((state) => state.auth.loading);
+
+  //user state from auth
+  const user = useSelector((state) => state.auth.user);
+
+  const [followStatus, setFollowStatus] = useState("");
+
+  //check if the user is in logged user's following list/follow requests list
+  useEffect(() => {
+    // if (profile && !loading) {
+    //     if (profile.user.followers.filter(follower => follower.user === user._id).length > 0) {
+    //         setFollowStatus('unfollow');
+    //     }
+    //     else if (profile.user.followRequests.filter(followReq => followReq.user === user._id).length > 0) {
+    //         setFollowStatus('requested');
+    //     }
+    //     else {
+    //         setFollowStatus('follow');
+    //     }
+    // }
+    if (profile) {
+      axios
+        .get(`/users/checkFollow/${profile.user._id}`)
+        .then((response) => setFollowStatus(response.data.status))
+        .catch((error) => console.log(error));
     }
-    else if (value === 1) {
-        pageContent = <ProfilePosts profile={profile} />;
+  }, [followLoading, profile]);
+
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  //check if the logged in user is following the user and whether s/he can see their posts
+  useEffect(() => {
+    if (followStatus === "follow") {
+      setIsFollowing(false);
+      setValue(0);
+    } else if (followStatus === "unfollow") {
+      setIsFollowing(true);
     }
-    else {
-        pageContent = <About profile={profile} />;
+  }, [followStatus]);
+
+  //follow action
+  const handleFollow = async () => {
+    if (followStatus === "follow") {
+      dispatch(followUserById(profile.user._id, id));
+    } else if (followStatus === "unfollow") {
+      dispatch(unfollowUserById(profile.user._id, id));
     }
-    //------------------------
+  };
 
-    //loading state
-    const loading = useSelector(state => state.profile.loading);
+  const history = useHistory();
 
-    //follow load from auth
-    const followLoading = useSelector(state => state.auth.loading);
-
-    //user state from auth
-    const user = useSelector(state => state.auth.user);
-
-    const [followStatus, setFollowStatus] = useState('');
-
-    //check if the user is in logged user's following list/follow requests list
-    useEffect(() => {
-        // if (profile && !loading) {
-        //     if (profile.user.followers.filter(follower => follower.user === user._id).length > 0) {
-        //         setFollowStatus('unfollow');
-        //     }
-        //     else if (profile.user.followRequests.filter(followReq => followReq.user === user._id).length > 0) {
-        //         setFollowStatus('requested');
-        //     }
-        //     else {
-        //         setFollowStatus('follow');
-        //     }
-        // }
-        if (profile) {
-            axios.get(`/users/checkFollow/${profile.user._id}`).then(response => setFollowStatus(response.data.status)).catch(error => console.log(error));
-        }
-    }, [followLoading, profile]);
-
-
-    const [isFollowing, setIsFollowing] = useState(false);
-
-
-    //check if the logged in user is following the user and whether s/he can see their posts
-    useEffect(() => {
-        if (followStatus === 'follow') {
-            setIsFollowing(false);
-            setValue(0);
-        }
-        else if (followStatus === 'unfollow') {
-            setIsFollowing(true);
-        }
-    }, [followStatus]);
-
-    //follow action
-    const handleFollow = async () => {
-        if (followStatus === 'follow') {
-            dispatch(followUserById(profile.user._id, id));
-        }
-        else if (followStatus === 'unfollow') {
-            dispatch(unfollowUserById(profile.user._id, id));
-        }
-    };
-
-    const history = useHistory();
-
-    //JSX
-    let profileContent = null;
-
-    // if loading show spinner otherwise profile
-    if (loading && profile === null) {
-        profileContent = <Spinner />;
+  //check if it is logged in user's profile
+  useEffect(() => {
+    if (!loading && profile && user._id === profile.user._id) {
+      history.push("/profile");
     }
-    else {
-        profileContent = (
-            <Grid container direction="row" justify="space-between" alignItems="stretch" className={classes.root} >
-                <Grid item xs={12} >
-                    {/* <Link to={{
+  }, [loading, profile, user._id, history]);
+
+  //JSX
+  let profileContent = null;
+
+  // if loading show spinner otherwise profile
+  if (loading && profile === null) {
+    profileContent = <Spinner />;
+  } else {
+    profileContent = (
+      <Grid
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="stretch"
+        className={classes.root}
+      >
+        <Grid item xs={12}>
+          {/* <Link to={{
                         pathname: '/home',
                         state: {
                             tab: 1
                         }
                     }} className={classes.link} > */}
 
-                    <IconButton aria-label="go back" color="primary" size="small" onClick={history.goBack} >
-                        <ArrowBackIos />
-                            back
-                        </IconButton>
-                    {/* </Link> */}
-                </Grid>
-                <Grid item xs={6} >
-                    <Avatar image={profile && profile.user.avatar && profile.user.avatar} width={12} height={12} />
-                    <Typography variant="h5" align="center" >
-                        {profile && profile.user.name}
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary" align="center" gutterBottom >
-                        {profile && profile.profession}
-                    </Typography>
-                </Grid>
-                <Grid item xs={6} className={classes.followSystem} >
-                    <div className={classes.follows} >
-                        <Link to={{ pathname: isFollowing ? `/followers/${profile && profile.user._id}` : "", state: { profile } }} className={classes.link3} >
-                            <Typography variant="h6" className={classes.follow} >
-                                {profile && profile.user.followers && profile.user.followers.length}
-                                <Typography variant="body2" color="textSecondary" >Followers</Typography>
-                            </Typography>
-                        </Link>
-                        <Link to={{ pathname: isFollowing ? `/following/${profile && profile.user._id}` : "", state: { profile } }} className={classes.link3} >
-                            <Typography variant="h6" className={classes.follow} >
-                                {profile && profile.user.following && profile.user.following.length}
-                                <Typography variant="body2" color="textSecondary" >Following</Typography>
-                            </Typography>
-                        </Link>
-                    </div>
-                    {!loading && profile && user._id === profile.user._id ? (
-                        <Link className={classes.link2} to="/profile" >
-                            <Button variant="contained" color="primary" >Edit profile</Button>
-                        </Link>) : (
-                            <Button variant="contained" color={followStatus === 'follow' ? 'primary' : 'secondary'} disabled={followLoading} onClick={handleFollow} >{followStatus === 'follow' ? 'follow' : 'unfollow'}</Button>
-                        )}
-                </Grid>
-                <Grid item xs={12} >
-                    <ProfileTabs value={value} handleChange={handleChange} isFollowing={isFollowing} />
-                </Grid>
-                {pageContent}
-                <Grid item xs={12} md={6} lg={4} >
-                    {!loading && !isFollowing && profile && user._id !== profile.user._id && <Typography variant="body1" align="center" color="primary" >Follow this user to see their Posts and About</Typography>}
-                </Grid>
-            </Grid>
-        );
-    }
+          <IconButton
+            aria-label="go back"
+            color="primary"
+            size="small"
+            onClick={history.goBack}
+          >
+            <ArrowBackIos />
+            back
+          </IconButton>
+          {/* </Link> */}
+        </Grid>
+        <Grid item xs={6}>
+          <Avatar
+            image={profile && profile.user.avatar && profile.user.avatar}
+            width={12}
+            height={12}
+          />
+          <Typography variant="h5" align="center">
+            {profile && profile.user.name}
+          </Typography>
+          <Typography
+            variant="body1"
+            color="textSecondary"
+            align="center"
+            gutterBottom
+          >
+            {profile && profile.profession}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} className={classes.followSystem}>
+          <div className={classes.follows}>
+            <Link
+              to={{
+                pathname: isFollowing
+                  ? `/followers/${profile && profile.user._id}`
+                  : "",
+                state: { profile },
+              }}
+              className={classes.link3}
+            >
+              <Typography variant="h6" className={classes.follow}>
+                {profile &&
+                  profile.user.followers &&
+                  profile.user.followers.length}
+                <Typography variant="body2" color="textSecondary">
+                  Followers
+                </Typography>
+              </Typography>
+            </Link>
+            <Link
+              to={{
+                pathname: isFollowing
+                  ? `/following/${profile && profile.user._id}`
+                  : "",
+                state: { profile },
+              }}
+              className={classes.link3}
+            >
+              <Typography variant="h6" className={classes.follow}>
+                {profile &&
+                  profile.user.following &&
+                  profile.user.following.length}
+                <Typography variant="body2" color="textSecondary">
+                  Following
+                </Typography>
+              </Typography>
+            </Link>
+          </div>
+          {!loading && profile && user._id === profile.user._id ? (
+            <Link className={classes.link2} to="/profile">
+              <Button variant="contained" color="primary">
+                Edit profile
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              variant="contained"
+              color={followStatus === "follow" ? "primary" : "secondary"}
+              disabled={followLoading}
+              onClick={handleFollow}
+            >
+              {followStatus === "follow" ? "follow" : "unfollow"}
+            </Button>
+          )}
+        </Grid>
+        <Grid item xs={12}>
+          <ProfileTabs
+            value={value}
+            handleChange={handleChange}
+            isFollowing={isFollowing}
+          />
+        </Grid>
+        {pageContent}
+        <Grid item xs={12} md={6} lg={4}>
+          {!loading &&
+            !isFollowing &&
+            profile &&
+            user._id !== profile.user._id && (
+              <Typography variant="body1" align="center" color="primary">
+                Follow this user to see their Posts and About
+              </Typography>
+            )}
+        </Grid>
+      </Grid>
+    );
+  }
 
-    return profileContent;
-}
+  return profileContent;
+};
 
 export default Profile;
