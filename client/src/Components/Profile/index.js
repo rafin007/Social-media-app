@@ -13,7 +13,7 @@ import ProfilePosts from "./ProfilePosts";
 import About from "./About";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../Spinner/Spinner";
-import { useParams, Link, useHistory, Redirect } from "react-router-dom";
+import { useParams, Link, useHistory } from "react-router-dom";
 import { useEffect } from "react";
 import { getProfileById } from "../../Actions/profile";
 import { ArrowBackIos } from "@material-ui/icons";
@@ -169,23 +169,25 @@ const Profile = () => {
         className={classes.root}
       >
         <Grid item xs={12}>
-          {/* <Link to={{
-                        pathname: '/home',
-                        state: {
-                            tab: 1
-                        }
-                    }} className={classes.link} > */}
-
-          <IconButton
-            aria-label="go back"
-            color="primary"
-            size="small"
-            onClick={history.goBack}
+          <Link
+            to={{
+              pathname: "/home",
+              state: {
+                tab: 1,
+              },
+            }}
+            className={classes.link}
           >
-            <ArrowBackIos />
-            back
-          </IconButton>
-          {/* </Link> */}
+            <IconButton
+              aria-label="go back"
+              color="primary"
+              size="small"
+              // onClick={history.goBack}
+            >
+              <ArrowBackIos />
+              back
+            </IconButton>
+          </Link>
         </Grid>
         <Grid item xs={6}>
           <Avatar

@@ -13,11 +13,11 @@ import {
 import { MoreVert } from "@material-ui/icons";
 import SimpleMenu from "../SimpleMenu/SimpleMenu";
 import axios from "axios";
-import bufferToImage from "../../utils/bufferToImage";
 import Moment from "react-moment";
 import { useSelector, useDispatch } from "react-redux";
 import { editCommentOnPostById } from "../../Actions/post";
 import Avatar from "../Avatar/Avatar";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   update: {
@@ -64,6 +64,18 @@ const Comment = ({ comment, postId }) => {
     }
   }, [comment]);
 
+  //get the profile of the user
+  const [profile, setProfile] = useState({});
+
+  useEffect(() => {
+    if (comment) {
+      axios
+        .get(`/profile/user/${comment.user}`)
+        .then((response) => setProfile(response.data))
+        .catch((error) => console.error(error));
+    }
+  }, [comment]);
+
   //user state from auth
   const loggedUser = useSelector((state) => state.auth.user);
 
@@ -88,11 +100,28 @@ const Comment = ({ comment, postId }) => {
   return (
     <ListItem className={classes.listItem}>
       <ListItemAvatar>
-        <Avatar image={user && user.avatar} height={5} width={5} />
+        {loggedUser._id !== comment.user ? (
+          <Link to={`/profile/${profile && profile._id}`}>
+            <Avatar image={user && user.avatar} height={5} width={5} />
+          </Link>
+        ) : (
+          <Avatar image={user && user.avatar} height={5} width={5} />
+        )}
       </ListItemAvatar>
       {!editComment ? (
         <ListItemText
-          primary={user && user.name}
+          primary={
+            loggedUser._id !== user.id ? (
+              <Link
+                to={`/profile/${profile && profile._id}`}
+                style={{ textDecoration: "none", color: "#000" }}
+              >
+                {user && user.name}
+              </Link>
+            ) : (
+              user && user.name
+            )
+          }
           secondary={
             <Fragment>
               <Typography variant="body1">{comment.text}</Typography>

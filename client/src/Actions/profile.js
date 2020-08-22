@@ -37,9 +37,9 @@ export const addBio = ({ bio }) => async (dispatch) => {
   const body = JSON.stringify({ bio });
 
   try {
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     const response = await axios.post("/profile/bio", body, config);
 
@@ -68,9 +68,9 @@ export const postPersonalInformation = ({
 
   try {
     //loading first
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     //send data
     const response = await axios.post("/profile/personal", body, config);
@@ -97,9 +97,9 @@ export const postEducationalInformation = ({ school, degree }) => async (
 
   try {
     //loading first
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     //send data
     const response = await axios.post("/profile/education", body, config);
@@ -122,9 +122,9 @@ export const postEducationalInformation = ({ school, degree }) => async (
 export const deleteEducationalInformation = (id) => async (dispatch) => {
   try {
     //loading first
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     const response = await axios.delete(`/profile/education/${id}`);
 
@@ -145,9 +145,9 @@ export const postExperienceInformation = ({ company, title }) => async (
 
   try {
     //loading first
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     //send data
     const response = await axios.post("/profile/experience", body, config);
@@ -170,9 +170,9 @@ export const postExperienceInformation = ({ company, title }) => async (
 export const deleteExperienceInformation = (id) => async (dispatch) => {
   try {
     //loading first
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     const response = await axios.delete(`/profile/experience/${id}`);
 
@@ -193,9 +193,9 @@ export const postSocialInformation = ({ name, username }) => async (
 
   try {
     //loading first
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     //send data
     const response = await axios.post("/profile/social", body, config);
@@ -218,9 +218,9 @@ export const postSocialInformation = ({ name, username }) => async (
 export const deleteSocialInformation = (id) => async (dispatch) => {
   try {
     //loading first
-    dispatch({
-      type: actionTypes.LOADING,
-    });
+    // dispatch({
+    //   type: actionTypes.LOADING,
+    // });
 
     const response = await axios.delete(`/profile/social/${id}`);
 
@@ -302,4 +302,12 @@ export const getProfileByUserId = (id) => async (dispatch) => {
       payload: errors.map((error) => error.msg),
     });
   }
+};
+
+//---------------Search profile----------------
+export const searchProfileByName = (name) => async (dispatch) => {
+  dispatch({
+    type: actionTypes.SEARCH_PROFILE,
+    payload: name,
+  });
 };

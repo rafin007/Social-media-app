@@ -6,7 +6,6 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
-// import Avatar from '@material-ui/core/Avatar';
 import Avatar from "../Avatar/Avatar";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
@@ -82,13 +81,15 @@ const Post = ({ post, ...props }) => {
 
   //get profile of the post owner
   useEffect(() => {
-    axios
-      .get(`/profile/user/${post.user._id}`)
-      .then((response) => {
-        setProfile(response.data);
-      })
-      .catch((error) => console.error(error));
-  }, [post.user._id]);
+    if (post.user._id) {
+      axios
+        .get(`/profile/user/${post && post.user._id}`)
+        .then((response) => {
+          setProfile(response.data);
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [post]);
 
   //comment section handler
   const [expanded, setExpanded] = useState(false);
@@ -145,7 +146,9 @@ const Post = ({ post, ...props }) => {
 
   if (isLiked && post.likes.length === 1) {
     likeString = "You like this";
-  } else if (isLiked && post.likes.length > 1) {
+  } else if (isLiked && post.likes.length === 2) {
+    likeString = `You and ${post.likes.length - 1} other`;
+  } else if (isLiked && post.likes.length > 2) {
     likeString = `You and ${post.likes.length - 1} others`;
   } else if (!isLiked && post.likes.length > 0) {
     likeString = `${post.likes.length}`;
