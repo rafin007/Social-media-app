@@ -107,12 +107,15 @@ export const login = ({ email, password }) => async (dispatch) => {
 
 //----------------LOGOUT---------------
 export const logout = () => (dispatch) => {
-  //clear the profile first and then logout
+  //clear the profile and post first and then logout
   dispatch({
     type: actionTypes.CLEAR_PROFILE,
   });
   dispatch({
     type: actionTypes.CLEAR_POST,
+  });
+  dispatch({
+    type: actionTypes.CLEAR_POSTS,
   });
   dispatch({
     type: actionTypes.LOGOUT,

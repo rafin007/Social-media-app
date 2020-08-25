@@ -26,6 +26,9 @@ const Feed = () => {
     dispatch(getFeedPosts());
   }, [dispatch]);
 
+  //user state from auth to make sure the user has indeed loaded
+  const user = useSelector((state) => state.auth.user);
+
   //posts state
   const posts = useSelector((state) => state.post.posts);
 
@@ -54,7 +57,7 @@ const Feed = () => {
 
   let jsx = null;
 
-  if (posts.length > 0) {
+  if (user && posts.length > 0) {
     jsx = posts.map((post) => {
       return (
         <Grid item xs={12} key={post._id}>

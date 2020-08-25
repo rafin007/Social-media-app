@@ -82,6 +82,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(2),
   },
+  removeImage: {
+    marginBottom: theme.spacing(2),
+  },
 }));
 
 const CreatePost = (props) => {
@@ -180,6 +183,20 @@ const CreatePost = (props) => {
               "Image must be smaller than 2MB"}
           </Typography>
           <div className={classes.upload}>
+            {fileURL && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                component="span"
+                fullWidth
+                className={classes.removeImage}
+                onClick={() => {
+                  setFileURL("");
+                }}
+              >
+                Remove Image
+              </Button>
+            )}
             <input
               accept="image/*"
               className={classes.input}
@@ -188,7 +205,7 @@ const CreatePost = (props) => {
               onChange={onChange}
             />
             <label htmlFor="contained-button-file" className={classes.label}>
-              <Button variant="contained" color="primary" component="span">
+              <Button variant="outlined" color="primary" component="span">
                 Choose an image
               </Button>
             </label>

@@ -72,6 +72,7 @@ const Users = () => {
         variant="outlined"
         value={search}
         onChange={onSearch}
+        disabled={loading}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">

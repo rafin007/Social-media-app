@@ -59,6 +59,7 @@ const postReducer = (state = initalState, action) => {
         ...state,
         loading: false,
         posts: state.posts.filter((post) => post._id !== payload._id),
+        post: null,
       };
 
     case actionTypes.UPDATE_LIKES:

@@ -4,7 +4,7 @@ import { makeStyles, Grid } from "@material-ui/core";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPostById } from "../../Actions/post";
-import { useParams } from "react-router-dom";
+import { useParams, Redirect } from "react-router-dom";
 import Spinner from "../../Components/Spinner/Spinner";
 
 const useStyles = makeStyles((theme) => ({
@@ -44,7 +44,7 @@ const SinglePost = () => {
   ) : (
     <Grid container className={classes.root}>
       <Grid item xs={12}>
-        <Post post={post && post} />
+        {post ? <Post post={post} /> : <Redirect to="/profile" />}
       </Grid>
     </Grid>
   );

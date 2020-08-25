@@ -4,21 +4,13 @@ import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 import { red } from "@material-ui/core/colors";
-import {
-  Grid,
-  Button,
-  TextField,
-  Divider,
-  IconButton,
-  CardHeader,
-} from "@material-ui/core";
+import { Grid, Button, TextField, Divider } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
 import { getPostById, editPost } from "../../Actions/post";
 import CustomAlert from "../../Components/CustomAlert/CustomAlert";
 import { useHistory, useParams } from "react-router-dom";
 import Spinner from "../../Components/Spinner/Spinner";
 import bufferToImage from "../../utils/bufferToImage";
-import { CancelOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,9 +84,8 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(2),
   },
-  crossIcon: {
-    float: "right",
-    marginRight: theme.spacing(1),
+  removeImage: {
+    marginBottom: theme.spacing(2),
   },
 }));
 
@@ -210,20 +201,6 @@ const EditPost = (props) => {
           ) : (
             <Fragment>
               <Card className={classes.card}>
-                <CardHeader
-                  action={
-                    <IconButton
-                      className={classes.crossIcon}
-                      onClick={
-                        newUpload ? () => setFileURL("") : () => setImageURL("")
-                      }
-                    >
-                      <CancelOutlined
-                        style={{ height: "1.5rem", width: "1.5rem" }}
-                      />
-                    </IconButton>
-                  }
-                />
                 {newUpload ? (
                   <CardMedia
                     component="img"
@@ -262,15 +239,30 @@ const EditPost = (props) => {
               "Image must be smaller than 2MB"}
           </Typography>
           <div className={classes.upload}>
+            {(imageURL || fileURL) && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                component="span"
+                fullWidth
+                className={classes.removeImage}
+                onClick={() => {
+                  setFileURL("");
+                  setImageURL("");
+                }}
+              >
+                Remove Image
+              </Button>
+            )}
             <input
               accept="image/*"
               className={classes.input}
-              id="contained-button-file"
+              id="outlined-button-file"
               type="file"
               onChange={onChange}
             />
-            <label htmlFor="contained-button-file" className={classes.label}>
-              <Button variant="contained" color="primary" component="span">
+            <label htmlFor="outlined-button-file" className={classes.label}>
+              <Button variant="outlined" color="primary" component="span">
                 Choose an image
               </Button>
             </label>

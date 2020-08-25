@@ -80,7 +80,7 @@ router.post(
       res.status(500).send("Server error");
     }
   },
-  (error, req, res) => {
+  (error, req, res, next) => {
     res.status(400).send({ errors: [{ msg: error.message }] });
   }
 );
@@ -256,6 +256,9 @@ router.patch(
         return res.status(404).send({ errors: [{ msg: "Post not found!" }] });
       res.status(500).send("Server error");
     }
+  },
+  (error, req, res, next) => {
+    res.status(400).send({ errors: [{ msg: error.message }] });
   }
 );
 

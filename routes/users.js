@@ -1,18 +1,18 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const config = require("config");
-const multer = require('multer');
+const multer = require("multer");
 const { check, validationResult } = require("express-validator");
-const sharp = require('sharp');
-const cryptoRandomString = require('crypto-random-string');
-const bcryptjs = require('bcryptjs');
+const sharp = require("sharp");
+const cryptoRandomString = require("crypto-random-string");
+const bcryptjs = require("bcryptjs");
 
 const User = require("../models/User");
 const Profile = require("../models/Profile");
-const auth = require('../middlewares/auth');
-const isVerified = require('../middlewares/isVerified');
-const { verifyEmail } = require('../email/account');
-const mongoose = require('mongoose');
+const auth = require("../middlewares/auth");
+// const isVerified = require('../middlewares/isVerified');
+const { verifyEmail } = require("../email/account");
+// const mongoose = require('mongoose');
 const isFollowing = require("../middlewares/isFollowing");
 
 const router = express.Router();
@@ -20,15 +20,15 @@ const router = express.Router();
 //for file upload
 const upload = multer({
   limits: {
-    fileSize: 1024 * 1024 * 2
+    fileSize: 1024 * 1024 * 2,
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|jpeg|png|JPG|JPEG|PNG)$/)) {
-      return cb(new Error('Please upload an image'));
+      return cb(new Error("Please upload an image"));
     }
 
     cb(undefined, true);
-  }
+  },
 });
 
 /*  @route POST /users
@@ -38,14 +38,12 @@ const upload = multer({
 router.post(
   "/",
   [
-    check("name", "Name is required")
-      .not()
-      .isEmpty(),
+    check("name", "Name is required").not().isEmpty(),
     check("email", "Please include a valid email").isEmail(),
     check("password", "Password must be at least 6 characters long").isLength({
-      min: 6
+      min: 6,
     }),
-    check("gender", "Please select your gender").not().isEmpty()
+    check("gender", "Please select your gender").not().isEmpty(),
   ],
   async (req, res) => {
     const error = validationResult(req);
@@ -61,13 +59,9 @@ router.post(
       let user = await User.findOne({ email });
 
       if (user) {
-        return res
-          .status(400)
-          .send({
-            errors: [
-              { msg: "User already exists" }
-            ]
-          });
+        return res.status(400).send({
+          errors: [{ msg: "User already exists" }],
+        });
       }
 
       //create the user object
@@ -75,7 +69,7 @@ router.post(
         name,
         email,
         password,
-        gender
+        gender,
       });
 
       //get the encrypted password
@@ -97,8 +91,8 @@ router.post(
 
       const payload = {
         user: {
-          id: user.id
-        }
+          id: user.id,
+        },
       };
 
       //return jsonwebtoken
@@ -118,7 +112,6 @@ router.post(
   }
 );
 
-
 /*  @route GET /users/sendEmailVerification
     @desc Send email to users to verify email address
     @access Protected
@@ -134,7 +127,6 @@ router.post(
 //   //send that random string to email
 //   verifyEmail(user.email, user.name, user.randomString);
 // });
-
 
 /*  @route POST /users/verifyEmail
     @desc Register user if their email is verified
@@ -171,179 +163,191 @@ router.post(
 
 // });
 
-
 /*  @route POST /users/changePassword
     @desc Change users' password
     @access Private
 */
-router.post('/changePassword', [auth, [
-  check('oldPassword', 'Old password cannot be empty').not().isEmpty(),
-  check('newPassword', 'Password must be at least 6 characters').isLength({
-    min: 6
-  }),
-  check('confirmPassword', 'Field cannot be empty').not().isEmpty()
-]], async (req, res) => {
+router.post(
+  "/changePassword",
+  [
+    auth,
+    [
+      check("oldPassword", "Old password cannot be empty").not().isEmpty(),
+      check("newPassword", "Password must be at least 6 characters").isLength({
+        min: 6,
+      }),
+      check("confirmPassword", "Field cannot be empty").not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
 
-  const errors = validationResult(req);
-
-  //if errors, throw them
-  if (!errors.isEmpty()) {
-    return res.status(400).send({ msg: errors.array() });
-  }
-
-  try {
-    const user = await User.findById(req.user.id);
-
-    //extract the fields
-    const { oldPassword, newPassword, confirmPassword } = req.body;
-
-    //throw error if old password doesn't match with user's current password
-    const isMatch = await bcryptjs.compare(oldPassword, user.password);
-    if (!isMatch) {
-      return res.status(401).send({ msg: 'Your old password did not match' });
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ msg: errors.array() });
     }
 
-    //throw error if new password and confirm password don't match
-    if (newPassword !== confirmPassword) {
-      return res.status(400).send({ msg: 'Your new passwords do not match' });
+    try {
+      const user = await User.findById(req.user.id);
+
+      //extract the fields
+      const { oldPassword, newPassword, confirmPassword } = req.body;
+
+      //throw error if old password doesn't match with user's current password
+      const isMatch = await bcryptjs.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).send({ msg: "Your old password did not match" });
+      }
+
+      //throw error if new password and confirm password don't match
+      if (newPassword !== confirmPassword) {
+        return res.status(400).send({ msg: "Your new passwords do not match" });
+      }
+
+      //save the new password
+      user.password = await user.encryptPassword(newPassword);
+
+      //save the user
+      await user.save();
+
+      res.send({ msg: "Your password has been changed" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
     }
-
-    //save the new password
-    user.password = await user.encryptPassword(newPassword);
-
-    //save the user
-    await user.save();
-
-    res.send({ msg: 'Your password has been changed' });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
   }
-});
-
+);
 
 /*  @route POST /users/recoverPassword
     @desc send email to recover password
     @access Public
 */
-router.post('/recoverPassword', [
-  check('email', 'Email is not valid').isEmail()
-], async (req, res) => {
+router.post(
+  "/recoverPassword",
+  [check("email", "Email is not valid").isEmail()],
+  async (req, res) => {
+    const errors = validationResult(req);
 
-  const errors = validationResult(req);
-
-  //if errors, throw them
-  if (!errors.isEmpty()) {
-    return res.status(400).send({ errors: errors.array() });
-  }
-
-  const email = req.body.email;
-
-  try {
-    const user = await User.findOne({ email });
-
-    //if no user throw error
-    if (!user) {
-      return res.status(404).send({ msg: 'Sorry no user found with provided email' });
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ errors: errors.array() });
     }
 
-    //save the new random string to user
-    const randomString = cryptoRandomString({ length: 6, type: 'base64' }).toUpperCase();
+    const email = req.body.email;
 
-    //send email
-    verifyEmail(user.email, user.name, randomString);
+    try {
+      const user = await User.findOne({ email });
 
-    //save the string to user model
-    user.randomString = randomString;
+      //if no user throw error
+      if (!user) {
+        return res
+          .status(404)
+          .send({ msg: "Sorry no user found with provided email" });
+      }
 
-    await user.save();
+      //save the new random string to user
+      const randomString = cryptoRandomString({
+        length: 6,
+        type: "base64",
+      }).toUpperCase();
 
-    res.send({ msg: 'Your verification code has been sent to your email!', email });
+      //send email
+      verifyEmail(user.email, user.name, randomString);
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
+      //save the string to user model
+      user.randomString = randomString;
+
+      await user.save();
+
+      res.send({
+        msg: "Your verification code has been sent to your email!",
+        email,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
+    }
   }
-
-});
-
+);
 
 //@TODO => redirect user to change their password
 /*  @route POST /users/recoverPassword/:email
     @desc check verification code to recover password
     @access Public
 */
-router.post('/recoverPassword/:email', [
-  check('string', 'Verification code cannot be empty').not().isEmpty()
-], async (req, res) => {
-  const errors = validationResult(req);
+router.post(
+  "/recoverPassword/:email",
+  [check("string", "Verification code cannot be empty").not().isEmpty()],
+  async (req, res) => {
+    const errors = validationResult(req);
 
-  //if errors, throw them
-  if (!errors.isEmpty()) {
-    return res.status(400).send({ errors: errors.array() });
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ errors: errors.array() });
+    }
+
+    const user = await User.findOne({ email: req.params.email });
+
+    //check users' string with verification string
+    if (user.randomString !== req.body.string) {
+      return res
+        .status(401)
+        .send({ msg: "Sorry verification code did not match!" });
+    }
+
+    res.send({ msg: "Matched. yay!!!" });
   }
-
-  const user = await User.findOne({ email: req.params.email });
-
-  //check users' string with verification string
-  if (user.randomString !== req.body.string) {
-    return res.status(401).send({ msg: 'Sorry verification code did not match!' });
-  }
-
-  res.send({ msg: 'Matched. yay!!!' });
-
-});
-
+);
 
 /*  @route POST /users/changePassword/:email
     @desc Change users' password
     @access Private
 */
-router.post('/changePassword/:email', [
-  check('newPassword', 'Password must be at least 6 characters').isLength({
-    min: 6
-  }),
-  check('confirmPassword', 'Field cannot be empty').not().isEmpty()
-], async (req, res) => {
+router.post(
+  "/changePassword/:email",
+  [
+    check("newPassword", "Password must be at least 6 characters").isLength({
+      min: 6,
+    }),
+    check("confirmPassword", "Field cannot be empty").not().isEmpty(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
 
-  const errors = validationResult(req);
-
-  //if errors, throw them
-  if (!errors.isEmpty()) {
-    return res.status(400).send({ msg: errors.array() });
-  }
-
-  try {
-    //find user by email
-    const user = await User.findOne({ email: req.params.email });
-
-    if (!user) {
-      return res.status(404).send({ msg: 'No user found!' });
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ msg: errors.array() });
     }
 
-    //extract the fields
-    const { newPassword, confirmPassword } = req.body;
+    try {
+      //find user by email
+      const user = await User.findOne({ email: req.params.email });
 
-    //throw error if new password and confirm password don't match
-    if (newPassword !== confirmPassword) {
-      return res.status(400).send({ msg: 'Your new passwords do not match' });
+      if (!user) {
+        return res.status(404).send({ msg: "No user found!" });
+      }
+
+      //extract the fields
+      const { newPassword, confirmPassword } = req.body;
+
+      //throw error if new password and confirm password don't match
+      if (newPassword !== confirmPassword) {
+        return res.status(400).send({ msg: "Your new passwords do not match" });
+      }
+
+      //save the new password
+      user.password = await user.encryptPassword(newPassword);
+
+      //save the user
+      await user.save();
+
+      res.send({ msg: "Your password has been changed" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
     }
-
-    //save the new password
-    user.password = await user.encryptPassword(newPassword);
-
-    //save the user
-    await user.save();
-
-    res.send({ msg: 'Your password has been changed' });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
   }
-});
-
+);
 
 //----------------------------FOLLOW----------------------------------------
 
@@ -357,40 +361,37 @@ router.post('/changePassword/:email', [
     @desc return if user is private
     @access Private
 */
-router.get('/isPrivate/:user_id', auth, async (req, res) => {
+router.get("/isPrivate/:user_id", auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.user_id);
 
     if (!user) {
-      return res.status(404).send({ errors: [{ msg: 'User not found!' }] });
+      return res.status(404).send({ errors: [{ msg: "User not found!" }] });
     }
 
     return res.send(user.isPrivate);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
 
 /*  @route PUT /users/isPrivate
     @desc change user's privacy
     @access Private
 */
-router.put('/isPrivate', auth, async (req, res) => {
+router.put("/isPrivate", auth, async (req, res) => {
   try {
-
     //if !isPrivate then make it true otherwise make it false and take everything from followRequests to following
     if (!req.user.isPrivate) {
       req.user.isPrivate = true;
-    }
-    else {
+    } else {
       req.user.isPrivate = false;
       req.user.followers = [...req.user.followRequests];
       req.user.followRequests = [];
 
       //add this user's id to each follower's following list
-      req.user.followers.forEach(async follower => {
+      req.user.followers.forEach(async (follower) => {
         let user = await User.findById(follower.user);
 
         user.following.unshift({ user: req.user.id });
@@ -403,51 +404,58 @@ router.put('/isPrivate', auth, async (req, res) => {
     return res.send(req.user);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
-
 
 /*  @route GET /users/checkFollow/:user_id
     @desc check the follow status for a user with correlation with the logged in user 
     @access Private
 */
-router.get('/checkFollow/:user_id', auth, async (req, res) => {
+router.get("/checkFollow/:user_id", auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.user_id);
 
     if (!user) {
-      res.status(404).send({ errors: [{ msg: 'User not found!' }] });
+      res.status(404).send({ errors: [{ msg: "User not found!" }] });
     }
 
     //check if the logged in user is currently following the user
-    if (user.followers.filter(follower => follower.user.toString() === req.user.id).length > 0) {
-      return res.send({ status: 'unfollow' });
+    if (
+      user.followers.filter(
+        (follower) => follower.user.toString() === req.user.id
+      ).length > 0
+    ) {
+      return res.send({ status: "unfollow" });
     }
 
     //check if the logged in user is currently in the follow request of the user
-    if (user.followRequests.filter(followReq => followReq.user.toString() === req.user.id).length > 0) {
-      return res.send({ status: 'requested' });
+    if (
+      user.followRequests.filter(
+        (followReq) => followReq.user.toString() === req.user.id
+      ).length > 0
+    ) {
+      return res.send({ status: "requested" });
     }
 
-    res.send({ status: 'follow' });
+    res.send({ status: "follow" });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
 
 /*  @route PUT /users/follow/:user_id
     @desc Follow user by id
     @access Private
 */
-router.put('/follow/:user_id', auth, async (req, res) => {
+router.put("/follow/:user_id", auth, async (req, res) => {
   try {
     //if the req.user wants to follow himself
     if (req.params.user_id === req.user.id) {
-      return res.status(400).send({ errors: [{ msg: 'You cannot follow yourself' }] });
+      return res
+        .status(400)
+        .send({ errors: [{ msg: "You cannot follow yourself" }] });
     }
 
     //find the user
@@ -457,27 +465,40 @@ router.put('/follow/:user_id', auth, async (req, res) => {
     // const reqUser = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).send({ errors: [{ msg: 'User does not exist' }] });
+      return res.status(404).send({ errors: [{ msg: "User does not exist" }] });
     }
 
     //check if the req.user is already following the user
-    if (user.followers.filter(follower => follower.user.toString() === req.user.id).length > 0) {
-      return res.status(400).send({ errors: [{ msg: 'Already following this user' }] });
+    if (
+      user.followers.filter(
+        (follower) => follower.user.toString() === req.user.id
+      ).length > 0
+    ) {
+      return res
+        .status(400)
+        .send({ errors: [{ msg: "Already following this user" }] });
     }
 
     //check if the req.user has already sent a follow request
-    if (user.followRequests.filter(followReq => followReq.user.toString() === req.user.id).length > 0) {
-      return res.status(400).send({ errors: [{ msg: 'You have already sent a follow request to this user!' }] });
+    if (
+      user.followRequests.filter(
+        (followReq) => followReq.user.toString() === req.user.id
+      ).length > 0
+    ) {
+      return res.status(400).send({
+        errors: [
+          { msg: "You have already sent a follow request to this user!" },
+        ],
+      });
     }
 
     //check if user's profile isPrivate
     if (user.isPrivate) {
-      //if not following, then push in followRequests 
+      //if not following, then push in followRequests
       user.followRequests.unshift({ user: req.user.id });
 
       await user.save();
-    }
-    else {
+    } else {
       //add req.user to user's followers list
       user.followers.unshift({ user: req.user.id });
 
@@ -503,23 +524,23 @@ router.put('/follow/:user_id', auth, async (req, res) => {
     // if (reqUser.following.filter(follow => follow.user.toString() === req.params.user_id).length > 0) {
     //   return res.status(400).send({msg: 'A'})
     // }
-
   } catch (error) {
     console.error(error);
-    res.status(500).send({ errors: [{ msg: 'Server error!' }] });
+    res.status(500).send({ errors: [{ msg: "Server error!" }] });
   }
 });
-
 
 /*  @route PUT /users/unfollow/:user_id
     @desc Unfollow user by id
     @access Private
 */
-router.put('/unfollow/:user_id', auth, async (req, res) => {
+router.put("/unfollow/:user_id", auth, async (req, res) => {
   try {
     //check if the req.user wants to unfollow himself
     if (req.params.user_id === req.user.id) {
-      return res.status(400).send({ errors: [{ msg: 'You cannot unfollow yourself' }] });
+      return res
+        .status(400)
+        .send({ errors: [{ msg: "You cannot unfollow yourself" }] });
     }
 
     //find the user
@@ -527,16 +548,24 @@ router.put('/unfollow/:user_id', auth, async (req, res) => {
 
     //if user does not exist then exit
     if (!user) {
-      return res.status(404).send({ errors: [{ msg: 'User not found!' }] });
+      return res.status(404).send({ errors: [{ msg: "User not found!" }] });
     }
 
     //check if req.user deos NOT exist in the user's followers' list
-    if (user.followers.filter(follower => follower.user.toString() === req.user.id).length === 0) {
-      return res.status(400).send([{ errors: { msg: 'User has not been followed yet!' } }]);
+    if (
+      user.followers.filter(
+        (follower) => follower.user.toString() === req.user.id
+      ).length === 0
+    ) {
+      return res
+        .status(400)
+        .send([{ errors: { msg: "User has not been followed yet!" } }]);
     }
 
     //get the index to remove from followers' list
-    const index = user.followers.map(follower => follower.user.toString()).indexOf(req.user.id);
+    const index = user.followers
+      .map((follower) => follower.user.toString())
+      .indexOf(req.user.id);
 
     //remove the index
     user.followers.splice(index, 1);
@@ -548,7 +577,9 @@ router.put('/unfollow/:user_id', auth, async (req, res) => {
     const reqUser = await User.findById(req.user.id);
 
     //get the index of req.user's following list
-    const reqIndex = reqUser.following.map(follow => follow.user.toString()).indexOf(req.params.user_id);
+    const reqIndex = reqUser.following
+      .map((follow) => follow.user.toString())
+      .indexOf(req.params.user_id);
 
     //remove that index
     reqUser.following.splice(reqIndex, 1);
@@ -557,24 +588,21 @@ router.put('/unfollow/:user_id', auth, async (req, res) => {
     await reqUser.save();
 
     res.send(reqUser);
-
   } catch (error) {
     console.error(error);
-    res.status(500).send({ errors: [{ msg: 'Server error!' }] });
+    res.status(500).send({ errors: [{ msg: "Server error!" }] });
   }
 });
-
 
 /*  @route PUT /users/acceptFollow/:user_id
     @desc Accept follow requests by user_id
     @access Private
 */
-router.put('/acceptFollow/:user_id', auth, async (req, res) => {
+router.put("/acceptFollow/:user_id", auth, async (req, res) => {
   try {
-
     //if the req.user wants to send follow request to himself
     if (req.params.user_id === req.user.id) {
-      return res.status(400).send({ msg: 'You cannot follow yourself' });
+      return res.status(400).send({ msg: "You cannot follow yourself" });
     }
 
     //find the user that is logged in
@@ -584,16 +612,24 @@ router.put('/acceptFollow/:user_id', auth, async (req, res) => {
 
     // if there is no user, then exit
     if (!user) {
-      return res.status(404).send({ msg: 'User not found!' });
+      return res.status(404).send({ msg: "User not found!" });
     }
 
     //check if the other user is already a follower
-    if (reqUser.followers.filter(follower => follower.user.toString() === req.params.user_id).length > 0) {
-      return res.status(400).send({ msg: 'Sorry, this user is already following you' });
+    if (
+      reqUser.followers.filter(
+        (follower) => follower.user.toString() === req.params.user_id
+      ).length > 0
+    ) {
+      return res
+        .status(400)
+        .send({ msg: "Sorry, this user is already following you" });
     }
 
     //find the index and remove from follow requests
-    const index = reqUser.followRequests.map(followReq => followReq.user.toString()).indexOf(req.params.user_id);
+    const index = reqUser.followRequests
+      .map((followReq) => followReq.user.toString())
+      .indexOf(req.params.user_id);
     reqUser.followRequests.splice(index, 1);
 
     //add to the followers' list
@@ -609,30 +645,31 @@ router.put('/acceptFollow/:user_id', auth, async (req, res) => {
     await user.save();
 
     res.send(reqUser);
-
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
-
 
 /*  @route PUT /users/rejectFollowRequest/:user_id
     @desc Reject follow requests by user_id
     @access Private
 */
-router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
+router.put("/rejectFollowRequest/:user_id", auth, async (req, res) => {
   try {
     //get the logged in user
     const reqUser = await User.findById(req.user.id);
 
     //find the index of the follow requester
-    const index = reqUser.followRequests.findIndex(followReq => followReq.user.toString() === req.params.user_id);
+    const index = reqUser.followRequests.findIndex(
+      (followReq) => followReq.user.toString() === req.params.user_id
+    );
 
     //check if the other user is in logged in user's followRequests
     if (index === -1) {
-      return res.status(404).send({ errors: [{ msg: 'This person did not request to follow you' }] });
+      return res.status(404).send({
+        errors: [{ msg: "This person did not request to follow you" }],
+      });
     }
 
     //remove that index from array
@@ -642,31 +679,31 @@ router.put('/rejectFollowRequest/:user_id', auth, async (req, res) => {
     await reqUser.save();
 
     res.send(reqUser);
-
   } catch (error) {
     console.error(error);
     res.status(500).send({ errors: error });
   }
 });
 
-
 /*  @route GET /users/followers
     @desc Get followers' list of logged in user
     @access Private
 */
-router.get('/followers', auth, async (req, res) => {
+router.get("/followers", auth, async (req, res) => {
   try {
     const profiles = [];
 
     for (let follower of req.user.followers) {
-      let profile = await Profile.findOne({ user: follower.user }).populate('user', ['avatar', 'name', 'gender']);
+      let profile = await Profile.findOne({
+        user: follower.user,
+      }).populate("user", ["avatar", "name", "gender"]);
       profiles.push(profile);
     }
 
     res.send(profiles);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
 
@@ -674,94 +711,95 @@ router.get('/followers', auth, async (req, res) => {
     @desc Get following list of logged in user
     @access Private
 */
-router.get('/following', auth, async (req, res) => {
+router.get("/following", auth, async (req, res) => {
   try {
-
     const profiles = [];
 
     for (let follow of req.user.following) {
-      let profile = await Profile.findOne({ user: follow.user }).populate('user', ['avatar', 'name', 'gender']);
+      let profile = await Profile.findOne({
+        user: follow.user,
+      }).populate("user", ["avatar", "name", "gender"]);
       profiles.push(profile);
     }
 
     res.send(profiles);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
 
 /*  @route GET /users/followers/:user_id
     @desc Get followers' list of profiles for a particular user
     @access Private
 */
-router.get('/followers/:user_id', [auth, isFollowing], async (req, res) => {
+router.get("/followers/:user_id", [auth, isFollowing], async (req, res) => {
   try {
     // res.send(req.otheruser.followers);
     const profiles = [];
 
     for (let follower of req.otherUser.followers) {
-      let profile = await Profile.findOne({ user: follower.user }).populate('user', ['avatar', 'name', 'gender']);
+      let profile = await Profile.findOne({
+        user: follower.user,
+      }).populate("user", ["avatar", "name", "gender"]);
       profiles.push(profile);
     }
 
     res.send(profiles);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
 
 /*  @route GET /users/following/:user_id
     @desc Get following's list of profiles for a particular user
     @access Private
 */
-router.get('/following/:user_id', [auth, isFollowing], async (req, res) => {
+router.get("/following/:user_id", [auth, isFollowing], async (req, res) => {
   try {
     const profiles = [];
 
     for (let follow of req.otherUser.following) {
-      let profile = await Profile.findOne({ user: follow.user }).populate('user', ['avatar', 'name', 'gender']);
+      let profile = await Profile.findOne({
+        user: follow.user,
+      }).populate("user", ["avatar", "name", "gender"]);
       profiles.push(profile);
     }
 
     res.send(profiles);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
 
 /*  @route GET /users/followRequests
     @desc Get users' follow requests
     @access Private
 */
-router.get('/followRequests', auth, async (req, res) => {
+router.get("/followRequests", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
     res.send(user.followRequests);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
 
 /*  @route GET /users/:user_id
     @desc Get an individual user
     @access Private
 */
-router.get('/:user_id', async (req, res) => {
+router.get("/:user_id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.user_id).select('-password');
+    const user = await User.findById(req.params.user_id).select("-password");
 
     //if any of user or avatar not found, throw error
     if (!user) {
-      return res.status(404).send({ errors: [{ msg: 'User not found' }] });
+      return res.status(404).send({ errors: [{ msg: "User not found" }] });
     }
 
     //send back the user
@@ -770,7 +808,6 @@ router.get('/:user_id', async (req, res) => {
     res.status(404).send({ msg: error });
   }
 });
-
 
 /*  @route GET /users/me/avatar
     @desc Get logged in user's avatar
@@ -795,39 +832,51 @@ router.get('/:user_id', async (req, res) => {
 //   }
 // });
 
-
 /*  @route POST /users/me/avatar
     @desc Post users' profile picture
     @access Private
 */
-router.post('/me/avatar', [auth, upload.single('upload')], async (req, res) => {
-  try {
-    const user = req.user;
+router.post(
+  "/me/avatar",
+  [auth, upload.single("upload")],
+  async (req, res) => {
+    try {
+      const user = req.user;
 
-    //resize and convert to png
-    const buffer = await sharp(req.file.buffer).rotate().resize({ width: 300, height: 300, fit: 'contain', background: { r: 255, g: 255, b: 255 } }).png().toBuffer();
+      //resize and convert to png
+      const buffer = await sharp(req.file.buffer)
+        .rotate()
+        .resize({
+          width: 300,
+          height: 300,
+          fit: "contain",
+          background: { r: 255, g: 255, b: 255 },
+        })
+        .png()
+        .toBuffer();
 
-    //save the buffer file in avatar field
-    user.avatar = buffer;
+      //save the buffer file in avatar field
+      user.avatar = buffer;
 
-    //save the user
-    await user.save();
+      //save the user
+      await user.save();
 
-    res.send(user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
+      res.send(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
+    }
+  },
+  (error, req, res, next) => {
+    res.status(400).send({ errors: [{ msg: error.message }] });
   }
-}, (error, req, res, next) => {
-  res.status(400).send({ errors: [{ msg: error.message }] });
-});
-
+);
 
 /*  @route DELETE /users/me/avatar
     @desc Delete users' profile picture
     @access Private
 */
-router.delete('/me/avatar', auth, async (req, res) => {
+router.delete("/me/avatar", auth, async (req, res) => {
   try {
     const user = req.user;
 
@@ -838,26 +887,25 @@ router.delete('/me/avatar', auth, async (req, res) => {
     res.send(user);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
 
 /*  @route GET /users/:user_id/avatar
     @desc Get users' profile picture
     @access Private
 */
-router.get('/:user_id/avatar', auth, async (req, res) => {
+router.get("/:user_id/avatar", auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.user_id);
 
     //if any of user or avatar not found, throw error
     if (!user || !user.avatar) {
-      throw new Error('Not found');
+      throw new Error("Not found");
     }
 
     //set the content type to image
-    res.set('Content-Type', 'image/png');
+    res.set("Content-Type", "image/png");
 
     //send the image
     res.send(user.avatar);
