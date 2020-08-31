@@ -247,8 +247,10 @@ const EditPost = (props) => {
                 fullWidth
                 className={classes.removeImage}
                 onClick={() => {
+                  setFile("");
                   setFileURL("");
                   setImageURL("");
+                  setNewUpload(true);
                 }}
               >
                 Remove Image

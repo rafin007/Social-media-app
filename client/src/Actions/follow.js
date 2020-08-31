@@ -138,3 +138,11 @@ export const getFollowings = (user_id = null) => async (dispatch) => {
     });
   }
 };
+
+//-----------------search followings--------------------
+export const searchFollowingsByName = (name) => async (dispatch) => {
+  dispatch({
+    type: actionTypes.SEARCH_FOLLOWINGS,
+    payload: name,
+  });
+};

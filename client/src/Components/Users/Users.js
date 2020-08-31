@@ -1,25 +1,17 @@
 import React, { useEffect, useState } from "react";
-import {
-  Grid,
-  List,
-  TextField,
-  makeStyles,
-  InputAdornment,
-} from "@material-ui/core";
+import { Grid, List, TextField, InputAdornment } from "@material-ui/core";
 import { SearchOutlined } from "@material-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProfiles, searchProfileByName } from "../../Actions/profile";
+import {
+  getAllProfiles,
+  searchProfileByName,
+  clearSearchProfiles,
+  clearProfiles,
+} from "../../Actions/profile";
 import Spinner from "../Spinner/Spinner";
 import User from "./User/User";
 
-const useStyles = makeStyles((theme) => ({
-  searchBox: {
-    width: "100%",
-  },
-}));
-
 const Users = () => {
-  const classes = useStyles();
   const dispatch = useDispatch();
 
   //loading state
@@ -36,6 +28,11 @@ const Users = () => {
   //get all the profiles when the component loads
   useEffect(() => {
     dispatch(getAllProfiles());
+
+    return () => {
+      dispatch(clearSearchProfiles());
+      dispatch(clearProfiles());
+    };
   }, [dispatch]);
 
   //search users
@@ -61,10 +58,21 @@ const Users = () => {
       profiles.map((profile) => <User profile={profile} key={profile._id} />);
   }
 
+  //to avoid the weird mount-unmount error
+  // const [didMount, setDidMount] = useState(false);
+
+  // useEffect(() => {
+  //   setDidMount(true);
+  //   return () => setDidMount(false);
+  // }, []);
+
+  // if (!didMount) {
+  //   return null;
+  // }
+
   return (
     <Grid item xs={12}>
       <TextField
-        className={classes.margin}
         id="search-users"
         placeholder="Search Users"
         autoComplete=""

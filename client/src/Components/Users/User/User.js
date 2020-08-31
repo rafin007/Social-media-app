@@ -53,10 +53,15 @@ const User = ({ profile }) => {
     // else {
     //     setFollowStatus('follow');
     // }
-    axios
-      .get(`/users/checkFollow/${profile.user._id}`)
-      .then((response) => setFollowStatus(response.data.status))
-      .catch((error) => console.log(error));
+    let mounted = true;
+    if (mounted) {
+      axios
+        .get(`/users/checkFollow/${profile.user._id}`)
+        .then((response) => setFollowStatus(response.data.status))
+        .catch((error) => console.log(error));
+    }
+
+    return () => (mounted = false);
   }, [loading, profile]);
 
   const handleFollow = async () => {

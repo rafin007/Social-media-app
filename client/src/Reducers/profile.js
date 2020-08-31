@@ -88,6 +88,35 @@ const profileReducer = (state = initialState, action) => {
           }),
       };
 
+    case actionTypes.SEARCH_FOLLOWINGS:
+      return {
+        ...state,
+        searchedProfiles:
+          state.profiles &&
+          state.profiles.length > 0 &&
+          state.profiles.filter((profile) => {
+            if (
+              profile.user.name.toUpperCase().includes(payload.toUpperCase())
+            ) {
+              return profile;
+            } else {
+              return null;
+            }
+          }),
+      };
+
+    case actionTypes.CLEAR_SEARCH_PROFILES:
+      return {
+        ...state,
+        searchedProfiles: [],
+      };
+
+    case actionTypes.CLEAR_PROFILES:
+      return {
+        ...state,
+        profiles: [],
+      };
+
     default:
       return state;
   }

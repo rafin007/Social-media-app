@@ -309,3 +309,17 @@ export const searchProfileByName = (name) => async (dispatch) => {
     payload: name,
   });
 };
+
+//---------------Clear search profile-------------
+export const clearSearchProfiles = () => async (dispatch) => {
+  dispatch({
+    type: actionTypes.CLEAR_SEARCH_PROFILES,
+  });
+};
+
+//---------------Clear search profile-------------
+export const clearProfiles = () => async (dispatch) => {
+  dispatch({
+    type: actionTypes.CLEAR_PROFILES,
+  });
+};

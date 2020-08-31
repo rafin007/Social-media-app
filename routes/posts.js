@@ -32,6 +32,7 @@ const upload = multer({
     @desc Create a post
     @access Private
 */
+
 router.post(
   "/",
   [
@@ -86,9 +87,9 @@ router.post(
 );
 
 /*  @route GET /posts/me
-    @desc Get all posts of logged in user
+@desc Get all posts of logged in user
     @access Private
-*/
+    */
 router.get("/me", auth, async (req, res) => {
   try {
     const posts = await Post.find({ user: req.user.id })
@@ -107,8 +108,8 @@ router.get("/me", auth, async (req, res) => {
 });
 
 /*  @route GET /posts/:post_id
-    @desc Get post by id
-    @access Private
+@desc Get post by id
+@access Private
 */
 // uses the isFollowingPost middleware to check if the logged in user is a follower of the post's owner
 router.get("/:post_id", [auth, isFollowingPost], async (req, res) => {
@@ -121,8 +122,8 @@ router.get("/:post_id", [auth, isFollowingPost], async (req, res) => {
 });
 
 /*  @route GET /posts/:post_id/image
-    @desc Get post's image by id
-    @access Private
+@desc Get post's image by id
+@access Private
 */
 // router.get('/:post_id/image', [auth, isFollowingPost], async (req, res) => {
 //     try {
@@ -142,8 +143,8 @@ router.get("/:post_id", [auth, isFollowingPost], async (req, res) => {
 // });
 
 /*  @route GET /posts
-    @desc Get all posts of their following
-    @access Private
+@desc Get all posts of their following
+@access Private
 */
 router.get("/", auth, async (req, res) => {
   //map through req.user's following list
@@ -171,8 +172,8 @@ router.get("/", auth, async (req, res) => {
 });
 
 /*  @route GET /posts/users/:user_id
-    @desc Get all posts of a user
-    @access Private
+@desc Get all posts of a user
+@access Private
 */
 //uses the isFollowing middleware to check if the logged in user is a follower of the searched user
 router.get("/users/:user_id", [auth, isFollowing], async (req, res) => {
@@ -192,9 +193,12 @@ router.get("/users/:user_id", [auth, isFollowing], async (req, res) => {
   }
 });
 
+/**
+ * @TODO => Removing image not working in from front end
+ */
 /*  @route PATCH /posts/:post_id
-    @desc Update post by id
-    @access Private
+  @desc Update post by id
+  @access Private
 */
 router.patch(
   "/:post_id",

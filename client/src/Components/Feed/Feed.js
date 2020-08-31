@@ -4,7 +4,7 @@ import Post from "../Post/Post";
 import FloatingAction from "../FloatingAction/FloatingAction";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import { useDispatch, useSelector } from "react-redux";
-import { getFeedPosts } from "../../Actions/post";
+import { getFeedPosts, clearPosts } from "../../Actions/post";
 import Spinner from "../Spinner/Spinner";
 
 const useStyles = makeStyles((theme) => ({
@@ -24,6 +24,10 @@ const Feed = () => {
   //get feed posts
   useEffect(() => {
     dispatch(getFeedPosts());
+
+    return () => {
+      dispatch(clearPosts());
+    };
   }, [dispatch]);
 
   //user state from auth to make sure the user has indeed loaded
@@ -67,12 +71,24 @@ const Feed = () => {
     });
   } else {
     jsx = (
-      <Typography color="primary" className={classes.text}>
+      <Typography color="textPrimary" className={classes.text}>
         You're not following any users. Head on to the users tab to follow
         someone!
       </Typography>
     );
   }
+
+  //to avoid the weird mount-unmount error
+  // const [didMount, setDidMount] = useState(false);
+
+  // useEffect(() => {
+  //   setDidMount(true);
+  //   return () => setDidMount(false);
+  // }, []);
+
+  // if (!didMount) {
+  //   return null;
+  // }
 
   // feed contains all the posts user's followings
   return (

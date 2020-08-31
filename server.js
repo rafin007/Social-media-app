@@ -1,31 +1,44 @@
-const express = require("express");
 const connectDB = require("./DB/db");
+const express = require("./config/express");
+const jwt = require("jsonwebtoken");
+const config = require("config");
 
-// import all the route modules
-const users = require("./routes/users");
-const posts = require("./routes/posts");
-const profile = require("./routes/profile");
-const auth = require("./routes/auth");
+//socket.io
+const app = express.init();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server);
 
-const app = express();
+// io.of("/socket").on("connection", (socket) => {
+//   console.log("Socket.io - User connected: ", socket.id);
 
-//init middlewares
-app.use(express.json({ extended: false }));
+//   socket.on("disconnect", () => {
+//     console.log("Socket.io - User disconnected: ", socket.id);
+//   });
+// });
 
 //conncect to database
-connectDB();
+connectDB(io);
 
 const PORT = process.env.PORT || 5000;
 
-// base route
-// app.get("/", (req, res) => {
-//   res.send("helo!!");
-// });
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-//define routes
-app.use("/users", users);
-app.use("/posts", posts);
-app.use("/profile", profile);
-app.use("/auth", auth);
+//check token via socket.io
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.query.token;
+    const payload = jwt.verify(token, config.get("jwtSecret"));
+    socket.userId = payload.user.id;
+    next();
+  } catch (error) {
+    console.error(error);
+  }
+});
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+io.on("connection", (socket) => {
+  console.log("Connected: ", socket.userId);
+
+  socket.on("disconnect", () => {
+    console.log("Disconnected: ", socket.userId);
+  });
+});

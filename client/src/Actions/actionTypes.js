@@ -17,6 +17,11 @@ export const AUTH_ERROR = "AUTH_ERROR";
 export const LOGOUT = "LOGOUT";
 //clear profile
 export const CLEAR_PROFILE = "CLEAR_PROFILE";
+//clear profiles
+export const CLEAR_PROFILES = "CLEAR_PROFILES";
+
+//clear search profile
+export const CLEAR_SEARCH_PROFILES = "CLEAR_SEARCH_PROFILES";
 
 //profile
 export const GET_PROFILE = "GET_PROFILE";
@@ -55,6 +60,9 @@ export const FOLLOW_USER = "FOLLOW_USER";
 export const UNFOLLOW_USER = "UNFOLLOW_USER";
 export const GET_FOLLOWERS = "GET_FOLLOWERS";
 export const GET_FOLLOWINGS = "GET_FOLLOWINGS";
+
+//search followings
+export const SEARCH_FOLLOWINGS = "SEARCH_FOLLOWINGS";
 
 //follow loading
 export const FOLLOW_LOADING = "FOLLOW_LOADING";

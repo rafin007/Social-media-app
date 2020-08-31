@@ -1,72 +1,69 @@
-import React, { Fragment, useState } from 'react';
-import { Grid, makeStyles } from '@material-ui/core';
-import Post from '../../Components/Post/Post';
+import React, { useState } from "react";
+import { Grid, makeStyles } from "@material-ui/core";
+import Post from "../../Components/Post/Post";
+import FloatingAction from "../../Components/FloatingAction/FloatingAction";
+import { useScrollPosition } from "@n8tb1t/use-scroll-position";
+import { useEffect } from "react";
+import { getAllPosts } from "../../Actions/post";
+import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../../Components/Spinner/Spinner";
 
-import owner from '../../assets/images/avatar.jpg';
-
-import Post1 from '../../assets/images/post1.jpg';
-import Post2 from '../../assets/images/post2.jpg';
-import Post3 from '../../assets/images/post3.jpg';
-import FloatingAction from '../../Components/FloatingAction/FloatingAction';
-import { useScrollPosition } from '@n8tb1t/use-scroll-position';
-import { useEffect } from 'react';
-import { getAllPosts } from '../../Actions/post';
-import { useDispatch, useSelector } from 'react-redux';
-import Spinner from '../../Components/Spinner/Spinner';
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        marginTop: theme.spacing(3),
-    }
+const useStyles = makeStyles((theme) => ({
+  root: {
+    marginTop: theme.spacing(3),
+  },
 }));
 
 const ProfilePosts = () => {
+  //scroll to top logic
+  const [shouldScroller, setShouldScroller] = useState(false);
 
-    //scroll to top logic
-    const [shouldScroller, setShouldScroller] = useState(false);
+  let action = null;
 
-    let action = null;
+  if (shouldScroller) {
+    action = <FloatingAction action="scroller" />;
+  } else {
+    action = <FloatingAction action="button" />;
+  }
 
-    if (shouldScroller) {
-        action = <FloatingAction action="scroller" />;
+  // if scrolled down scroll to top will appear
+  useScrollPosition(({ prevPos, currPos }) => {
+    if (currPos.y < 0 && currPos.y < prevPos.y) {
+      setShouldScroller(true);
+    } else {
+      setShouldScroller(false);
     }
-    else {
-        action = <FloatingAction action="button" />;
-    }
+  });
 
-    // if scrolled down scroll to top will appear
-    useScrollPosition(({ prevPos, currPos }) => {
-        if (currPos.y < 0 && currPos.y < prevPos.y) {
-            setShouldScroller(true);
-        }
-        else {
-            setShouldScroller(false);
-        }
-    });
+  // ProfilePosts contains all the posts from this user
 
-    // ProfilePosts contains all the posts from this user
+  const classes = useStyles();
+  const dispatch = useDispatch();
 
-    const classes = useStyles();
-    const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllPosts());
+  }, [dispatch]);
 
-    useEffect(() => {
-        dispatch(getAllPosts());
-    }, []);
+  //loading state
+  const loading = useSelector((state) => state.post.loading);
 
-    //loading state
-    const loading = useSelector(state => state.post.loading);
+  //posts state
+  const posts = useSelector((state) => state.post.posts);
 
-    //posts state
-    const posts = useSelector(state => state.post.posts);
-
-    return (
-        <Grid container className={classes.root}>
-            <Grid item xs={12} >
-                {loading ? <Spinner /> : posts && posts.length > 0 && posts.map(post => <Post post={post} key={post._id} />)}
-            </Grid>
-            {action}
-        </Grid>
-    );
-}
+  return (
+    <Grid container className={classes.root}>
+      <Grid item xs={12}>
+        {loading ? (
+          <Spinner />
+        ) : (
+          posts &&
+          posts.length > 0 &&
+          posts.map((post) => <Post post={post} key={post._id} />)
+        )}
+      </Grid>
+      {action}
+    </Grid>
+  );
+};
 
 export default ProfilePosts;

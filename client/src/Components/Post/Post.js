@@ -28,7 +28,12 @@ import Comment from "../Comment/Comment";
 import SimpleMenu from "../SimpleMenu/SimpleMenu";
 import bufferToImage from "../../utils/bufferToImage";
 import { useSelector, useDispatch } from "react-redux";
-import { removeLike, addLike, postCommentOnPostById } from "../../Actions/post";
+import {
+  removeLike,
+  addLike,
+  postCommentOnPostById,
+  clearPost,
+} from "../../Actions/post";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -169,6 +174,13 @@ const Post = ({ post, ...props }) => {
     setComment("");
     setExpanded(true);
   };
+
+  useEffect(() => {
+    // setDidMount(true);
+    return () => {
+      dispatch(clearPost());
+    };
+  }, [dispatch]);
 
   return (
     <Card className={classes.root}>
