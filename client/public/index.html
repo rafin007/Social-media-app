@@ -49,12 +49,14 @@
           var originalSize = $(window).height();
 
           $(window).resize(function () {
+            // console.log($(window).height());
+
             if ($(window).height() !== originalSize) {
               //keyboard disappears
 
               $("#bottomNavbar").css("display", "none");
             } else {
-              //keyboard appears
+              //keyboard reappears
 
               $("#bottomNavbar").css("display", "");
             }

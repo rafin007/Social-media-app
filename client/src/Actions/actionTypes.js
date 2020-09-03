@@ -91,3 +91,10 @@ export const EDIT_COMMENT = "EDIT_COMMENT";
 //avatar
 export const REMOVE_AVATAR = "REMOVE_AVATAR";
 export const SET_AVATAR = "SET_AVATAR";
+
+//messages
+export const CHATS_LOADING = "CHATS_LOADING";
+export const MESSAGE_LOADING = "MESSAGE_LOADING";
+export const GET_ALL_CHATS = "GET_ALL_CHATS";
+export const GET_ALL_MESSAGES = "GET_ALL_MESSAGES";
+export const MESSAGES_ERROR = "MESSAGES_ERROR";

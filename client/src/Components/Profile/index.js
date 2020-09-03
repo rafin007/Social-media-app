@@ -169,7 +169,7 @@ const Profile = () => {
         className={classes.root}
       >
         <Grid item xs={12}>
-          <Link
+          {/* <Link
             to={{
               pathname: "/home",
               state: {
@@ -177,17 +177,17 @@ const Profile = () => {
               },
             }}
             className={classes.link}
+          > */}
+          <IconButton
+            aria-label="go back"
+            color="primary"
+            size="small"
+            onClick={history.goBack}
           >
-            <IconButton
-              aria-label="go back"
-              color="primary"
-              size="small"
-              // onClick={history.goBack}
-            >
-              <ArrowBackIos />
-              back
-            </IconButton>
-          </Link>
+            <ArrowBackIos />
+            back
+          </IconButton>
+          {/* </Link> */}
         </Grid>
         <Grid item xs={6}>
           <Avatar

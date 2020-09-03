@@ -1,6 +1,12 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 
+const NewMessage = React.lazy(() =>
+  import("../../SubViews/NewMessage/NewMessage")
+);
+const ConversationView = React.lazy(() =>
+  import("../../SubViews/ConversationView/ConversationView")
+);
 const Posts = React.lazy(() => import("../../SubViews/Posts"));
 const Followers = React.lazy(() => import("../../SubViews/Followers"));
 const Following = React.lazy(() => import("../../SubViews/Following"));
@@ -45,6 +51,8 @@ const Routes = () => {
       <Route path="/create" exact component={CreatePost} />
       <Route path="/edit/:post_id" exact component={EditPost} />
       <Route path="/post/:post_id" exact component={SinglePost} />
+      <Route path="/newMessage" exact component={NewMessage} />
+      <Route path="/chat/:receiver" exact component={ConversationView} />
     </Switch>
   );
 };
