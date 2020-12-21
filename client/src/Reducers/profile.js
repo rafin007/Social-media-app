@@ -117,6 +117,9 @@ const profileReducer = (state = initialState, action) => {
         profiles: [],
       };
 
+    case actionTypes.LOGOUT:
+      return initialState;
+
     default:
       return state;
   }

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Grid, makeStyles } from "@material-ui/core";
 import Tabs from "../../Components/Tabs/Tabs";
-import Feed from "../../Components/Feed/Feed";
 import Users from "../../Components/Users/Users";
 import { useLocation } from "react-router-dom";
+import Feed from "../../Components/Feed/Feed";
+// const Feed = React.lazy(() => import("../../Components/Feed/Feed"));
 
 const useStyles = makeStyles((theme) => ({
   root: {

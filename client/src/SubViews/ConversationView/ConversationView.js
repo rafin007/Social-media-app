@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import {
   makeStyles,
   Grid,
@@ -9,7 +9,6 @@ import {
 import { useParams, useHistory, useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import io from "socket.io-client";
 import { Send, ArrowBackIos } from "@material-ui/icons";
 import ChatMessages from "../../Components/ChatMessages/ChatMessages";
 import { useState } from "react";
@@ -50,9 +49,8 @@ const ConversationView = () => {
 
   const { receiver } = useParams();
 
-  const ENDPOINT = "http://localhost:5000";
-
-  const socket = useRef(null);
+  //get socket instance
+  const socket = useSelector((state) => state.message.socket);
 
   //calculate the height of chat messages dynamically according to window size
   const [height, setHeight] = useState(0);
@@ -86,14 +84,20 @@ const ConversationView = () => {
   // }, [text]);
 
   useEffect(() => {
-    socket.current = io(ENDPOINT);
-    socket.current.emit("initiateConversation", { sender: user._id, receiver });
+    socket.emit("initiateConversation", { receiver });
 
-    return () => {
-      socket.current.disconnect();
-      socket.current.off();
-    };
-  }, [ENDPOINT, receiver, user._id]);
+    // return () => {
+    //   socket.current.disconnect();
+    //   socket.current.off();
+    // };
+  }, [receiver, user._id, socket]);
+
+  //receive message
+  useEffect(() => {
+    socket.on("newMessage", (message) => {
+      console.log("new", message);
+    });
+  }, [socket]);
 
   //chat message
   const [message, setMessage] = useState("");
@@ -102,8 +106,9 @@ const ConversationView = () => {
   const sendMessage = () => {
     const date = Moment();
     //emit event and send message to backend
-    socket.current.emit("sendMessage", {
-      sender: user._id,
+
+    //need to create the same room for both users
+    socket.emit("sendMessage", {
       receiver,
       text: message,
       date,

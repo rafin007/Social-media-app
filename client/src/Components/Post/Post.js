@@ -175,12 +175,12 @@ const Post = ({ post, ...props }) => {
     setExpanded(true);
   };
 
-  useEffect(() => {
-    // setDidMount(true);
-    return () => {
-      dispatch(clearPost());
-    };
-  }, [dispatch]);
+  // useEffect(() => {
+  //   // setDidMount(true);
+  //   return () => {
+  //     dispatch(clearPost());
+  //   };
+  // }, [dispatch]);
 
   return (
     <Card className={classes.root}>

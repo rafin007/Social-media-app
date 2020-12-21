@@ -34,6 +34,9 @@ const postReducer = (state = initalState, action) => {
         errors: payload,
       };
 
+    case actionTypes.LOGOUT:
+      return initalState;
+
     case actionTypes.CLEAR_POST:
       return {
         ...state,

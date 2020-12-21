@@ -1,10 +1,13 @@
 import * as actionTypes from "../Actions/actionTypes";
 
 const initialState = {
+  chat: null,
   chats: [],
   messages: [],
   chatsLoading: false,
   errors: null,
+  threads: [],
+  socket: null,
 };
 
 const messageReducer = (state = initialState, action) => {
@@ -16,6 +19,30 @@ const messageReducer = (state = initialState, action) => {
         ...state,
         chatsLoading: false,
         chats: payload,
+        // chats: state.threads && state.threads.length > 0 && state.threads.filter(thread => {
+
+        // })
+      };
+
+    // case actionTypes.GET_CHAT:
+    //   return {
+    //     ...state,
+    //     chatsLoading: false,
+    //     chat: payload,
+    //     // threads: state.threads.concat(payload),
+    //   };
+
+    // case actionTypes.GET_ALL_MESSAGES:
+    //   return {
+    //     ...state,
+    //     chatsLoading: false,
+    //     messages: payload,
+    //   };
+
+    case actionTypes.SAVE_SOCKET:
+      return {
+        ...state,
+        socket: payload,
       };
 
     case actionTypes.CHATS_LOADING:
@@ -30,6 +57,9 @@ const messageReducer = (state = initialState, action) => {
         chatsLoading: false,
         errors: payload,
       };
+
+    case actionTypes.LOGOUT:
+      return initialState;
 
     default:
       return state;
