@@ -21,15 +21,6 @@ const Feed = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  //get feed posts
-  useEffect(() => {
-    dispatch(getFeedPosts());
-
-    return () => {
-      dispatch(clearPosts());
-    };
-  }, [dispatch]);
-
   //user state from auth to make sure the user has indeed loaded
   const user = useSelector((state) => state.auth.user);
 
@@ -38,6 +29,16 @@ const Feed = () => {
 
   //loading state
   const loading = useSelector((state) => state.post.loading);
+
+  //get feed posts
+  useEffect(() => {
+    dispatch(clearPosts());
+    dispatch(getFeedPosts());
+
+    return () => {
+      dispatch(clearPosts());
+    };
+  }, [dispatch]);
 
   //scroll to top logic
   const [shouldScroller, setShouldScroller] = useState(false);

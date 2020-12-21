@@ -9,6 +9,7 @@ import {
   TextField,
   InputAdornment,
   List,
+  Typography,
 } from "@material-ui/core";
 import { SearchOutlined } from "@material-ui/icons";
 import { useState } from "react";
@@ -16,8 +17,9 @@ import { searchFollowingsByName, getFollowings } from "../../Actions/follow";
 import Conversation from "../../Components/Conversation/Conversation";
 import Spinner from "../../Components/Spinner/Spinner";
 import { clearProfiles, clearSearchProfiles } from "../../Actions/profile";
-import { getAllChats } from "../../Actions/message";
+import { getAllChats, saveSocketInstance } from "../../Actions/message";
 import FloatingAction from "../../Components/FloatingAction/FloatingAction";
+import Thread from "../../Components/Thread/Thread";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,23 +39,28 @@ const MessagesView = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  // const socket = useRef(null);
+  const socket = useRef(null);
 
-  //token from auth state
-  // const token = useSelector((state) => state.auth.token);
+  // token from auth state
+  const token = useSelector((state) => state.auth.token);
 
-  // useEffect(() => {
-  //   socket.current = io("http://localhost:5000", {
-  //     query: {
-  //       token,
-  //     },
-  //   });
+  const newSocket = useSelector((state) => state.message.socket);
 
-  //   return () => {
-  //     socket.current.disconnect();
-  //     socket.current.off();
-  //   };
-  // }, [token]);
+  useEffect(() => {
+    if (!newSocket) {
+      socket.current = io("http://localhost:5000", {
+        query: {
+          token,
+        },
+      });
+
+      //save socket instance
+      dispatch(saveSocketInstance(socket.current));
+      console.log("socket created");
+    } else {
+      console.log("socket already exists");
+    }
+  }, [token, dispatch, newSocket]);
 
   const [search, setSearch] = useState("");
 
@@ -84,8 +91,6 @@ const MessagesView = () => {
     // };
   }, [dispatch]);
 
-  console.log(chats);
-
   // const onSearch = (event) => {
   //   setSearch(event.target.value);
   //   dispatch(searchFollowingsByName(event.target.value));
@@ -108,28 +113,23 @@ const MessagesView = () => {
   //     ));
   // }
 
+  // console.log(chats);
+
   return (
     <Grid container className={classes.root}>
       <Grid item xs={12}>
-        <TextField
-          className={classes.margin}
-          id="search-conversations"
-          placeholder="Search conversations"
-          autoComplete=""
-          fullWidth
-          variant="outlined"
-          // value={search}
-          // onChange={onSearch}
-          disabled={loading}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchOutlined />
-              </InputAdornment>
-            ),
-          }}
-        />
-        {/* <List>{loading ? <Spinner /> : chats}</List> */}
+        <Typography variant="h5" color="primary">
+          Chats
+        </Typography>
+        <List>
+          {loading ? (
+            <Spinner />
+          ) : (
+            chats &&
+            chats.length > 0 &&
+            chats.map((thread) => <Thread key={thread._id} thread={thread} />)
+          )}
+        </List>
       </Grid>
       <FloatingAction action="message" />
     </Grid>

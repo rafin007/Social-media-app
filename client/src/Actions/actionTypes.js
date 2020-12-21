@@ -96,5 +96,12 @@ export const SET_AVATAR = "SET_AVATAR";
 export const CHATS_LOADING = "CHATS_LOADING";
 export const MESSAGE_LOADING = "MESSAGE_LOADING";
 export const GET_ALL_CHATS = "GET_ALL_CHATS";
+export const GET_CHAT = "GET_CHAT";
 export const GET_ALL_MESSAGES = "GET_ALL_MESSAGES";
+export const GET_ALL_THREADS = "GET_ALL_THREADS";
 export const MESSAGES_ERROR = "MESSAGES_ERROR";
+export const CLEAR_CHAT = "CLEAR_CHAT";
+export const CLEAR_MESSAGES = "CLEAR_MESSAGES";
+
+//save socket
+export const SAVE_SOCKET = "SAVE_SOCKET";

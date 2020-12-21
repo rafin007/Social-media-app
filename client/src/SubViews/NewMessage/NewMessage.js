@@ -63,7 +63,7 @@ const NewMessage = () => {
     (state) => state.profile.searchedProfiles
   );
 
-  //loading state from profile
+  //loading state from auth
   const loading = useSelector((state) => state.auth.loading);
 
   useEffect(() => {

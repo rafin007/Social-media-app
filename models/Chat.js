@@ -7,13 +7,16 @@ const chatSchema = mongoose.Schema({
       ref: "user",
     },
   ],
+  date: {
+    type: Date,
+  },
 });
 
-// chatSchema.virtual("msgs", {
-//   ref: "message",
-//   localField: "_id",
-//   foreignField: "chatId",
-// });
+chatSchema.virtual("msgs", {
+  ref: "message",
+  localField: "_id",
+  foreignField: "chatId",
+});
 
 const Chat = mongoose.model("chat", chatSchema);
 
