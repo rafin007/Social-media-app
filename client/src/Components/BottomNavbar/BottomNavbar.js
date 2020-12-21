@@ -4,9 +4,8 @@ import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import {
   HomeOutlined,
-  MessageOutlined,
   AccountCircleOutlined,
-  NotificationsOutlined,
+  ImageOutlined,
 } from "@material-ui/icons";
 import { useLocation } from "react-router-dom";
 
@@ -56,19 +55,14 @@ const SimpleBottomNavigation = (props) => {
         icon={<HomeOutlined />}
       />
       <BottomNavigationAction
-        label="Messages"
-        value="messages"
-        icon={<MessageOutlined />}
-      />
-      <BottomNavigationAction
         label="Profile"
         value="profile"
         icon={<AccountCircleOutlined />}
       />
       <BottomNavigationAction
-        label="Notifications"
-        value="notifications"
-        icon={<NotificationsOutlined />}
+        label="Posts"
+        value="posts"
+        icon={<ImageOutlined />}
       />
     </BottomNavigation>
   );

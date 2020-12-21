@@ -1,21 +1,11 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
-
-const NewMessage = React.lazy(() =>
-  import("../../SubViews/NewMessage/NewMessage")
-);
-const ConversationView = React.lazy(() =>
-  import("../../SubViews/ConversationView/ConversationView")
-);
 const Posts = React.lazy(() => import("../../SubViews/Posts"));
 const Followers = React.lazy(() => import("../../SubViews/Followers"));
 const Following = React.lazy(() => import("../../SubViews/Following"));
 const Requests = React.lazy(() => import("../../SubViews/Requests"));
 const Settings = React.lazy(() => import("../../SubViews/Settings"));
 const Logout = React.lazy(() => import("../../SubViews/Logout"));
-const MessagesView = React.lazy(() =>
-  import("../../Views/Messages/MessagesView")
-);
 const ProfileView = React.lazy(() => import("../../Views/Profile/ProfileView"));
 const NotificationsView = React.lazy(() =>
   import("../../Views/Notifications/NotificationsView")
@@ -41,7 +31,6 @@ const Routes = () => {
       <Route path="/requests" exact component={Requests} />
       <Route path="/settings" exact component={Settings} />
       <Route path="/logout" exact component={Logout} />
-      <Route path="/messages" exact component={MessagesView} />
       <Route path="/profile" exact component={ProfileView} />
       <Route path="/notifications" exact component={NotificationsView} />
       <Route path="/home" exact component={HomeView} />
@@ -51,8 +40,6 @@ const Routes = () => {
       <Route path="/create" exact component={CreatePost} />
       <Route path="/edit/:post_id" exact component={EditPost} />
       <Route path="/post/:post_id" exact component={SinglePost} />
-      <Route path="/newMessage" exact component={NewMessage} />
-      <Route path="/chat/:receiver" exact component={ConversationView} />
     </Switch>
   );
 };

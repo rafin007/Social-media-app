@@ -61,6 +61,9 @@ const Posts = () => {
   if (posts && posts.length > 0) {
     jsx = (
       <Grid container className={classes.root}>
+        <Typography gutterBottom color="primary" variant="h5">
+          Your posts
+        </Typography>
         {posts.map((post) => (
           <Post post={post} key={post._id} />
         ))}

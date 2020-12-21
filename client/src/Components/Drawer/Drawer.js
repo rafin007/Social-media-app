@@ -13,9 +13,7 @@ import { Link, useLocation } from "react-router-dom";
 import { MenuList, MenuItem, ListItemIcon } from "@material-ui/core";
 import {
   HomeOutlined,
-  MessageOutlined,
   AccountCircleOutlined,
-  NotificationsOutlined,
   SupervisorAccountOutlined,
   ImageOutlined,
   GroupOutlined,
@@ -136,7 +134,7 @@ const ResponsiveDrawer = (props) => {
                     );
                 })} */}
 
-        <MenuItem
+        {/* <MenuItem
           component={Link}
           to="/posts"
           selected={"/posts" === pathname}
@@ -146,7 +144,7 @@ const ResponsiveDrawer = (props) => {
             <ImageOutlined />
           </ListItemIcon>
           Posts
-        </MenuItem>
+        </MenuItem> */}
 
         <MenuItem
           component={Link}
@@ -248,14 +246,6 @@ const ResponsiveDrawer = (props) => {
               </MenuItem>
               <MenuItem
                 component={Link}
-                to="/messages"
-                selected={"/messages" === pathname}
-                className={classes.menu}
-              >
-                <MessageOutlined />
-              </MenuItem>
-              <MenuItem
-                component={Link}
                 to="/profile"
                 selected={"/profile" === pathname}
                 className={classes.menu}
@@ -264,11 +254,11 @@ const ResponsiveDrawer = (props) => {
               </MenuItem>
               <MenuItem
                 component={Link}
-                to="/notifications"
-                selected={"/notifications" === pathname}
+                to="/posts"
+                selected={"/posts" === pathname}
                 className={classes.menu}
               >
-                <NotificationsOutlined />
+                <ImageOutlined />
               </MenuItem>
             </MenuList>
           </div>
