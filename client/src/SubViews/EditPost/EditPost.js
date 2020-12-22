@@ -160,6 +160,8 @@ const EditPost = (props) => {
 
   const history = useHistory();
 
+  // console.log(imageURL);
+
   const onSubmit = async (event) => {
     event.preventDefault();
 
@@ -168,12 +170,25 @@ const EditPost = (props) => {
     if (newUpload) {
       formData.append("upload", file);
       formData.append("text", text);
+
+      // to check in backend if the image is removed
+      if (!file) {
+        formData.append("hasRemoved", true);
+      }
     } else {
       formData.append("text", text);
     }
 
     //pass the history object to redirect to SinglePost component from post actions
     dispatch(editPost(post._id, formData, history));
+  };
+
+  //remove image
+  const removeImage = () => {
+    setFile("");
+    setFileURL("");
+    setImageURL("");
+    setNewUpload(true);
   };
 
   return (
@@ -246,12 +261,7 @@ const EditPost = (props) => {
                 component="span"
                 fullWidth
                 className={classes.removeImage}
-                onClick={() => {
-                  setFile("");
-                  setFileURL("");
-                  setImageURL("");
-                  setNewUpload(true);
-                }}
+                onClick={removeImage}
               >
                 Remove Image
               </Button>
