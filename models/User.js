@@ -1,71 +1,73 @@
 const mongoose = require("mongoose");
-const bcryptjs = require('bcryptjs');
+const bcryptjs = require("bcryptjs");
 
 const userSchema = mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   gender: {
     type: String,
-    required: true
+    required: true,
   },
   avatar: {
-    type: Buffer
+    type: Buffer,
   },
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   followers: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
-      }
-    }
+        ref: "user",
+      },
+    },
   ],
   following: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
-      }
-    }
+        ref: "user",
+      },
+    },
   ],
   followRequests: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user'
-      }
-    }
+        ref: "user",
+      },
+    },
   ],
   verified: {
     type: Boolean,
-    default: false
+    default: false,
   },
   isPrivate: {
     type: Boolean,
-    default: false
+    default: false,
   },
   randomString: {
-    type: String
-  }
+    type: String,
+  },
+  theme: {
+    type: String,
+    default: "light",
+  },
 });
 
 userSchema.methods.encryptPassword = async function (password) {
-  const user = this;
-
   //generate salt
   const salt = await bcryptjs.genSalt(10);
 
@@ -73,8 +75,8 @@ userSchema.methods.encryptPassword = async function (password) {
   const hashedPassword = await bcryptjs.hash(password, salt);
 
   return hashedPassword;
-}
+};
 
-const User = mongoose.model('user', userSchema);
+const User = mongoose.model("user", userSchema);
 
 module.exports = User;

@@ -6,6 +6,7 @@ const initalState = {
   user: null,
   loading: false,
   errors: [],
+  theme: "light",
 };
 
 const authReducer = (state = initalState, action) => {
@@ -18,6 +19,7 @@ const authReducer = (state = initalState, action) => {
         user: payload,
         loading: false,
         isAuthenticated: true,
+        theme: payload.theme,
       };
 
     case actionTypes.REGISTER_SUCCESS:
@@ -88,6 +90,19 @@ const authReducer = (state = initalState, action) => {
         ...state,
         loading: false,
         user: payload,
+      };
+
+    case actionTypes.SWITCH_THEME:
+    case actionTypes.GET_THEME:
+      return {
+        ...state,
+        theme: payload.theme,
+      };
+
+    case actionTypes.RESET_THEME:
+      return {
+        ...state,
+        theme: "light",
       };
 
     default:

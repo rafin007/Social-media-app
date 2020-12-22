@@ -229,12 +229,10 @@ router.patch(
         return res.status(401).send({ errors: [{ msg: "Unauthorized" }] });
       }
 
-      let buffer;
-
       //check if there is a file
       if (req.file) {
         //resize and convert to png
-        buffer = await sharp(req.file.buffer)
+        let buffer = await sharp(req.file.buffer)
           .rotate()
           .resize({
             width: 600,
@@ -244,11 +242,17 @@ router.patch(
           })
           .png()
           .toBuffer();
+
+        post.image = buffer;
+      }
+
+      //check if the edited post's image has been removed
+      if (req.body.hasRemoved) {
+        post.image = null;
       }
 
       //edit the post
       post.text = req.body.text;
-      post.image = req.file ? buffer : post.image;
 
       //save the post
       await post.save();

@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     bottom: 0,
     width: "100%",
     height: "7vh",
-    backgroundColor: "#ededed",
+    backgroundColor: theme.palette.type === "dark" ? "#424242" : "#ededed",
     borderTop: "1px solid #ccc",
     [theme.breakpoints.up("sm")]: {
       display: "none",

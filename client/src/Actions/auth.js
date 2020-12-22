@@ -107,7 +107,7 @@ export const login = ({ email, password }) => async (dispatch) => {
 
 //----------------LOGOUT---------------
 export const logout = () => (dispatch) => {
-  //clear the profile and post first and then logout
+  //clear the profile and post first, reset theme and then logout
   dispatch({
     type: actionTypes.CLEAR_PROFILE,
   });
@@ -116,6 +116,9 @@ export const logout = () => (dispatch) => {
   });
   dispatch({
     type: actionTypes.CLEAR_POSTS,
+  });
+  dispatch({
+    type: actionTypes.RESET_THEME,
   });
   dispatch({
     type: actionTypes.LOGOUT,
@@ -164,5 +167,33 @@ export const removeUserAvatar = () => async (dispatch) => {
     });
   } catch (err) {
     console.log(err);
+  }
+};
+
+//---------------get current theme-------------
+export const getCurrentTheme = () => async (dispatch) => {
+  try {
+    const response = await axios.get("/users/get/theme");
+
+    dispatch({
+      type: actionTypes.GET_THEME,
+      payload: response.data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//-------------------Switch theme--------------
+export const switchTheme = () => async (dispatch) => {
+  try {
+    const response = await axios.patch("/users/switch/theme");
+
+    dispatch({
+      type: actionTypes.SWITCH_THEME,
+      payload: response.data,
+    });
+  } catch (error) {
+    console.log(error);
   }
 };

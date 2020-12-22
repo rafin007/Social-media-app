@@ -31,13 +31,13 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     height: "3vh",
-    backgroundColor: "#000",
   },
   drawer: {
     [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
       flexShrink: 0,
     },
+    backgroundColor: "red",
   },
   appBar: {
     [theme.breakpoints.up("sm")]: {
@@ -67,6 +67,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "space-between",
     height: "100%",
     alignItems: "center",
+    backgroundColor: theme.palette.type === "dark" && "#424242",
   },
   menus: {
     display: "none",
@@ -80,6 +81,13 @@ const useStyles = makeStyles((theme) => ({
   menu: {
     alignSelf: "stretch",
     height: "4rem",
+  },
+  sidebar: {
+    backgroundColor: theme.palette.type === "dark" && "#424242",
+    height: "100%",
+  },
+  headerWrapper: {
+    backgroundColor: theme.palette.type === "dark" && "#424242",
   },
   // title: {
   //     marginLeft: 'auto',
@@ -110,7 +118,7 @@ const ResponsiveDrawer = (props) => {
   const loading = useSelector((state) => state.auth.loading);
 
   const drawer = (
-    <div>
+    <div className={classes.sidebar}>
       <div className={classes.toolbar} />
       {loading ? (
         <Spinner />
@@ -221,9 +229,10 @@ const ResponsiveDrawer = (props) => {
     <div className={classes.root} id="topHeader">
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
+        <Toolbar className={classes.headerWrapper}>
           <IconButton
             color="inherit"
+            // color={theme.palette.type === "dark" && "primary"}
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
@@ -232,7 +241,11 @@ const ResponsiveDrawer = (props) => {
             <MenuIcon />
           </IconButton>
           <div className={classes.header}>
-            <Typography variant="h6" className={classes.title}>
+            <Typography
+              variant="h6"
+              className={classes.title}
+              // color={theme.palette.type === "dark" && "primary"}
+            >
               Social media
             </Typography>
             <MenuList className={classes.menus}>

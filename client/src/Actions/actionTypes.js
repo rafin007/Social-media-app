@@ -91,3 +91,8 @@ export const EDIT_COMMENT = "EDIT_COMMENT";
 //avatar
 export const REMOVE_AVATAR = "REMOVE_AVATAR";
 export const SET_AVATAR = "SET_AVATAR";
+
+//theme
+export const SWITCH_THEME = "SWITCH_THEME";
+export const GET_THEME = "GET_THEME";
+export const RESET_THEME = "RESET_THEME";

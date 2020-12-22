@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
   link3: {
     textDecoration: "none",
-    color: "#000",
+    color: theme.palette.type === "dark" ? "#fff" : "#000",
   },
   input: {
     display: "none",

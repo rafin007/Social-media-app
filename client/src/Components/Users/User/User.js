@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   link: {
     display: "flex",
     textDecoration: "none",
-    color: "#000",
+    color: theme.palette.type === "dark" ? "#fff" : "#000",
   },
 }));
 

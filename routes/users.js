@@ -914,4 +914,48 @@ router.get("/:user_id/avatar", auth, async (req, res) => {
   }
 });
 
+/*  @route PATCH /users/switch/theme
+    @desc Switch users' theme
+    @access Private
+*/
+router.patch("/switch/theme", auth, async (req, res) => {
+  try {
+    //get the theme
+    let theme = await req.user.theme;
+
+    //change the theme
+    if (!theme || theme === "light") {
+      theme = "dark";
+    } else {
+      theme = "light";
+    }
+
+    //save the theme
+    req.user.theme = theme;
+    await req.user.save();
+
+    res.send({ theme });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
+});
+
+/*  @route GET /users/get/theme
+    @desc Get users' theme
+    @access Private
+*/
+router.get("/get/theme", auth, (req, res) => {
+  try {
+    if (!req.user) {
+      return res.send({ theme: "light" });
+    }
+
+    return res.send({ theme: req.user.theme });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;

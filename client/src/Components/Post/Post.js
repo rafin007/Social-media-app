@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import clsx from "clsx";
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -182,6 +182,9 @@ const Post = ({ post, ...props }) => {
     };
   }, [dispatch]);
 
+  //theme
+  const theme = useTheme();
+
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -214,7 +217,10 @@ const Post = ({ post, ...props }) => {
           user._id !== post.user._id ? (
             <Link
               to={`/profile/${profile && profile._id}`}
-              style={{ textDecoration: "none", color: "#000" }}
+              style={{
+                textDecoration: "none",
+                color: theme.palette.type === "dark" ? "#fff" : "#000",
+              }}
             >
               {post.user.name}
             </Link>
