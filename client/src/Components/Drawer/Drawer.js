@@ -10,7 +10,12 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link, useLocation } from "react-router-dom";
-import { MenuList, MenuItem, ListItemIcon } from "@material-ui/core";
+import {
+  MenuList,
+  MenuItem,
+  ListItemIcon,
+  useMediaQuery,
+} from "@material-ui/core";
 import {
   HomeOutlined,
   AccountCircleOutlined,
@@ -117,6 +122,9 @@ const ResponsiveDrawer = (props) => {
   //loading state
   const loading = useSelector((state) => state.auth.loading);
 
+  //when query is true open drawer
+  const query = useMediaQuery("(max-width:600px)");
+
   const drawer = (
     <div className={classes.sidebar}>
       <div className={classes.toolbar} />
@@ -158,7 +166,7 @@ const ResponsiveDrawer = (props) => {
           component={Link}
           to="/followers"
           selected={"/followers" === pathname}
-          onClick={handleDrawerToggle}
+          onClick={query && handleDrawerToggle}
         >
           <ListItemIcon>
             <GroupOutlined />
@@ -170,7 +178,7 @@ const ResponsiveDrawer = (props) => {
           component={Link}
           to="/following"
           selected={"/following" === pathname}
-          onClick={handleDrawerToggle}
+          onClick={query && handleDrawerToggle}
         >
           <ListItemIcon>
             <SupervisorAccountOutlined />
@@ -182,7 +190,7 @@ const ResponsiveDrawer = (props) => {
           component={Link}
           to="/requests"
           selected={"/requests" === pathname}
-          onClick={handleDrawerToggle}
+          onClick={query && handleDrawerToggle}
         >
           <ListItemIcon>
             <GroupAddOutlined />
@@ -194,7 +202,7 @@ const ResponsiveDrawer = (props) => {
           component={Link}
           to="/settings"
           selected={"/settings" === pathname}
-          onClick={handleDrawerToggle}
+          onClick={query && handleDrawerToggle}
         >
           <ListItemIcon>
             <SettingsOutlined />
@@ -206,7 +214,7 @@ const ResponsiveDrawer = (props) => {
           component={Link}
           to="/logout"
           selected={"/logout" === pathname}
-          onClick={handleDrawerToggle}
+          onClick={query && handleDrawerToggle}
         >
           <ListItemIcon>
             <ExitToAppOutlined />
