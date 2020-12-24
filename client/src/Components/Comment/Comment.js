@@ -29,6 +29,10 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     // paddingRight: 0
   },
+  link: {
+    color: theme.palette.type === "dark" ? "#fff" : "#000",
+    textDecoration: "none",
+  },
 }));
 
 const Comment = ({ comment, postId }) => {
@@ -114,7 +118,8 @@ const Comment = ({ comment, postId }) => {
             loggedUser._id !== user.id ? (
               <Link
                 to={`/profile/${profile && profile._id}`}
-                style={{ textDecoration: "none", color: "#000" }}
+                // style={{ textDecoration: "none", color: "#000" }}
+                className={classes.link}
               >
                 {user && user.name}
               </Link>

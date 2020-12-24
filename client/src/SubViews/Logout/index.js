@@ -10,6 +10,8 @@ const Logout = () => {
     dispatch(logout());
   }, [dispatch]);
 
+  window.location.reload();
+
   return <Redirect to="/" />;
 };
 

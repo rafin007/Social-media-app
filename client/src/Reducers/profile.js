@@ -53,6 +53,9 @@ const profileReducer = (state = initialState, action) => {
         errors: [],
       };
 
+    case actionTypes.LOGOUT:
+      return initialState;
+
     case actionTypes.GET_PROFILES:
     case actionTypes.GET_FOLLOWERS:
     case actionTypes.GET_FOLLOWINGS:

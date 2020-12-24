@@ -1,5 +1,11 @@
 import React from "react";
-import { Grid, makeStyles, List, IconButton } from "@material-ui/core";
+import {
+  Grid,
+  makeStyles,
+  List,
+  IconButton,
+  Typography,
+} from "@material-ui/core";
 import { useEffect } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import Spinner from "../../Components/Spinner/Spinner";
@@ -55,7 +61,12 @@ const Following = () => {
 
   return (
     <Grid container className={classes.root}>
-      <Grid item xs={12}>
+      <Typography variant="h5" color="primary">
+        {!user_id
+          ? "Your followings"
+          : `${state && state.profile.user.name}'s followings`}
+      </Typography>
+      {/* <Grid item xs={12}>
         <Link
           to={`/profile/${state ? state.profile._id : ""}`}
           className={classes.link}
@@ -65,7 +76,7 @@ const Following = () => {
             {state ? state.profile.user.name : "back"}
           </IconButton>
         </Link>
-      </Grid>
+      </Grid> */}
       <Grid item xs={12}>
         <List>
           {loading ? (

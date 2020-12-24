@@ -1,6 +1,6 @@
 import * as actionTypes from "../Actions/actionTypes";
 
-const initalState = {
+const initialState = {
   posts: [],
   post: null,
   errors: [],
@@ -8,7 +8,7 @@ const initalState = {
   likeLoading: false,
 };
 
-const postReducer = (state = initalState, action) => {
+const postReducer = (state = initialState, action) => {
   const { type, payload } = action;
 
   switch (type) {
@@ -45,6 +45,9 @@ const postReducer = (state = initalState, action) => {
         ...state,
         posts: [],
       };
+
+    case actionTypes.LOGOUT:
+      return initialState;
 
     case actionTypes.GET_USER_POSTS:
     case actionTypes.GET_FEED:

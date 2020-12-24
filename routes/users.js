@@ -99,7 +99,7 @@ router.post(
       jwt.sign(
         payload,
         config.get("jwtSecret"),
-        { expiresIn: 3600 },
+        // { expiresIn: 3600 },
         (error, token) => {
           if (error) throw error;
           res.send({ token });
@@ -847,8 +847,8 @@ router.post(
       const buffer = await sharp(req.file.buffer)
         .rotate()
         .resize({
-          width: 300,
-          height: 300,
+          width: 200,
+          height: 200,
           fit: "contain",
           background: { r: 255, g: 255, b: 255 },
         })
@@ -921,7 +921,7 @@ router.get("/:user_id/avatar", auth, async (req, res) => {
 router.patch("/switch/theme", auth, async (req, res) => {
   try {
     //get the theme
-    let theme = await req.user.theme;
+    let theme = req.user.theme;
 
     //change the theme
     if (!theme || theme === "light") {

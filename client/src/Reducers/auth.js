@@ -1,6 +1,6 @@
 import * as actionTypes from "../Actions/actionTypes";
 
-const initalState = {
+const initialState = {
   token: localStorage.getItem("token"),
   isAuthenticated: null,
   user: null,
@@ -9,7 +9,7 @@ const initalState = {
   theme: "light",
 };
 
-const authReducer = (state = initalState, action) => {
+const authReducer = (state = initialState, action) => {
   const { type, payload } = action;
 
   switch (type) {
@@ -35,7 +35,6 @@ const authReducer = (state = initalState, action) => {
     case actionTypes.REGISTER_FAIL:
     case actionTypes.AUTH_ERROR:
     case actionTypes.LOGIN_FAIL:
-    case actionTypes.LOGOUT:
       localStorage.removeItem("token");
       return {
         ...state,
@@ -45,6 +44,10 @@ const authReducer = (state = initalState, action) => {
         errors: payload,
         user: null,
       };
+
+    case actionTypes.LOGOUT:
+      localStorage.removeItem("token");
+      return initialState;
 
     case actionTypes.LOADING:
     case actionTypes.FOLLOW_LOADING:

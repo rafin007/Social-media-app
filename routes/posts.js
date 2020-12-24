@@ -56,8 +56,8 @@ router.post(
       buffer = await sharp(req.file.buffer)
         .rotate()
         .resize({
-          width: 600,
-          height: 600,
+          width: 500,
+          height: 500,
           fit: "contain",
           background: { r: 255, g: 255, b: 255 },
         })
@@ -235,8 +235,8 @@ router.patch(
         let buffer = await sharp(req.file.buffer)
           .rotate()
           .resize({
-            width: 600,
-            height: 600,
+            width: 500,
+            height: 500,
             fit: "contain",
             background: { r: 255, g: 255, b: 255 },
           })

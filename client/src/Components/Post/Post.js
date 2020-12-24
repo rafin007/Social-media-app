@@ -84,6 +84,10 @@ const Post = ({ post, ...props }) => {
   //profile of the post owner
   const [profile, setProfile] = useState(null);
 
+  useEffect(() => {
+    console.log("Post component rendered");
+  });
+
   //get profile of the post owner
   useEffect(() => {
     if (post.user._id) {
@@ -324,4 +328,4 @@ const Post = ({ post, ...props }) => {
   );
 };
 
-export default Post;
+export default React.memo(Post);
