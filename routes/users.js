@@ -376,6 +376,23 @@ router.get("/isPrivate/:user_id", auth, async (req, res) => {
   }
 });
 
+/*  @route GET /users/get/privacy
+    @desc Get users' privacy
+    @access Private
+*/
+router.get("/get/privacy", auth, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.send({ privacy: false });
+    }
+
+    return res.send({ privacy: req.user.isPrivate });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
+});
+
 /*  @route PUT /users/isPrivate
     @desc change user's privacy
     @access Private
@@ -594,6 +611,51 @@ router.put("/unfollow/:user_id", auth, async (req, res) => {
   }
 });
 
+/*  @route PUT /users/cancelRequest/:user_id
+    @desc Cancel requested follow by user_id
+    @access Private
+*/
+router.put("/cancelRequest/:user_id", auth, async (req, res) => {
+  try {
+    //get the user
+    const user = await User.findById(req.params.user_id);
+
+    //throw error if no user is found
+    if (!user) {
+      return res.status(404).send({ errors: [{ msg: "No user found" }] });
+    }
+
+    //check if the user's account is indeed private
+    if (!user.isPrivate) {
+      return res
+        .status(400)
+        .send({ errors: [{ msg: "This user's account is not private" }] });
+    }
+
+    //get the index of logged in user from user's followRequests
+    const index = user.followRequests.findIndex(
+      (followReq) => followReq.user.toString() === req.user.id
+    );
+
+    //check if the logged in user is in the user's followRequests
+    if (index === -1) {
+      return res.status(404).send({
+        errors: [{ msg: "You have not requested to follow this user" }],
+      });
+    }
+
+    //remove the index
+    user.followRequests.splice(index, 1);
+
+    await user.save();
+
+    res.send("Done");
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500).send("Server error");
+  }
+});
+
 /*  @route PUT /users/acceptFollow/:user_id
     @desc Accept follow requests by user_id
     @access Private
@@ -655,7 +717,7 @@ router.put("/acceptFollow/:user_id", auth, async (req, res) => {
     @desc Reject follow requests by user_id
     @access Private
 */
-router.put("/rejectFollowRequest/:user_id", auth, async (req, res) => {
+router.put("/rejectFollow/:user_id", auth, async (req, res) => {
   try {
     //get the logged in user
     const reqUser = await User.findById(req.user.id);
@@ -667,9 +729,9 @@ router.put("/rejectFollowRequest/:user_id", auth, async (req, res) => {
 
     //check if the other user is in logged in user's followRequests
     if (index === -1) {
-      return res.status(404).send({
-        errors: [{ msg: "This person did not request to follow you" }],
-      });
+      return res
+        .status(404)
+        .send({ msg: "This person did not request to follow you" });
     }
 
     //remove that index from array
@@ -696,7 +758,8 @@ router.get("/followers", auth, async (req, res) => {
     for (let follower of req.user.followers) {
       let profile = await Profile.findOne({
         user: follower.user,
-      }).populate("user", ["avatar", "name", "gender"]);
+      }).populate("user", ["avatar", "name", "gender", "isPrivate"]);
+      // }).populate("user", ["name", "gender"]);
       profiles.push(profile);
     }
 
@@ -718,7 +781,8 @@ router.get("/following", auth, async (req, res) => {
     for (let follow of req.user.following) {
       let profile = await Profile.findOne({
         user: follow.user,
-      }).populate("user", ["avatar", "name", "gender"]);
+      }).populate("user", ["avatar", "name", "gender", "isPrivate"]);
+      // }).populate("user", ["name", "gender"]);
       profiles.push(profile);
     }
 
@@ -779,10 +843,26 @@ router.get("/following/:user_id", [auth, isFollowing], async (req, res) => {
     @access Private
 */
 router.get("/followRequests", auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
+  // try {
+  //   const user = await User.findById(req.user.id);
 
-    res.send(user.followRequests);
+  //   res.send(user.followRequests);
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).send("Server error");
+  // }
+  try {
+    const profiles = [];
+
+    for (let followReq of req.user.followRequests) {
+      let profile = await Profile.findOne({
+        user: followReq.user,
+      }).populate("user", ["avatar", "name", "gender"]);
+      // }).populate("user", ["name", "gender"]);
+      profiles.push(profile);
+    }
+
+    res.send(profiles);
   } catch (error) {
     console.error(error);
     res.status(500).send("Server error");

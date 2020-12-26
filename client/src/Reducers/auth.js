@@ -5,8 +5,11 @@ const initialState = {
   isAuthenticated: null,
   user: null,
   loading: false,
+  followLoading: false,
   errors: [],
+  error: null,
   theme: "light",
+  privacy: false,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -20,6 +23,7 @@ const authReducer = (state = initialState, action) => {
         loading: false,
         isAuthenticated: true,
         theme: payload.theme,
+        privacy: payload.isPrivate,
       };
 
     case actionTypes.REGISTER_SUCCESS:
@@ -64,10 +68,17 @@ const authReducer = (state = initialState, action) => {
         user: payload,
       };
 
+    case actionTypes.CANCEL_FOLLOW_REQUEST:
+      return {
+        ...state,
+        loading: false,
+      };
+
     case actionTypes.GET_PROFILES:
     case actionTypes.GET_PROFILE:
     case actionTypes.GET_FOLLOWERS:
     case actionTypes.GET_FOLLOWINGS:
+    case actionTypes.GET_FOLLOW_REQUESTS:
     case actionTypes.ADD_BIO:
       // case actionTypes.POST_EDUCATIONAL:
       // case actionTypes.POST_EXPERIENCE:
@@ -107,6 +118,40 @@ const authReducer = (state = initialState, action) => {
         ...state,
         theme: "light",
       };
+
+    case actionTypes.FOLLOW_REQ_LOADING:
+      return {
+        ...state,
+        followLoading: true,
+      };
+
+    case actionTypes.ACCEPT_FOLLOW_REQUEST:
+    case actionTypes.REJECT_FOLLOW_REQUEST:
+      return {
+        ...state,
+        followLoading: false,
+        user: payload,
+      };
+
+    case actionTypes.FOLLOW_ERROR:
+      return {
+        ...state,
+        followLoading: false,
+        error: payload,
+      };
+
+    case actionTypes.SWITCH_PRIVACY:
+      return {
+        ...state,
+        user: payload,
+        privacy: payload.isPrivate,
+      };
+
+    // case actionTypes.GET_PRIVACY:
+    //   return {
+    //     ...state,
+    //     privacy: payload.privacy,
+    //   };
 
     default:
       return state;

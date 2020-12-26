@@ -10,9 +10,14 @@ import {
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { followUserById, unfollowUserById } from "../../../Actions/follow";
+import {
+  cancelFollowRequest,
+  followUserById,
+  unfollowUserById,
+} from "../../../Actions/follow";
 import Avatar from "../../Avatar/Avatar";
 import axios from "axios";
+import ConfirmDialog from "../../ConfirmDialog/ConfirmDialog";
 
 const useStyles = makeStyles((theme) => ({
   link: {
@@ -64,15 +69,46 @@ const User = ({ profile }) => {
     return () => (mounted = false);
   }, [loading, profile]);
 
+  //confirm modal logic
+  const [open, setOpen] = useState(false);
+
+  const openModal = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const handleFollow = async () => {
     if (followStatus === "follow") {
       dispatch(followUserById(profile.user._id));
     } else if (followStatus === "unfollow") {
-      dispatch(unfollowUserById(profile.user._id));
+      //check if the user's account is private
+      if (profile.user.isPrivate) {
+        openModal(true);
+      } else {
+        dispatch(unfollowUserById(profile.user._id));
+      }
+    } else if (followStatus === "requested") {
+      dispatch(cancelFollowRequest(profile.user._id));
     }
 
     // setValue(value++);
   };
+
+  //button text value
+  const [buttonText, setButtonText] = useState("loading");
+
+  useEffect(() => {
+    if (followStatus === "follow") {
+      setButtonText("follow");
+    } else if (followStatus === "unfollow") {
+      setButtonText("unfollow");
+    } else if (followStatus === "requested") {
+      setButtonText("requested");
+    }
+  }, [followStatus]);
 
   return (
     <ListItem>
@@ -98,10 +134,16 @@ const User = ({ profile }) => {
             disabled={loading}
             onClick={handleFollow}
           >
-            {followStatus === "follow" ? "follow" : "unfollow"}
+            {buttonText}
           </Button>
         )}
       </ListItemSecondaryAction>
+      <ConfirmDialog
+        open={open}
+        handleClose={handleClose}
+        user={profile.user}
+        criteria="unfollow"
+      />
     </ListItem>
   );
 };

@@ -59,6 +59,7 @@ const profileReducer = (state = initialState, action) => {
     case actionTypes.GET_PROFILES:
     case actionTypes.GET_FOLLOWERS:
     case actionTypes.GET_FOLLOWINGS:
+    case actionTypes.GET_FOLLOW_REQUESTS:
       return {
         ...state,
         loading: false,

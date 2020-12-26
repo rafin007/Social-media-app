@@ -16,10 +16,14 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     height: "7vh",
     backgroundColor: theme.palette.type === "dark" ? "#424242" : "#ededed",
-    borderTop: "1px solid #ccc",
+    // borderTop: "1px solid #ccc",
     [theme.breakpoints.up("sm")]: {
       display: "none",
     },
+    boxShadow:
+      theme.palette.type === "dark"
+        ? "0px -0.1px 10px #000"
+        : "0px -0.1px 10px #ccc",
   },
 }));
 

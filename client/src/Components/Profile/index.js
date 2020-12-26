@@ -17,8 +17,13 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import { useEffect } from "react";
 import { getProfileById } from "../../Actions/profile";
 import { ArrowBackIos } from "@material-ui/icons";
-import { followUserById, unfollowUserById } from "../../Actions/follow";
+import {
+  cancelFollowRequest,
+  followUserById,
+  unfollowUserById,
+} from "../../Actions/follow";
 import axios from "axios";
+import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
 
 const useStyles = makeStyles((theme) => ({
   follows: {
@@ -132,17 +137,58 @@ const Profile = () => {
       setValue(0);
     } else if (followStatus === "unfollow") {
       setIsFollowing(true);
+    } else if (followStatus === "requested") {
+      setIsFollowing(false);
     }
   }, [followStatus]);
 
   //follow action
+  // const handleFollow = async () => {
+  //   if (followStatus === "follow") {
+  // dispatch(followUserById(profile.user._id, id));
+  //   } else if (followStatus === "unfollow") {
+  //     dispatch(unfollowUserById(profile.user._id, id));
+  //   }
+  // };
+
+  //modal logic
+  const [open, setOpen] = useState(false);
+
+  const openModal = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const handleFollow = async () => {
     if (followStatus === "follow") {
       dispatch(followUserById(profile.user._id, id));
     } else if (followStatus === "unfollow") {
-      dispatch(unfollowUserById(profile.user._id, id));
+      //check if the user's account is private
+      if (profile.user.isPrivate) {
+        openModal(true);
+      } else {
+        dispatch(unfollowUserById(profile.user._id, id));
+      }
+    } else if (followStatus === "requested") {
+      dispatch(cancelFollowRequest(profile.user._id));
     }
   };
+
+  //follow button text
+  const [buttonText, setButtonText] = useState("loading");
+
+  useEffect(() => {
+    if (followStatus === "follow") {
+      setButtonText("follow");
+    } else if (followStatus === "unfollow") {
+      setButtonText("unfollow");
+    } else if (followStatus === "requested") {
+      setButtonText("requested");
+    }
+  }, [followStatus]);
 
   const history = useHistory();
 
@@ -259,7 +305,8 @@ const Profile = () => {
               disabled={followLoading}
               onClick={handleFollow}
             >
-              {followStatus === "follow" ? "follow" : "unfollow"}
+              {/* {followStatus === "follow" ? "follow" : "unfollow"} */}
+              {buttonText}
             </Button>
           )}
         </Grid>
@@ -281,6 +328,13 @@ const Profile = () => {
               </Typography>
             )}
         </Grid>
+        <ConfirmDialog
+          open={open}
+          handleClose={handleClose}
+          user={profile && profile.user}
+          id={id}
+          criteria="unfollow"
+        />
       </Grid>
     );
   }

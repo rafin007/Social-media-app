@@ -197,3 +197,31 @@ export const switchTheme = () => async (dispatch) => {
     console.log(error);
   }
 };
+
+// //---------------get user privacy-------------
+// export const getUserPrivacy = () => async (dispatch) => {
+//   try {
+//     const response = await axios.get("/users/get/privacy");
+
+//     dispatch({
+//       type: actionTypes.GET_THEME,
+//       payload: response.data,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+//------------------Switch privacy--------------------
+export const switchPrivacy = () => async (dispatch) => {
+  try {
+    const response = await axios.put("/users/isPrivate");
+
+    dispatch({
+      type: actionTypes.SWITCH_PRIVACY,
+      payload: response.data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

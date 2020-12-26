@@ -244,6 +244,7 @@ router.get("/", auth, async (req, res) => {
       "gender",
       "followers",
       "followRequests",
+      "isPrivate",
     ]);
 
     res.send(profiles);
@@ -294,7 +295,15 @@ router.get("/:user_id", auth, async (req, res) => {
   try {
     const profile = await Profile.findById(req.params.user_id).populate(
       "user",
-      ["name", "avatar", "gender", "followers", "following", "followRequests"]
+      [
+        "name",
+        "avatar",
+        "gender",
+        "followers",
+        "following",
+        "followRequests",
+        "isPrivate",
+      ]
     );
 
     if (!profile) {

@@ -8,9 +8,10 @@ import {
   Switch,
   Typography,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { switchTheme } from "../../Actions/auth";
+import { getUserPrivacy, switchPrivacy, switchTheme } from "../../Actions/auth";
+import ConfirmDialog from "../../Components/ConfirmDialog/ConfirmDialog";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,21 +35,49 @@ const Settings = () => {
   const dispatch = useDispatch();
 
   //theme switching
-  const [checked, setChecked] = useState(theme === "dark" ? true : false);
+  const [userTheme, setUserTheme] = useState(theme === "dark" ? true : false);
+
+  const privacy = useSelector((state) => state.auth.privacy);
 
   //private account
-  const [isPrivate, setIsprivate] = useState(false);
+  const [isPrivate, setIsprivate] = useState(privacy);
 
-  const handleChange = (event) => {
+  const handleThemeChange = (event) => {
     if (event.target.checked) {
       // dark
-      setChecked(true);
+      setUserTheme(true);
     } else {
       // light
-      setChecked(false);
+      setUserTheme(false);
     }
 
     dispatch(switchTheme());
+  };
+
+  //confirm modal logic
+  const [open, setOpen] = useState(false);
+
+  const canceledPrivacyChange = () => {
+    setIsprivate((state) => !state);
+
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handlePrivacyChange = (event) => {
+    //open modal
+
+    if (event.target.checked) {
+      setIsprivate(true);
+    } else {
+      setIsprivate(false);
+    }
+    setOpen(true);
+
+    // dispatch(switchPrivacy());
   };
 
   return (
@@ -61,8 +90,8 @@ const Settings = () => {
           <ListItemText primary="Dark mode" />
           <ListItemSecondaryAction>
             <Switch
-              checked={checked}
-              onChange={handleChange}
+              checked={userTheme}
+              onChange={handleThemeChange}
               name="themeSwitcher"
               color="primary"
               inputProps={{ "aria-label": "Theme Switcher" }}
@@ -74,10 +103,19 @@ const Settings = () => {
           <ListItemSecondaryAction>
             <Switch
               checked={isPrivate}
-              onChange={() => setIsprivate((state) => !state)}
-              name="themeSwitcher"
+              onChange={handlePrivacyChange}
+              name="privacySwitcher"
               color="primary"
-              inputProps={{ "aria-label": "Theme Switcher" }}
+              inputProps={{ "aria-label": "Privacy Switcher" }}
+            />
+            <ConfirmDialog
+              open={open}
+              handleClose={handleClose}
+              // setIsprivate={setIsprivate}
+              // isPrivate={isPrivate}
+              criteria="change privacy"
+              canceledPrivacyChange={canceledPrivacyChange}
+              // handlePrivacyChange={handlePrivacyChange}
             />
           </ListItemSecondaryAction>
         </ListItem>
