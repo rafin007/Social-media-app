@@ -14,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Main = () => {
   const history = useHistory();
-
   //main contains components after the user has logged in
 
   const classes = useStyles();

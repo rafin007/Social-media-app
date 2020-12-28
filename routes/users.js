@@ -4,14 +4,13 @@ const config = require("config");
 const multer = require("multer");
 const { check, validationResult } = require("express-validator");
 const sharp = require("sharp");
-const cryptoRandomString = require("crypto-random-string");
 const bcryptjs = require("bcryptjs");
 
 const User = require("../models/User");
 const Profile = require("../models/Profile");
 const auth = require("../middlewares/auth");
 // const isVerified = require('../middlewares/isVerified');
-const { verifyEmail } = require("../email/account");
+const { forgetPassword } = require("../email/account");
 // const mongoose = require('mongoose');
 const isFollowing = require("../middlewares/isFollowing");
 
@@ -163,11 +162,11 @@ router.post(
 
 // });
 
-/*  @route POST /users/changePassword
+/*  @route PATCH /users/changePassword
     @desc Change users' password
     @access Private
 */
-router.post(
+router.patch(
   "/changePassword",
   [
     auth,
@@ -195,6 +194,7 @@ router.post(
 
       //throw error if old password doesn't match with user's current password
       const isMatch = await bcryptjs.compare(oldPassword, user.password);
+
       if (!isMatch) {
         return res.status(401).send({ msg: "Your old password did not match" });
       }
@@ -202,6 +202,13 @@ router.post(
       //throw error if new password and confirm password don't match
       if (newPassword !== confirmPassword) {
         return res.status(400).send({ msg: "Your new passwords do not match" });
+      }
+
+      //check if the previous password is the new password
+      if (oldPassword === newPassword) {
+        return res
+          .status(400)
+          .send({ msg: "New password cannot be the same as old password" });
       }
 
       //save the new password
@@ -218,12 +225,90 @@ router.post(
   }
 );
 
+/*  @route PATCH /users/changeName
+    @desc Change users' password
+    @access Private
+*/
+router.patch(
+  "/changeName",
+  [auth, [check("name", "Name cannot be empty").not().isEmpty()]],
+  async (req, res) => {
+    const errors = validationResult(req);
+
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ msg: errors.array() });
+    }
+
+    try {
+      const user = await User.findById(req.user.id);
+
+      //extract the fields
+      const { name } = req.body;
+
+      //save the new password
+      user.name = name;
+
+      //save the user
+      await user.save();
+
+      res.send({ msg: "Your name has been changed", user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
+    }
+  }
+);
+
+/*  @route PATCH /users/changeEmail
+    @desc Change users' password
+    @access Private
+*/
+router.patch(
+  "/changeEmail",
+  [auth, [check("email", "Must be a valid email").isEmail()]],
+  async (req, res) => {
+    const errors = validationResult(req);
+
+    //if errors, throw them
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ msg: errors.array() });
+    }
+
+    try {
+      const user = await User.findById(req.user.id);
+
+      //extract the fields
+      const { email } = req.body;
+
+      const existingUser = await User.findOne({ email });
+
+      if (existingUser) {
+        return res
+          .status(400)
+          .send({ msg: "A user already exists with that email" });
+      }
+
+      //save the new password
+      user.email = email;
+
+      //save the user
+      await user.save();
+
+      res.send({ msg: "Your email has been changed", user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
+    }
+  }
+);
+
 /*  @route POST /users/recoverPassword
     @desc send email to recover password
     @access Public
 */
 router.post(
-  "/recoverPassword",
+  "/recover/password/email",
   [check("email", "Email is not valid").isEmail()],
   async (req, res) => {
     const errors = validationResult(req);
@@ -240,28 +325,31 @@ router.post(
 
       //if no user throw error
       if (!user) {
-        return res
-          .status(404)
-          .send({ msg: "Sorry no user found with provided email" });
+        return res.status(404).send({
+          errors: [{ msg: "Sorry no user found with provided email" }],
+        });
       }
 
-      //save the new random string to user
-      const randomString = cryptoRandomString({
-        length: 6,
-        type: "base64",
-      }).toUpperCase();
+      //declare payload
+      const payload = {
+        user: {
+          id: user.id,
+        },
+      };
 
-      //send email
-      verifyEmail(user.email, user.name, randomString);
-
-      //save the string to user model
-      user.randomString = randomString;
-
-      await user.save();
+      //if password matches, assign them a token
+      jwt.sign(
+        payload,
+        config.get("jwtSecret"),
+        { expiresIn: 3600 },
+        (error, token) => {
+          if (error) throw error;
+          forgetPassword(user.email, user.name, token);
+        }
+      );
 
       res.send({
-        msg: "Your verification code has been sent to your email!",
-        email,
+        msg: "Please check your email to reset your password",
       });
     } catch (error) {
       console.error(error);
@@ -270,69 +358,100 @@ router.post(
   }
 );
 
+/*  @route GET /users/confirmation/:token
+    @desc check token from email
+    @access Public
+*/
+router.get("/confirmation/:token", async (req, res) => {
+  try {
+    const token = req.params.token;
+
+    const decoded = jwt.verify(token, config.get("jwtSecret"));
+    const user = await User.findById(decoded.user.id).select("-password");
+
+    if (!user) {
+      return res.status(400).send({ msg: "Link expired" });
+    }
+
+    return res.redirect(`http://localhost:3000/recoverPassword/${token}`);
+  } catch (error) {
+    console.log("Server error");
+    res.status(500).send("Server error");
+  }
+});
+
 //@TODO => redirect user to change their password
 /*  @route POST /users/recoverPassword/:email
     @desc check verification code to recover password
     @access Public
 */
-router.post(
-  "/recoverPassword/:email",
-  [check("string", "Verification code cannot be empty").not().isEmpty()],
-  async (req, res) => {
-    const errors = validationResult(req);
+// router.post(
+//   "/recoverPassword/:email",
+//   [check("string", "Verification code cannot be empty").not().isEmpty()],
+//   async (req, res) => {
+//     const errors = validationResult(req);
 
-    //if errors, throw them
-    if (!errors.isEmpty()) {
-      return res.status(400).send({ errors: errors.array() });
-    }
+//     //if errors, throw them
+//     if (!errors.isEmpty()) {
+//       return res.status(400).send({ errors: errors.array() });
+//     }
 
-    const user = await User.findOne({ email: req.params.email });
+//     const user = await User.findOne({ email: req.params.email });
 
-    //check users' string with verification string
-    if (user.randomString !== req.body.string) {
-      return res
-        .status(401)
-        .send({ msg: "Sorry verification code did not match!" });
-    }
+//     //check users' string with verification string
+//     if (user.randomString !== req.body.string) {
+//       return res
+//         .status(401)
+//         .send({ msg: "Sorry verification code did not match!" });
+//     }
 
-    res.send({ msg: "Matched. yay!!!" });
-  }
-);
+//     res.send({ msg: "Matched. yay!!!" });
+//   }
+// );
 
-/*  @route POST /users/changePassword/:email
+/*  @route POST /users/forget/changePassword/
     @desc Change users' password
     @access Private
 */
 router.post(
-  "/changePassword/:email",
+  "/forget/changePassword",
   [
     check("newPassword", "Password must be at least 6 characters").isLength({
       min: 6,
     }),
-    check("confirmPassword", "Field cannot be empty").not().isEmpty(),
+    check("confirmNewPassword", "Field cannot be empty").not().isEmpty(),
+    check("token", "invalid token").not().isEmpty(),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
+    const error = validationResult(req);
 
     //if errors, throw them
-    if (!errors.isEmpty()) {
-      return res.status(400).send({ msg: errors.array() });
+    if (!error.isEmpty()) {
+      return res.status(400).send({ errors: error.array() });
     }
 
+    const { newPassword, confirmNewPassword, token } = req.body;
+
     try {
+      //if token exists, verify the token
+      const decoded = jwt.verify(token, config.get("jwtSecret"));
+
       //find user by email
-      const user = await User.findOne({ email: req.params.email });
+      const user = await User.findById(decoded.user.id).select("-password");
 
       if (!user) {
-        return res.status(404).send({ msg: "No user found!" });
+        return res
+          .status(401)
+          .send({ errors: [{ msg: "Please authenticate" }] });
       }
 
       //extract the fields
-      const { newPassword, confirmPassword } = req.body;
 
       //throw error if new password and confirm password don't match
-      if (newPassword !== confirmPassword) {
-        return res.status(400).send({ msg: "Your new passwords do not match" });
+      if (newPassword !== confirmNewPassword) {
+        return res
+          .status(400)
+          .send({ errors: [{ msg: "Your passwords do not match" }] });
       }
 
       //save the new password
@@ -341,10 +460,12 @@ router.post(
       //save the user
       await user.save();
 
-      res.send({ msg: "Your password has been changed" });
+      res.send({ msg: "Your password has been changed successfully" });
     } catch (error) {
       console.error(error);
-      res.status(500).send("Server error");
+      res.status(401).send({
+        errors: [{ msg: "Link expired" }],
+      });
     }
   }
 );

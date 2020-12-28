@@ -225,3 +225,112 @@ export const switchPrivacy = () => async (dispatch) => {
     console.log(error);
   }
 };
+
+//--------------------Change password----------------------
+export const changePassword = ({
+  oldPassword,
+  newPassword,
+  confirmNewPassword,
+}) => async (dispatch) => {
+  config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const body = JSON.stringify({
+    oldPassword,
+    newPassword,
+    confirmPassword: confirmNewPassword,
+  });
+
+  try {
+    //loading first
+    dispatch({
+      type: actionTypes.LOADING,
+    });
+
+    const response = await axios.patch("/users/changePassword", body, config);
+
+    dispatch({
+      type: actionTypes.CHANGE_PASSWORD,
+      payload: response.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: actionTypes.CHANGE_PASSWORD_ERROR,
+      payload: error?.response?.data?.msg,
+    });
+  }
+};
+
+//--------------------Change name----------------------
+export const changeName = ({ name }) => async (dispatch) => {
+  config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const body = JSON.stringify({
+    name,
+  });
+
+  try {
+    //loading first
+    dispatch({
+      type: actionTypes.LOADING,
+    });
+
+    const response = await axios.patch("/users/changeName", body, config);
+
+    dispatch({
+      type: actionTypes.CHANGE_NAME,
+      payload: response.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: actionTypes.CHANGE_NAME_ERROR,
+      payload: error?.response?.data?.msg,
+    });
+  }
+};
+
+//--------------------Change email----------------------
+export const changeEmail = ({ email }) => async (dispatch) => {
+  config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const body = JSON.stringify({
+    email,
+  });
+
+  try {
+    //loading first
+    dispatch({
+      type: actionTypes.LOADING,
+    });
+
+    const response = await axios.patch("/users/changeEmail", body, config);
+
+    dispatch({
+      type: actionTypes.CHANGE_EMAIL,
+      payload: response.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: actionTypes.CHANGE_EMAIL_ERROR,
+      payload: error?.response?.data?.msg,
+    });
+  }
+};
+
+//clear message
+export const clearMessage = () => (dispatch) => {
+  dispatch({
+    type: actionTypes.CLEAR_MESSAGE,
+  });
+};

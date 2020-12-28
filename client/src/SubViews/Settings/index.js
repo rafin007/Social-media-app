@@ -8,10 +8,12 @@ import {
   Switch,
   Typography,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserPrivacy, switchPrivacy, switchTheme } from "../../Actions/auth";
+import { switchTheme } from "../../Actions/auth";
 import ConfirmDialog from "../../Components/ConfirmDialog/ConfirmDialog";
+import Modal from "../../Components/Modal/Modal";
+import CustomAlert from "../../Components/CustomAlert/CustomAlert";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +56,7 @@ const Settings = () => {
     dispatch(switchTheme());
   };
 
-  //confirm modal logic
+  //confirm privacy confirmation logic
   const [open, setOpen] = useState(false);
 
   const canceledPrivacyChange = () => {
@@ -68,7 +70,7 @@ const Settings = () => {
   };
 
   const handlePrivacyChange = (event) => {
-    //open modal
+    //open privacy confirmation
 
     if (event.target.checked) {
       setIsprivate(true);
@@ -79,6 +81,46 @@ const Settings = () => {
 
     // dispatch(switchPrivacy());
   };
+
+  //-------------Password change modal------------------
+  const [passwordModal, setPasswordModal] = useState(false);
+
+  const passwordModalHandleCloser = () => {
+    setPasswordModal(false);
+  };
+
+  const openPasswordModal = () => {
+    setPasswordModal(true);
+  };
+
+  //password, name, email error and success
+  const error = useSelector((state) => state.auth.error);
+
+  const success = useSelector((state) => state.auth.success);
+
+  //-------------Name change modal------------------
+  const [nameModal, setNameModal] = useState(false);
+
+  const nameModalHandleCloser = () => {
+    setNameModal(false);
+  };
+
+  const openNameModal = () => {
+    setNameModal(true);
+  };
+
+  //-------------Email change modal------------------
+  const [emailModal, setEmailModal] = useState(false);
+
+  const emailModalHandleCloser = () => {
+    setEmailModal(false);
+  };
+
+  const openEmailModal = () => {
+    setEmailModal(true);
+  };
+
+  const user = useSelector((state) => state.auth.user);
 
   return (
     <Grid className={classes.root}>
@@ -119,7 +161,44 @@ const Settings = () => {
             />
           </ListItemSecondaryAction>
         </ListItem>
+        <ListItem>
+          <ListItemText primary="Change Password" onClick={openPasswordModal} />
+          <Modal
+            type="changePassword"
+            open={passwordModal}
+            handleClose={passwordModalHandleCloser}
+          />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="Change Name" onClick={openNameModal} />
+          <Modal
+            type="changeName"
+            name={user.name}
+            open={nameModal}
+            handleClose={nameModalHandleCloser}
+          />
+        </ListItem>
+        <ListItem>
+          <ListItemText primary="Change Email" onClick={openEmailModal} />
+          <Modal
+            type="changeEmail"
+            email={user.email}
+            open={emailModal}
+            handleClose={emailModalHandleCloser}
+          />
+        </ListItem>
       </List>
+      {success && (
+        <Grid>
+          <CustomAlert message={success} severity="success" />
+        </Grid>
+      )}
+
+      {error && (
+        <Grid>
+          <CustomAlert message={error} severity="error" />
+        </Grid>
+      )}
     </Grid>
   );
 };

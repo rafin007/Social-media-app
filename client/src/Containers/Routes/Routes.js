@@ -40,6 +40,7 @@ const Routes = () => {
       <Route path="/create" exact component={CreatePost} />
       <Route path="/edit/:post_id" exact component={EditPost} />
       <Route path="/post/:post_id" exact component={SinglePost} />
+      {/* <Route path="/changePassword" exact component={ChangePassword} /> */}
     </Switch>
   );
 };

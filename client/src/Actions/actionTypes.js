@@ -105,4 +105,18 @@ export const RESET_THEME = "RESET_THEME";
 
 //privacy
 export const SWITCH_PRIVACY = "SWITCH_PRIVACY";
-// export const GET_PRIVACY = "GET_PRIVACY";
+
+//change PASSWORD
+export const CHANGE_PASSWORD = "CHANGE_PASSWORD";
+export const CHANGE_PASSWORD_ERROR = "CHANGE_PASSWORD_ERROR";
+
+//change NAME
+export const CHANGE_NAME = "CHANGE_NAME";
+export const CHANGE_NAME_ERROR = "CHANGE_NAME_ERROR";
+
+//change EMAIL
+export const CHANGE_EMAIL = "CHANGE_EMAIL";
+export const CHANGE_EMAIL_ERROR = "CHANGE_EMAIL_ERROR";
+
+//clear error and success
+export const CLEAR_MESSAGE = "CLEAR_MESSAGE";

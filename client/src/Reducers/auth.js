@@ -10,6 +10,7 @@ const initialState = {
   error: null,
   theme: "light",
   privacy: false,
+  success: null,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -147,11 +148,38 @@ const authReducer = (state = initialState, action) => {
         privacy: payload.isPrivate,
       };
 
-    // case actionTypes.GET_PRIVACY:
-    //   return {
-    //     ...state,
-    //     privacy: payload.privacy,
-    //   };
+    case actionTypes.CHANGE_PASSWORD:
+      return {
+        ...state,
+        loading: false,
+        success: payload.msg,
+      };
+
+    case actionTypes.CHANGE_EMAIL:
+    case actionTypes.CHANGE_NAME:
+      return {
+        ...state,
+        loading: false,
+        success: payload.msg,
+        user: payload.user,
+      };
+
+    case actionTypes.CHANGE_PASSWORD_ERROR:
+    case actionTypes.CHANGE_NAME_ERROR:
+    case actionTypes.CHANGE_EMAIL_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: payload,
+      };
+
+    case actionTypes.CLEAR_MESSAGE:
+      return {
+        ...state,
+        error: null,
+        success: null,
+        errors: [],
+      };
 
     default:
       return state;
