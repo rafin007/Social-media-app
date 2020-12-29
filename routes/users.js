@@ -520,12 +520,12 @@ router.get("/get/privacy", auth, async (req, res) => {
 */
 router.put("/isPrivate", auth, async (req, res) => {
   try {
-    //if !isPrivate then make it true otherwise make it false and take everything from followRequests to following
+    //if !isPrivate then make it true otherwise make it false and take everything from followRequests and followers to following
     if (!req.user.isPrivate) {
       req.user.isPrivate = true;
     } else {
       req.user.isPrivate = false;
-      req.user.followers = [...req.user.followRequests];
+      req.user.followers = [...req.user.followRequests, ...req.user.followers];
       req.user.followRequests = [];
 
       //add this user's id to each follower's following list
