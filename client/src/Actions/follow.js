@@ -179,7 +179,7 @@ export const cancelFollowRequest = (user_id, id = null) => async (dispatch) => {
       type: actionTypes.CANCEL_FOLLOW_REQUEST,
     });
   } catch (err) {
-    const errors = err.response.data.errors;
+    const errors = err?.response?.data?.errors;
 
     dispatch({
       type: actionTypes.PROFILE_ERROR,

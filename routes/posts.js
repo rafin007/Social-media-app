@@ -2,14 +2,18 @@ const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const sharp = require("sharp");
+const mongoose = require("mongoose");
 
 const auth = require("../middlewares/auth");
 const isFollowing = require("../middlewares/isFollowing");
 const isFollowingPost = require("../middlewares/isFollowingPost");
 const Post = require("../models/Post");
 
+const getPaginatedPosts = require("../Utils/utils");
+
 //file upload
 const multer = require("multer");
+const User = require("../models/User");
 
 const upload = multer({
   limits: {
@@ -28,11 +32,30 @@ const upload = multer({
   },
 });
 
+/*  @route GET /posts
+    @desc Get all posts
+    @access Test
+*/
+router.get("/all/:page", async (req, res) => {
+  try {
+    const posts = await getPaginatedPosts(req.params.page);
+    // const posts = await Post.find();
+
+    // const toBeSent = [];
+
+    // toBeSent.push(posts[0]);
+    // toBeSent.push(posts[1]);
+
+    return res.send(posts);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 /*  @route POST /posts
     @desc Create a post
     @access Private
 */
-
 router.post(
   "/",
   [
@@ -87,13 +110,19 @@ router.post(
 );
 
 /*  @route GET /posts/me
-@desc Get all posts of logged in user
+    @desc Get all posts of logged in user
     @access Private
-    */
+*/
+//--------------------changed route-------------------
 router.get("/me", auth, async (req, res) => {
   try {
+    // const { limit, skip } = getPaginatedPosts(req.params.page);
+
     const posts = await Post.find({ user: req.user.id })
       .sort({ date: -1 })
+      // .skip(skip)
+      // .limit(limit)
+      // .select("-image")
       .populate("user", ["name", "avatar"]);
 
     if (posts.length === 0) {
@@ -146,23 +175,168 @@ router.get("/:post_id", [auth, isFollowingPost], async (req, res) => {
 @desc Get all posts of their following
 @access Private
 */
+//-----------------changed route----------------------
 router.get("/", auth, async (req, res) => {
   //map through req.user's following list
-  let posts = [];
   try {
+    // const { limit, skip } = getPaginatedPosts(req.params.page);
+
+    let posts = [];
     for (let follow of req.user.following) {
       //get the posts of the user
       let userPosts = await Post.find({ user: follow.user })
+        // .limit(1)
+        // .skip(skip)
         // .sort({ date: -1 })
+        // .select("-image");
         .populate("user", ["name", "avatar"]);
       posts.push(userPosts);
     }
+
+    // for (let follow of req.user.following) {
+    //   // .limit(limit)
+    //   // .skip(skip)
+    //   // .sort({ date: -1 })
+    //   // .sort({ date: -1 })
+    //   // .select(
+    //   //   "-image"
+    //   // )
+    //   for await (const post of Post.find({ user: follow.user }).populate(
+    //     "user",
+    //     ["name", "avatar"]
+    //   )) {
+    //     posts.push(post);
+    //   }
+    // }
+
+    // let aggs = [];
+
+    // for (let follow of req.user.following) {
+    //   aggs.push(
+    //     Post.aggregate([
+    //       { $unwind: "$user" },
+    //       {
+    //         $match: { user: follow.user },
+    //       },
+    //       {
+    //         $project: {
+    //           user: 1,
+    //           text: 1,
+    //           date: 1,
+    //         },
+    //       },
+    //     ])
+    //   );
+    // }
+
+    // for (let agg of aggs) {
+    //   for await (let post of agg) {
+    //     posts.push(post);
+    //   }
+    // }
+
+    // let users = {};
+
+    // for (let key in req.user.following) {
+    //   users[key] = req.user.following[key];
+    // }
+
+    // const agg = Post.aggregate([
+    //   {
+    //     $match: { user: "$users" },
+    //   },
+    //   {
+    //     $project: {
+    //       user: 1,
+    //       text: 1,
+    //       date: 1,
+    //     },
+    //   },
+    // ]);
+
+    // for await (let post of agg) {
+    //   posts.push(post);
+    // }
+
+    // for (let follow of req.user.following) {
+
+    // }
+
+    // const agg = User.aggregate([
+    //   {
+    //     $match: {
+    //       _id: req.user._id,
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "posts",
+    //       localField: "following.user",
+    //       foreignField: "user",
+    //       as: "follow_posts",
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       follow_posts: { $slice: ["$follow_posts", -5] },
+    //       // name: 1,
+    //       // avatar: 1,
+    //     },
+    //   },
+    // ]);
+
+    // for await (let post of agg) {
+    //   // res.send(post);
+    //   posts.push(post);
+    // }
+    // const posts = await agg.exec();
+
+    // console.log(posts[0]);
+
+    // const newPosts = [...posts[0].follow_posts];
+
+    // let finalPosts = [];
+
+    // for (let post of posts[0].follow_posts) {
+    //   let newPost = await Post.findById(post._id).populate("user", [
+    //     "name",
+    //     "avatar",
+    //   ]);
+
+    //   post.user = {
+    //     _id: newPost.user._id,
+    //     name: newPost.user.name,
+    //     avatar: newPost.user.avatar,
+    //   };
+
+    //   finalPosts.push(post);
+    // }
+
+    // const newPosts = posts[0].follow_posts.map(async (post) => {
+    //   let newPost = await Post.findById(post._id).populate("user", [
+    //     "name",
+    //     "avatar",
+    //   ]);
+
+    //   post.user = {
+    //     _id: newPost.user._id,
+    //     name: newPost.user.name,
+    //     avatar: newPost.user.avatar,
+    //   };
+
+    //   return post;
+    // });
+
+    // const newPosts = [...posts.follow_posts];
 
     //flatten the array
     posts = posts.flat();
 
     //sort posts in descending order by date
     posts.sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    // posts = posts.slice(0, 4);
+    // res.set("Content-Type", "application/json");
 
     res.send(posts);
   } catch (error) {

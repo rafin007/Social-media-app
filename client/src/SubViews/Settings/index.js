@@ -27,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
       padding: "0 20rem",
     },
   },
+  link: {
+    cursor: "pointer",
+  },
 }));
 
 const Settings = () => {
@@ -161,7 +164,7 @@ const Settings = () => {
             />
           </ListItemSecondaryAction>
         </ListItem>
-        <ListItem>
+        <ListItem className={classes.link}>
           <ListItemText primary="Change Password" onClick={openPasswordModal} />
           <Modal
             type="changePassword"
@@ -169,7 +172,7 @@ const Settings = () => {
             handleClose={passwordModalHandleCloser}
           />
         </ListItem>
-        <ListItem>
+        <ListItem className={classes.link}>
           <ListItemText primary="Change Name" onClick={openNameModal} />
           <Modal
             type="changeName"
@@ -178,7 +181,7 @@ const Settings = () => {
             handleClose={nameModalHandleCloser}
           />
         </ListItem>
-        <ListItem>
+        <ListItem className={classes.link}>
           <ListItemText primary="Change Email" onClick={openEmailModal} />
           <Modal
             type="changeEmail"

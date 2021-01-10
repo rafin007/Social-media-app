@@ -10,7 +10,8 @@ import { getPostById, editPost } from "../../Actions/post";
 import CustomAlert from "../../Components/CustomAlert/CustomAlert";
 import { useHistory, useParams } from "react-router-dom";
 import Spinner from "../../Components/Spinner/Spinner";
-import bufferToImage from "../../utils/bufferToImage";
+import { bufferToImage } from "../../utils/bufferToImage";
+// import bufferToImage from "../../utils/bufferToImage";
 
 const useStyles = makeStyles((theme) => ({
   root: {

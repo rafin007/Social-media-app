@@ -26,7 +26,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import Comment from "../Comment/Comment";
 import SimpleMenu from "../SimpleMenu/SimpleMenu";
-import bufferToImage from "../../utils/bufferToImage";
 import { useSelector, useDispatch } from "react-redux";
 import {
   removeLike,
@@ -36,6 +35,7 @@ import {
 } from "../../Actions/post";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { bufferToImage } from "../../utils/bufferToImage";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,6 +81,8 @@ const Post = ({ post, ...props }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  // console.log(post);
+
   //profile of the post owner
   const [profile, setProfile] = useState(null);
 
@@ -107,7 +109,10 @@ const Post = ({ post, ...props }) => {
   const [imageURL, setImageURL] = useState("");
   useEffect(() => {
     if (post.image) {
-      const imageUrl = bufferToImage(post.image.data);
+      let imageUrl;
+      if (post.image.data) {
+        imageUrl = bufferToImage(post.image.data);
+      }
       setImageURL(imageUrl);
     }
   }, [post]);

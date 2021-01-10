@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { makeStyles, Grid, Typography } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getAllPosts } from "../../Actions/post";
+import { clearPosts, getAllPosts } from "../../Actions/post";
 import Spinner from "../../Components/Spinner/Spinner";
 import Post from "../../Components/Post/Post";
 import FloatingAction from "../../Components/FloatingAction/FloatingAction";
@@ -53,6 +53,9 @@ const Posts = () => {
   const loading = useSelector((state) => state.post.loading);
 
   useEffect(() => {
+    //clear posts component first
+    dispatch(clearPosts());
+
     dispatch(getAllPosts());
   }, [dispatch]);
 

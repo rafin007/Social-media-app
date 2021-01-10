@@ -529,12 +529,20 @@ router.put("/isPrivate", auth, async (req, res) => {
       req.user.followRequests = [];
 
       //add this user's id to each follower's following list
-      req.user.followers.forEach(async (follower) => {
+      for (let follower of req.user.followers) {
         let user = await User.findById(follower.user);
 
-        user.following.unshift({ user: req.user.id });
+        //check if a particular follower is already following req.user
+        if (
+          user.following.filter(
+            (follow) => follow.user.toString() === req.user.id
+          ).length === 0
+        ) {
+          user.following.unshift({ user: req.user.id });
+        }
+
         await user.save();
-      });
+      }
     }
 
     await req.user.save();

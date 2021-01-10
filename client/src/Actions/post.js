@@ -107,6 +107,7 @@ export const getAllPosts = () => async (dispatch) => {
     //loading first
     dispatch({ type: actionTypes.POST_LOADING });
 
+    //need to change with dynamic page
     const response = await axios.get("/posts/me");
 
     dispatch({
@@ -320,6 +321,8 @@ export const getFeedPosts = () => async (dispatch) => {
     });
 
     const response = await axios.get("/posts");
+
+    // console.log(response.data);
 
     //send back data
     dispatch({
