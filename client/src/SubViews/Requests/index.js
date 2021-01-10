@@ -1,19 +1,10 @@
 import React from "react";
-import {
-  Grid,
-  makeStyles,
-  List,
-  IconButton,
-  Typography,
-  useTheme,
-} from "@material-ui/core";
+import { Grid, makeStyles, List, Typography } from "@material-ui/core";
 import { useEffect } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Spinner from "../../Components/Spinner/Spinner";
-import User from "../../Components/Users/User/User";
-import { ArrowBackIos } from "@material-ui/icons";
 import { useSelector, useDispatch } from "react-redux";
-import { getFollowers, getFollowRequests } from "../../Actions/follow";
+import { getFollowRequests } from "../../Actions/follow";
 import RequestEvaluate from "./RequestEvaluate";
 
 const useStyles = makeStyles((theme) => ({
@@ -71,23 +62,25 @@ const Requests = () => {
     return <Typography>You do not have any follow requests pending</Typography>;
   } else if (!isPrivate) {
     return (
-      <Typography>
-        Please turn on private account in{" "}
-        <Link
-          to="/settings"
-          // style={{ color: theme.palette.primary, textDecoration: "none" }}
-          className={classes.link4}
-        >
-          settings
-        </Link>{" "}
-        to further receive follow requests
-      </Typography>
+      <Grid className={classes.root}>
+        <Typography>
+          Please turn on private account in{" "}
+          <Link
+            to="/settings"
+            // style={{ color: theme.palette.primary, textDecoration: "none" }}
+            className={classes.link4}
+          >
+            settings
+          </Link>{" "}
+          to further receive follow requests
+        </Typography>
+      </Grid>
     );
   }
 
   return (
     <Grid container className={classes.root}>
-      <Typography variant="h5" color="primary">
+      <Typography variant="h6" color="primary">
         {/* {!user_id
           ? "Your followers"
           : `${state && state.profile.user.name}'s followers`} */}

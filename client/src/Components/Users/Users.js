@@ -10,6 +10,7 @@ import {
 } from "../../Actions/profile";
 import Spinner from "../Spinner/Spinner";
 import User from "./User/User";
+import CustomAlert from "../CustomAlert/CustomAlert";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -70,6 +71,8 @@ const Users = () => {
   //   return null;
   // }
 
+  const errors = useSelector((state) => state.profile.errors);
+
   return (
     <Grid item xs={12}>
       <TextField
@@ -90,6 +93,13 @@ const Users = () => {
         }}
       />
       <List>{loading ? <Spinner /> : jsx}</List>
+      <Grid item xs={10} md={6} lg={4}>
+        {errors &&
+          errors.length > 0 &&
+          errors.map((error, i) => (
+            <CustomAlert message={error} key={i} severity="error" />
+          ))}
+      </Grid>
     </Grid>
   );
 };

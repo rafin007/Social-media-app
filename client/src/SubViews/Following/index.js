@@ -1,16 +1,9 @@
 import React from "react";
-import {
-  Grid,
-  makeStyles,
-  List,
-  IconButton,
-  Typography,
-} from "@material-ui/core";
+import { Grid, makeStyles, List, Typography } from "@material-ui/core";
 import { useEffect } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Spinner from "../../Components/Spinner/Spinner";
 import User from "../../Components/Users/User/User";
-import { ArrowBackIos } from "@material-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getFollowings } from "../../Actions/follow";
 
@@ -59,9 +52,28 @@ const Following = () => {
     dispatch(getFollowings(user_id));
   }, [dispatch, user_id]);
 
+  let jsx = null;
+
+  if (profiles && profiles.length === 0) {
+    jsx = (
+      <Typography>
+        <Typography>
+          {!user_id
+            ? "You are not following anyone"
+            : `${state && state.profile.user.name} is not following anyone`}
+        </Typography>
+      </Typography>
+    );
+  } else if (profiles && profiles.length > 0) {
+    jsx =
+      profiles &&
+      profiles.length > 0 &&
+      profiles.map((profile) => <User key={profile._id} profile={profile} />);
+  }
+
   return (
     <Grid container className={classes.root}>
-      <Typography variant="h5" color="primary">
+      <Typography variant="h6" color="primary">
         {!user_id
           ? "Your followings"
           : `${state && state.profile.user.name}'s followings`}
@@ -78,17 +90,7 @@ const Following = () => {
         </Link>
       </Grid> */}
       <Grid item xs={12}>
-        <List>
-          {loading ? (
-            <Spinner />
-          ) : (
-            profiles &&
-            profiles.length > 0 &&
-            profiles.map((profile) => (
-              <User key={profile._id} profile={profile} />
-            ))
-          )}
-        </List>
+        <List>{loading ? <Spinner /> : jsx}</List>
       </Grid>
     </Grid>
   );

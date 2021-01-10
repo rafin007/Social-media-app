@@ -214,27 +214,6 @@ const Profile = () => {
         alignItems="stretch"
         className={classes.root}
       >
-        <Grid item xs={12}>
-          {/* <Link
-            to={{
-              pathname: "/home",
-              state: {
-                tab: 1,
-              },
-            }}
-            className={classes.link}
-          > */}
-          <IconButton
-            aria-label="go back"
-            color="primary"
-            size="small"
-            onClick={history.goBack}
-          >
-            <ArrowBackIos />
-            back
-          </IconButton>
-          {/* </Link> */}
-        </Grid>
         <Grid item xs={6}>
           <Avatar
             image={profile && profile.user.avatar && profile.user.avatar}

@@ -754,6 +754,19 @@ router.put("/cancelRequest/:user_id", auth, async (req, res) => {
       return res.status(404).send({ errors: [{ msg: "No user found" }] });
     }
 
+    //check if the logged in user is in the user's follower's list
+    if (
+      user.followers.filter(
+        (follower) => follower.user.toString() === req.user.id
+      ).length > 0
+    ) {
+      return res
+        .status(400)
+        .send({
+          errors: [{ msg: "This user has already accepted your request!" }],
+        });
+    }
+
     //check if the user's account is indeed private
     if (!user.isPrivate) {
       return res
@@ -766,7 +779,7 @@ router.put("/cancelRequest/:user_id", auth, async (req, res) => {
       (followReq) => followReq.user.toString() === req.user.id
     );
 
-    //check if the logged in user is in the user's followRequests
+    //check if the logged in user is not in the user's followRequests
     if (index === -1) {
       return res.status(404).send({
         errors: [{ msg: "You have not requested to follow this user" }],
