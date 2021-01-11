@@ -192,6 +192,7 @@ const CreatePost = (props) => {
                 className={classes.removeImage}
                 onClick={() => {
                   setFileURL("");
+                  setFile("");
                 }}
               >
                 Remove Image
