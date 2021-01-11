@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Grid,
-  makeStyles,
-  Typography,
-  Button,
-  IconButton,
-} from "@material-ui/core";
+import { Grid, makeStyles, Typography, Button } from "@material-ui/core";
 import Avatar from "../Avatar/Avatar";
 import ProfileTabs from "./ProfileTabs";
 import Bio from "./Bio";
@@ -16,7 +10,6 @@ import Spinner from "../Spinner/Spinner";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { useEffect } from "react";
 import { getProfileById } from "../../Actions/profile";
-import { ArrowBackIos } from "@material-ui/icons";
 import {
   cancelFollowRequest,
   followUserById,
@@ -297,7 +290,7 @@ const Profile = () => {
           />
         </Grid>
         {pageContent}
-        <Grid item xs={12} md={6} lg={4}>
+        <Grid item xs={12} md={6} lg={4} justify="center">
           {!loading &&
             !isFollowing &&
             profile &&

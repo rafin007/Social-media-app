@@ -21,7 +21,7 @@ import {
   Button,
   Grid,
 } from "@material-ui/core";
-import Moment from "react-moment";
+import ReactMoment from "react-moment";
 import { useState } from "react";
 import { useEffect } from "react";
 import Comment from "../Comment/Comment";
@@ -237,9 +237,10 @@ const Post = ({ post, ...props }) => {
           <Fragment>
             {/* <Moment fromNow >{post.date}</Moment>
                         <br /> */}
-            <Moment format="D MMM YYYY HH:mm" withTitle>
+            <ReactMoment format="D MMM YYYY h:mm A" withTitle>
               {post.date}
-            </Moment>
+            </ReactMoment>
+            {/* {moment(post.date).format("ddd h:mm A")} */}
           </Fragment>
         }
       />

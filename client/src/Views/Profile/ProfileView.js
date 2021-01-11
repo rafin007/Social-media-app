@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Grid,
-  Paper,
   makeStyles,
   Typography,
   Button,

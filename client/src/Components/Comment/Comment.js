@@ -13,7 +13,7 @@ import {
 import { MoreVert } from "@material-ui/icons";
 import SimpleMenu from "../SimpleMenu/SimpleMenu";
 import axios from "axios";
-import Moment from "react-moment";
+import ReactMoment from "react-moment";
 import { useSelector, useDispatch } from "react-redux";
 import { editCommentOnPostById } from "../../Actions/post";
 import Avatar from "../Avatar/Avatar";
@@ -131,9 +131,9 @@ const Comment = ({ comment, postId }) => {
             <Fragment>
               <Typography variant="body1">{comment.text}</Typography>
               <Typography variant="body2">
-                <Moment format="D MMM YYYY HH:mm" withTitle>
+                <ReactMoment format="D MMM YYYY h:mm A" withTitle>
                   {comment.date}
-                </Moment>
+                </ReactMoment>
               </Typography>
             </Fragment>
           }

@@ -7,9 +7,6 @@ const Requests = React.lazy(() => import("../../SubViews/Requests"));
 const Settings = React.lazy(() => import("../../SubViews/Settings"));
 const Logout = React.lazy(() => import("../../SubViews/Logout"));
 const ProfileView = React.lazy(() => import("../../Views/Profile/ProfileView"));
-const NotificationsView = React.lazy(() =>
-  import("../../Views/Notifications/NotificationsView")
-);
 const HomeView = React.lazy(() => import("../../Views/Home/HomeView"));
 const ViewProfile = React.lazy(() => import("../../Components/Profile"));
 const CreatePost = React.lazy(() =>
@@ -32,7 +29,6 @@ const Routes = () => {
       <Route path="/settings" exact component={Settings} />
       <Route path="/logout" exact component={Logout} />
       <Route path="/profile" exact component={ProfileView} />
-      <Route path="/notifications" exact component={NotificationsView} />
       <Route path="/home" exact component={HomeView} />
       <Route path="/profile/:id" exact component={ViewProfile} />
       <Route path="/followers/:user_id" exact component={Followers} />
@@ -40,7 +36,6 @@ const Routes = () => {
       <Route path="/create" exact component={CreatePost} />
       <Route path="/edit/:post_id" exact component={EditPost} />
       <Route path="/post/:post_id" exact component={SinglePost} />
-      {/* <Route path="/changePassword" exact component={ChangePassword} /> */}
     </Switch>
   );
 };
