@@ -1,16 +1,1 @@
-node_modules/
-config/default.json
-
-# dependencies
-client/node_modules
-client/.pnp
-client/.pnp.js
-
-# testing
-client/coverage
-
-# production
-client/build
-
-#.env
-# client/.env
+node_modules
