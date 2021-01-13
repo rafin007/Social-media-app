@@ -51,6 +51,7 @@ const authReducer = (state = initialState, action) => {
       };
 
     case actionTypes.LOGOUT:
+    case actionTypes.DELETE_ACCOUNT: //-------------testing required----------------
       localStorage.removeItem("token");
       return initialState;
 

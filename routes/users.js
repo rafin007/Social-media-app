@@ -7,6 +7,7 @@ const sharp = require("sharp");
 const bcryptjs = require("bcryptjs");
 
 const User = require("../models/User");
+const Post = require("../models/Post");
 const Profile = require("../models/Profile");
 const auth = require("../middlewares/auth");
 // const isVerified = require('../middlewares/isVerified');
@@ -373,7 +374,9 @@ router.get("/confirmation/:token", async (req, res) => {
       return res.status(400).send({ msg: "Link expired" });
     }
 
-    return res.redirect(`http://localhost:3000/recoverPassword/${token}`);
+    return res.redirect(
+      `${config.get("frontendURL")}/recoverPassword/${token}`
+    );
   } catch (error) {
     console.log("Server error");
     res.status(500).send("Server error");
@@ -760,11 +763,9 @@ router.put("/cancelRequest/:user_id", auth, async (req, res) => {
         (follower) => follower.user.toString() === req.user.id
       ).length > 0
     ) {
-      return res
-        .status(400)
-        .send({
-          errors: [{ msg: "This user has already accepted your request!" }],
-        });
+      return res.status(400).send({
+        errors: [{ msg: "This user has already accepted your request!" }],
+      });
     }
 
     //check if the user's account is indeed private
@@ -1177,6 +1178,156 @@ router.get("/get/theme", auth, (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("Server error");
+  }
+});
+
+/*  @route DELETE /users/deleteAccount
+    @desc Delete user's account
+    @access Private
+*/
+router.delete("/deleteAccount", auth, async (req, res) => {
+  try {
+    //delete all post of the user first
+    await Post.deleteMany({ user: req.user.id });
+
+    //remove req.user from their followers', followings' and other people's request list
+
+    //loop through users where req.user might be in followers and remove that entry
+    for (let follow of req.user.following) {
+      const user = await User.findById(follow.user).select("-avatar");
+
+      const index = user.followers.findIndex(
+        (follower) => follower.user.toString() === req.user.id
+      );
+
+      if (index !== -1) {
+        user.followers.splice(index, 1);
+
+        await user.save();
+      }
+    }
+
+    //loop through users where req.user might be in following and remove that entry
+    for (let follow of req.user.followers) {
+      const user = await User.findById(follow.user).select("-avatar");
+
+      const index = user.following.findIndex(
+        (follower) => follower.user.toString() === req.user.id
+      );
+
+      if (index !== -1) {
+        user.following.splice(index, 1);
+
+        await user.save();
+      }
+    }
+
+    //get all the users
+    const users = await User.find().select("-avatar");
+
+    //check if the req.user is in any user's follow requests, if so then remove that index
+    for (let user of users) {
+      const index = user.followRequests.findIndex(
+        (follower) => follower.user.toString() === req.user.id
+      );
+
+      if (index !== -1) {
+        user.followRequests.splice(index, 1);
+
+        await user.save();
+      }
+    }
+
+    //delete the profile of the user
+    await Profile.findOneAndDelete({ user: req.user.id });
+
+    //lastly delete the user
+    const user = await User.findByIdAndDelete(req.user.id);
+
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error.message);
+    console.log(error.message);
+  }
+});
+
+//--------------Special route---------------------------
+/*  @route DELETE /users/deleteAccount/:user_id
+    @desc Delete user's account
+    @access ADMIN
+*/
+router.delete("/deleteAccount/:user_id", async (req, res) => {
+  try {
+    //check if user exists
+    const selectedUser = await User.findById(req.params.user_id).select(
+      "-avatar"
+    );
+
+    if (!selectedUser) {
+      return res.status(400).send({ msg: "No user found!" });
+    }
+
+    //delete all post of the user first
+    await Post.deleteMany({ user: req.params.user_id });
+
+    //remove req.params.user_id from their followers', followings' and other people's request list
+
+    //loop through users where req.params.user_id might be in followers and remove that entry
+    for (let follow of selectedUser.following) {
+      const user = await User.findById(follow.user).select("-avatar");
+
+      const index = user.followers.findIndex(
+        (follower) => follower.user.toString() === selectedUser.id
+      );
+
+      if (index !== -1) {
+        user.followers.splice(index, 1);
+
+        await user.save();
+      }
+    }
+
+    //loop through users where req.user might be in following and remove that entry
+    for (let follow of selectedUser.followers) {
+      const user = await User.findById(follow.user).select("-avatar");
+
+      const index = user.following.findIndex(
+        (follower) => follower.user.toString() === selectedUser.id
+      );
+
+      if (index !== -1) {
+        user.following.splice(index, 1);
+
+        await user.save();
+      }
+    }
+
+    //get all the users
+    const users = await User.find().select("-avatar");
+
+    //check if the req.params.user_id is in any user's follow requests, if so then remove that index
+    for (let user of users) {
+      const index = user.followRequests.findIndex(
+        (follower) => follower.user.toString() === selectedUser.id
+      );
+
+      if (index !== -1) {
+        user.followRequests.splice(index, 1);
+
+        await user.save();
+      }
+    }
+
+    //delete the profile of the user
+    await Profile.findOneAndDelete({ user: selectedUser.id });
+
+    //lastly delete the user
+    await User.findByIdAndDelete(selectedUser.id);
+
+    res.send("Done");
+  } catch (error) {
+    res.status(500).send(error.message);
+    console.log(error.message);
   }
 });
 

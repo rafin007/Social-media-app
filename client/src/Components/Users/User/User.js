@@ -61,7 +61,7 @@ const User = ({ profile }) => {
     let mounted = true;
     if (mounted) {
       axios
-        .get(`/users/checkFollow/${profile.user._id}`)
+        .get(`/users/checkFollow/${profile?.user._id}`)
         .then((response) => setFollowStatus(response.data.status))
         .catch((error) => console.log(error));
     }

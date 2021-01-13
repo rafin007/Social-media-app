@@ -334,3 +334,23 @@ export const clearMessage = () => (dispatch) => {
     type: actionTypes.CLEAR_MESSAGE,
   });
 };
+
+//----------------delete account----------------
+export const deleteAccount = () => async (dispatch) => {
+  try {
+    //loading first
+    dispatch({
+      type: actionTypes.LOADING,
+    });
+
+    const response = await axios.delete("/users/deleteAccount");
+
+    //fire away delete
+    dispatch({
+      type: actionTypes.DELETE_ACCOUNT,
+      payload: response.data,
+    });
+  } catch (error) {
+    console.log(error.response.data);
+  }
+};

@@ -120,3 +120,6 @@ export const CHANGE_EMAIL_ERROR = "CHANGE_EMAIL_ERROR";
 
 //clear error and success
 export const CLEAR_MESSAGE = "CLEAR_MESSAGE";
+
+//delete account
+export const DELETE_ACCOUNT = "DELETE_ACCOUNT";

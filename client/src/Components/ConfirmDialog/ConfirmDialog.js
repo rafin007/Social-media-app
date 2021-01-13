@@ -9,6 +9,7 @@ import Slide from "@material-ui/core/Slide";
 import { useDispatch } from "react-redux";
 import { unfollowUserById } from "../../Actions/follow";
 import { switchPrivacy } from "../../Actions/auth";
+import { Typography } from "@material-ui/core";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -43,12 +44,14 @@ const ConfirmDialog = ({ user, ...props }) => {
         TransitionComponent={Transition}
         keepMounted
         onClose={props.handleClose}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
+        aria-labelledby="alert-dialog-slide-unfollow-user"
+        aria-describedby="alert-dialog-slide-confirm-unfollow-user"
       >
-        <DialogTitle id="alert-dialog-slide-title">Unfollow user?</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-unfollow-user">
+          Unfollow user?
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
+          <DialogContentText id="alert-dialog-slide-confirm-unfollow-user">
             If you change your mind, you'll have to request to follow{" "}
             {user.name} again.
           </DialogContentText>
@@ -63,6 +66,38 @@ const ConfirmDialog = ({ user, ...props }) => {
         </DialogActions>
       </Dialog>
     );
+  } else if (props.criteria === "deleteAccount") {
+    jsx = (
+      <Dialog
+        open={props.open}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={props.handleClose}
+        aria-labelledby="alert-dialog-slide-delete-account"
+        aria-describedby="alert-dialog-slide-confirm-delete-account"
+      >
+        <DialogTitle id="alert-dialog-slide-delete-account">
+          Delete Account?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-confirm-delete-account">
+            Please be certain. Once you click{" "}
+            <Typography color="secondary" component="span">
+              Delete Account
+            </Typography>
+            , there is no going back.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={props.handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={props.deleteAccount} color="secondary">
+            Delete Account
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
   } else if (props.criteria === "change privacy") {
     jsx = (
       <Dialog
@@ -70,10 +105,12 @@ const ConfirmDialog = ({ user, ...props }) => {
         TransitionComponent={Transition}
         keepMounted
         onClose={props.handleClose}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
+        aria-labelledby="alert-dialog-slide-change-privacy"
+        aria-describedby="alert-dialog-slide-confirm-to-change-privacy"
       >
-        <DialogTitle id="alert-dialog-slide-title">Change Privacy?</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-privacy">
+          Change Privacy?
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
             This will impact how your future followers will connect with you.
@@ -96,14 +133,14 @@ const ConfirmDialog = ({ user, ...props }) => {
         TransitionComponent={Transition}
         keepMounted
         onClose={props.handleClose}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
+        aria-labelledby="alert-dialog-slide-delete-comment-or-post"
+        aria-describedby="alert-dialog-slide-confirm-delete-comment-or-post"
       >
-        <DialogTitle id="alert-dialog-slide-title">
+        <DialogTitle id="alert-dialog-slide-delete-comment-or-post">
           Delete this {props.criteria}?
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
+          <DialogContentText id="alert-dialog-slide-delete-comment-or-post">
             Are you sure you want to delete this {props.criteria}? This action
             cannot be undone.
           </DialogContentText>

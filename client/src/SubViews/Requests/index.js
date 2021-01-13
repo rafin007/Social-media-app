@@ -59,7 +59,11 @@ const Requests = () => {
   const isPrivate = useSelector((state) => state.auth.user.isPrivate);
 
   if (isPrivate && profiles && profiles.length === 0) {
-    return <Typography>You do not have any follow requests pending</Typography>;
+    return (
+      <Grid className={classes.root}>
+        <Typography>You do not have any follow requests pending</Typography>
+      </Grid>
+    );
   } else if (!isPrivate) {
     return (
       <Grid className={classes.root}>

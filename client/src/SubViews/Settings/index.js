@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { switchTheme } from "../../Actions/auth";
+import { deleteAccount, switchTheme } from "../../Actions/auth";
 import ConfirmDialog from "../../Components/ConfirmDialog/ConfirmDialog";
 import Modal from "../../Components/Modal/Modal";
 import CustomAlert from "../../Components/CustomAlert/CustomAlert";
@@ -123,11 +123,26 @@ const Settings = () => {
     setEmailModal(true);
   };
 
+  //-------------Delete account modal------------------
+  const [deleteAccountModal, setDeleteAccountModal] = useState(false);
+
+  const deleteAccountModalCloser = () => {
+    setDeleteAccountModal(false);
+  };
+
+  const openDeleteAccountModal = () => {
+    setDeleteAccountModal(true);
+  };
+
+  const deleteAccountHandler = () => {
+    dispatch(deleteAccount());
+  };
+
   const user = useSelector((state) => state.auth.user);
 
   return (
     <Grid className={classes.root}>
-      <Typography variant="h5" color="primary" gutterBottom>
+      <Typography variant="h6" color="primary" gutterBottom>
         Settings
       </Typography>
       <List>
@@ -188,6 +203,19 @@ const Settings = () => {
             email={user.email}
             open={emailModal}
             handleClose={emailModalHandleCloser}
+          />
+        </ListItem>
+        <ListItem className={classes.link}>
+          <ListItemText
+            primaryTypographyProps={{ color: "secondary" }}
+            primary="Delete Account"
+            onClick={openDeleteAccountModal}
+          />
+          <ConfirmDialog
+            handleClose={deleteAccountModalCloser}
+            open={deleteAccountModal}
+            criteria="deleteAccount"
+            deleteAccount={deleteAccountHandler}
           />
         </ListItem>
       </List>

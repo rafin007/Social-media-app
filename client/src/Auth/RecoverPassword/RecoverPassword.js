@@ -102,7 +102,7 @@ const RecoverPassword = () => {
       className={classes.root}
     >
       <Grid item xs={12}>
-        <Typography color="primary" variant="h4" gutterBottom align="center">
+        <Typography color="primary" variant="h5" gutterBottom align="center">
           Please choose a new password
         </Typography>
       </Grid>

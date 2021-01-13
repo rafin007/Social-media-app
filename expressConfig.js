@@ -3,10 +3,10 @@ const express = require("express");
 const cors = require("cors");
 
 // import all the route modules
-const users = require("../routes/users");
-const posts = require("../routes/posts");
-const profile = require("../routes/profile");
-const auth = require("../routes/auth");
+const users = require("./routes/users");
+const posts = require("./routes/posts");
+const profile = require("./routes/profile");
+const auth = require("./routes/auth");
 
 module.exports.init = () => {
   const app = express();

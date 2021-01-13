@@ -2,18 +2,14 @@ const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const sharp = require("sharp");
-const mongoose = require("mongoose");
 
 const auth = require("../middlewares/auth");
 const isFollowing = require("../middlewares/isFollowing");
 const isFollowingPost = require("../middlewares/isFollowingPost");
 const Post = require("../models/Post");
 
-const getPaginatedPosts = require("../Utils/utils");
-
 //file upload
 const multer = require("multer");
-const User = require("../models/User");
 
 const upload = multer({
   limits: {
@@ -36,9 +32,11 @@ const upload = multer({
     @desc Get all posts
     @access Test
 */
-router.get("/all/:page", async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
-    const posts = await getPaginatedPosts(req.params.page);
+    const posts = await Post.find().select("-image");
+
+    console.log(posts.length);
     // const posts = await Post.find();
 
     // const toBeSent = [];

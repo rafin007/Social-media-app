@@ -102,12 +102,14 @@ export const getFollowers = (user_id = null) => async (dispatch) => {
     });
   } catch (err) {
     console.log(err);
-    const errors = err.response.data.errors;
+    const errors = err?.response?.data?.errors;
 
-    dispatch({
-      type: actionTypes.PROFILE_ERROR,
-      payload: errors.map((error) => error.msg),
-    });
+    if (errors) {
+      dispatch({
+        type: actionTypes.PROFILE_ERROR,
+        payload: errors.map((error) => error.msg),
+      });
+    }
   }
 };
 
@@ -132,12 +134,14 @@ export const getFollowings = (user_id = null) => async (dispatch) => {
       payload: response.data,
     });
   } catch (err) {
-    const errors = err.response.data.errors;
+    const errors = err?.response?.data?.errors;
 
-    dispatch({
-      type: actionTypes.PROFILE_ERROR,
-      payload: errors.map((error) => error.msg),
-    });
+    if (errors) {
+      dispatch({
+        type: actionTypes.PROFILE_ERROR,
+        payload: errors.map((error) => error.msg),
+      });
+    }
   }
 };
 

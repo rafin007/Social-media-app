@@ -84,7 +84,7 @@ const RecoverPassword = () => {
       alignItems="center"
       className={classes.root}
     >
-      <Typography color="primary" variant="h5" gutterBottom align="center">
+      <Typography color="primary" variant="h6" gutterBottom align="center">
         Please input your email to recover your password
       </Typography>
       <Grid item xs={12}></Grid>
