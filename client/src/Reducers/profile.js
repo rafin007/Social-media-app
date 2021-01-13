@@ -6,6 +6,7 @@ const initialState = {
   searchedProfiles: [],
   loading: false,
   errors: [],
+  loadFollow: false,
 };
 
 const profileReducer = (state = initialState, action) => {
@@ -57,12 +58,24 @@ const profileReducer = (state = initialState, action) => {
       return initialState;
 
     case actionTypes.GET_PROFILES:
+      return {
+        ...state,
+        loading: false,
+        profiles: payload,
+      };
+
+    case actionTypes.LOAD_FOLLOW:
+      return {
+        ...state,
+        loadFollow: true,
+      };
+
     case actionTypes.GET_FOLLOWERS:
     case actionTypes.GET_FOLLOWINGS:
     case actionTypes.GET_FOLLOW_REQUESTS:
       return {
         ...state,
-        loading: false,
+        loadFollow: false,
         profiles: payload,
       };
 

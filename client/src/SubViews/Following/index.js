@@ -43,7 +43,7 @@ const Following = () => {
   const dispatch = useDispatch();
 
   //loading state
-  const loading = useSelector((state) => state.profile.loading);
+  const loading = useSelector((state) => state.profile.loadFollow);
 
   //profiles state
   const profiles = useSelector((state) => state.profile.profiles);

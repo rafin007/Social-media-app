@@ -83,10 +83,12 @@ export const unfollowUserById = (user_id, id = null) => async (dispatch) => {
 //----------------Get followers' profiles for a particular user---------------------
 export const getFollowers = (user_id = null) => async (dispatch) => {
   try {
-    //loading first
     // dispatch({ type: actionTypes.LOADING });
     dispatch({ type: actionTypes.CLEAR_PROFILE });
     dispatch({ type: actionTypes.CLEAR_PROFILES });
+
+    //loading first
+    dispatch({ type: actionTypes.LOAD_FOLLOW });
 
     let response = null;
 
@@ -116,10 +118,11 @@ export const getFollowers = (user_id = null) => async (dispatch) => {
 //----------------Get followings' profiles for a particular user---------------------
 export const getFollowings = (user_id = null) => async (dispatch) => {
   try {
-    //loading first
-    // dispatch({ type: actionTypes.LOADING });
     dispatch({ type: actionTypes.CLEAR_PROFILE });
     dispatch({ type: actionTypes.CLEAR_PROFILES });
+
+    //loading first
+    dispatch({ type: actionTypes.LOAD_FOLLOW });
 
     let response = null;
 
@@ -154,6 +157,9 @@ export const getFollowRequests = () => async (dispatch) => {
     dispatch({
       type: actionTypes.CLEAR_PROFILES,
     });
+
+    //loading first
+    dispatch({ type: actionTypes.LOAD_FOLLOW });
 
     const response = await axios.get("/users/followRequests");
 

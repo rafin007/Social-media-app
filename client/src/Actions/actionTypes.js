@@ -73,6 +73,9 @@ export const SEARCH_FOLLOWINGS = "SEARCH_FOLLOWINGS";
 //follow loading
 export const FOLLOW_LOADING = "FOLLOW_LOADING";
 
+//load follow
+export const LOAD_FOLLOW = "LOAD_FOLLOW";
+
 //post
 export const POST_LOADING = "POST_LOADING";
 export const CREATE_POST = "CREATE_POST";
