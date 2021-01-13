@@ -10,9 +10,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const forgetPassword = async (email, name, token) => {
-  const url = `http://localhost:${
-    process.env.PORT || 5000
-  }/users/confirmation/${token}`;
+  const url = `${config.get("frontendURL")}/users/confirmation/${token}`;
 
   try {
     const mailOptions = {
