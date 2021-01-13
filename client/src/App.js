@@ -7,10 +7,6 @@ import { Provider } from "react-redux";
 import setAuthToken from "./utils/setAuthToken";
 import { loadUser } from "./Actions/auth";
 import ThemeLayout from "./ThemeLayout";
-import setAxios from "./setAxios";
-
-//set axios base URL
-setAxios();
 
 //when the app is loaded, if there is a token found in localStorage, then set it to axios headers
 if (localStorage.token) {
