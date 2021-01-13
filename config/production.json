@@ -1,7 +1,7 @@
 {
-  "mongoURI": "mongodb+srv://arefin:arefin@socialmedia-sntw6.gcp.mongodb.net/test?retryWrites=true&w=majority",
+  "mongoURI": "mongodb+srv://arefin:arefin@socialmedia-sntw6.gcp.mongodb.net/final?retryWrites=true&w=majority",
   "jwtSecret": "thisisthesecrettoken",
   "email": "arefinmehediapps@gmail.com",
   "pass": "8CUz3DRSUnnDuvX",
-  "frontendURL": "http://localhost:3000"
+  "frontendURL": "https://social-media69.herokuapp.com"
 }
