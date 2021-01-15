@@ -11,7 +11,7 @@
 * Other CRUD operations
 
 **Technologies used:**
-* MongoDB Atlast
+* MongoDB Atlas
 * React.js
 * Express
 * Node
