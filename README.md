@@ -3,6 +3,7 @@
 
 **Features:**
 * Dark mode
+* User authentication
 * Password recovery via email
 * Create posts as pictures or statuses
 * Like or comment on pictures
